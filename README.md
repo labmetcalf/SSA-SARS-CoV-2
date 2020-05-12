@@ -17,22 +17,10 @@ You should find yourself in a new local RStudio Project with the cloned repo and
 
 The Happy Git and Github with R is a great resource, in particular if you're having issues check out [this section](https://happygitwithr.com/connect-intro.htm)].
 
-### Option 1: on the command line
+### On the command line
 
 ```git clone https://github.com/labmetcalf/covid19-africa.git```
-
-## The three git commands you need to know
-
-commit (your own work)
-pull (changes anyone else or if you're working on a separate branch, you yourself,  have made on the remote)
-push
-merge
-
-What if I pull & there are merge conflicts?
-- You can go back to your previous state:
-```git reset --hard HEAD``
-- This is why it's important to commit all changes before you pull!
-    - If you want to eventually push up.
+```git remote add origin https://github.com/labmetcalf/covid19-afr```
 
 ## Options for contributing
 
@@ -51,7 +39,23 @@ What if I pull & there are merge conflicts?
     - Then pull from that before pushing up to your own remote
     ```git pull upstream master`` (the --ff-only tag )```
     - Finally push to your own remote with the little green button
-
+    
+    ## The git commands you need to know
+    
+    - ```commit``` (your own work)
+    - ```pull``` (changes anyone else or if you're working on a separate branch, you yourself,  have made on the remote)
+    - ```push``` (to your remote)
+    - ```merge``` (two branches)
+    
+    What if I pull & there are merge conflicts?
+    - You can go back to your previous state:
+    ```git reset --hard HEAD```
+    - You'll eventually need to fix the merge conflicts though if you want to push up!
+    
+    Resources: 
+    - [happy git with r](https://happygitwithr.com)
+    - [https://git-scm.com](https://git-scm.com)
+    
 ## Repository Structure
 
 ```
@@ -61,16 +65,23 @@ What if I pull & there are merge conflicts?
 │   ├── agedem
 │   ├── climate
 │   ├── comorbidities
-│   ├── healthcap
-│   └── travel
+│   ├── health_access
+│   ├── health_capacity
+│   └── mobility
 ├── bash
 ├── data
 │   ├── processed
+│   │   ├── alegana_ttimes_reporting
+│   │   └── shapefiles
 │   └── raw
-|── docs
+│       ├── Africa_1km_Age_structures_2020
+│       ├── alegana_pseek.tif
+│       └── alegana_ttimes
+├── docs
 ├── output
 └── shiny
 ```
+Note the raw data files are not included in the repository due to file size!
 
 ### Avoiding  setwd()
 If you open the .Rproj and work from there, you do not need to set the working directory! 
