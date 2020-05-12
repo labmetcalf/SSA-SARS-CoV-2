@@ -13,49 +13,54 @@ Adapted from [Happy Git and GitHub for the useR](https://happygitwithr.com/rstud
 
 You should find yourself in a new local RStudio Project with the cloned repo and a remote set up to push to this github repository. 
 
-**If you want to fork this, then click fork above & then do the same but with your url: 
+**If you want to fork this, then click fork by the name of the repository & then do the same but with your url**
 
 The Happy Git and Github with R is a great resource, in particular if you're having issues check out [this section](https://happygitwithr.com/connect-intro.htm)].
 
 ### On the command line
 
 ```git clone https://github.com/labmetcalf/covid19-africa.git```
+
+From within the cloned directory:
+
 ```git remote add origin https://github.com/labmetcalf/covid19-afr```
 
+## The git commands you need to know
+
+The three below commands are all available in the Git pane of Rstudio. 
+   - ```commit``` (your own work)
+   - ```pull``` (changes anyone else or if you're working on a separate branch, you yourself,  have made on the remote)
+   - ```push``` (to your remote)
+
+This one you need to do on the command line I'm pretty sure. 
+   - ```merge``` (two branches)
+    
+What if I pull & there are merge conflicts?
+   - You can go back to your previous state:
+      ```git reset --hard HEAD```
+   - You'll eventually need to fix the merge conflicts though if you want to push up!
+    
+ Resources: 
+   - [happy git with r](https://happygitwithr.com)
+   - [https://git-scm.com](https://git-scm.com)
+   
 ## Options for contributing
 
-1. Push directly to this repository: remember to always go in the order of commit | pull | push! This is probably the easiest way. And if we're not directly messing with each others scripts then this would make the most sense!
+1. Push directly to this repository: remember to always go in the order of commit | pull | push. This is probably the easiest way. And if we're not directly messing with each others scripts then this would make the most sense!
 
-2. Create a branch. Then the order will be commit to your branch |  merge with master branch | pull | push. You may also want to pull to your master branch before merging in case it's been a while since you've pushed up!
+2. Create a branch. Then the order will be commit to your branch | merge with master branch | pull | push. You may also want to pull to your master branch before merging in case it's been a while since you've pushed up!
 
 3. Rather than clone this repository, you can fork it and submit a pull request when you want to merge changes. 
    - First fork it on github & set up the same way as you did the remote except now with url  *https://github.com/{yourusername}/covid19-africa.git*
-   - Commit | Pull (from labmetcalf remote) | Push 
-   - 
-    - To keep your fork up to date with the lab repo you will need to pull from the upstream repo (labmetcalf/covid19-afr)
-    - To do this first add a remote for the upstream branch:
-    ```git remote add upstream https://github.com/labmetcalf/covid19-afr```
-      or with Rstudio in the Rproject in the git pane click on New branch (the two little purple boxes) >  add remote > add the url with name *upstream*.
-    - Then pull from that before pushing up to your own remote
-    ```git pull upstream master`` (the --ff-only tag )```
-    - Finally push to your own remote with the little green button
-    
-    ## The git commands you need to know
-    
-    - ```commit``` (your own work)
-    - ```pull``` (changes anyone else or if you're working on a separate branch, you yourself,  have made on the remote)
-    - ```push``` (to your remote)
-    - ```merge``` (two branches)
-    
-    What if I pull & there are merge conflicts?
-    - You can go back to your previous state:
-    ```git reset --hard HEAD```
-    - You'll eventually need to fix the merge conflicts though if you want to push up!
-    
-    Resources: 
-    - [happy git with r](https://happygitwithr.com)
-    - [https://git-scm.com](https://git-scm.com)
-    
+   - You still follow this order: Commit | Pull (from labmetcalf remote) | Push 
+   - To keep your fork up to date with the lab repo you will need to pull from the upstream repo (labmetcalf/covid19-afr)
+      - To do this first add a remote for the upstream branch:
+       ```git remote add upstream https://github.com/labmetcalf/covid19-afr```
+        or with Rstudio in the Rproject in the git pane click on New branch (the two little purple boxes) >  add remote > add the url with name *upstream*.
+      - Then pull from that before pushing up to your own remote
+      ```git pull upstream master`` (the --ff-only tag )```
+      - Finally push to your own remote with the little green button
+          
 ## Repository Structure
 
 ```
