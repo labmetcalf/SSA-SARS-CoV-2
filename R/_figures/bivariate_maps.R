@@ -49,7 +49,7 @@ health.indicators$COUNTRY_NAME[grep("Tanzania",health.indicators$COUNTRY_NAME)]<
 
 ##define hand wash data
 hand.wash<-subset(health.indicators,indicator_label_standard=="% Urban popn with handwashing facilities at home")
-
+hand.wash$value[which(is.na(hand.wash$YEAR_recent))]<-NA
 # age structure 
 
 ## convenience functions
@@ -150,3 +150,39 @@ rect(left,bottom-space,right,top+space)
 segments(rep(right,5),seq(bottom,top,length.out = 5),rep(tick.x,5),seq(bottom,top,length.out = 5))
 text(rep(text.x,5),seq(bottom,top,length.out = 5),labels=seq(0,plot.max/100000,length.out = 5),cex=.75,adj=0)
 mtext("Severe cases per capita",cex=2)
+
+# plot handwashing
+plot.max<-75 #world max is 70000
+plot.col.pal<-colorRampPalette(RColorBrewer::brewer.pal(9,"YlOrRd"))
+pop.cols<-plot.col.pal(plot.max)
+
+sp::plot(0,0,type="n",xlim=c(-18,64),ylim=c(-36,41),asp=1,axes=F,xlab="",ylab="")
+
+for(i in (1:length(sub.sahara.index))[-2])
+{
+  sp::plot(ne_countries(country=sub.sahara.names[i]),add=T,col=pop.cols[get.value(i,sub.sahara.data.names,hand.wash,"value","COUNTRY_NAME")])
+}
+
+#for(i in 1:length(north.africa.names))
+#{
+#  sp::plot(ne_countries(country=north.africa.names[i]),add=T,col=pop.cols[round(get.value(i,north.africa.names,demog,"severe.cases"))])
+#}
+
+n.legend.points<-1000
+bottom=-37
+top=-2
+left=-15
+right=-10
+tick.x<-right+1.5
+text.x<-right+3
+y.cords<-seq(bottom,top,length.out = n.legend.points)
+space<-diff(y.cords)[1]/2
+for(i in 1:n.legend.points)
+{
+  rect(left,y.cords[i]-space,right,y.cords[i]+space,border = NA,col=plot.col.pal(n.legend.points)[i])
+}
+rect(left,bottom-space,right,top+space)
+segments(rep(right,5),seq(bottom,top,length.out = 5),rep(tick.x,5),seq(bottom,top,length.out = 5))
+text(rep(text.x,5),seq(bottom,top,length.out = 5),labels=seq(0,plot.max,length.out = 5),cex=.75,adj=0)
+mtext("% urban households\nwith handwashing facilities",cex=2)
+
