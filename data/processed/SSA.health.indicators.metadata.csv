@@ -1,0 +1,28 @@
+"alias","indicator_label_standard","reference_code","n_countries","SSA_mean.value","sd","min_YEAR","max_YEAR"
+"1_1_nurses_midwives_p100k","Nurses and midwives per 100 000 popn","SH.MED.NUMW.P3",47,110.58,93.9,2004,2017
+"1_1_physicians_p100k","Physicians per 100 000 popn","SH.MED.PHYS.ZS",47,22.79,34.04,2004,2017
+"1_2_hospital_beds_p100k","Hospital beds 100 000 popn","SH.MED.BEDS.ZS",47,130.85,115.06,2004,2015
+"1_2_hospitals_p100k","Hospitals per 100 000 popn","DEVICES00",34,0.8,0.64,2013,2013
+"1_4_p_births_att_by_skill","% Births attended by skilled staff","SH.STA.BRTC.ZS",48,66.66,23.37,2006,2018
+"1_4_p_full_vacc_1yos","% Full immunization coverage among 1yos","vfull",42,56.07,22.62,1998,2017
+"1_4_p_pneum_care_access","% Children with pneumonia symptoms taken to health facility","carep",41,48.1,16.52,2006,2017
+"2_1_inc_tuberculosis_p100k","TB incidence per 100 000 popn","SH.TBS.INCD",48,225.02,158.17,2018,2018
+"2_1_prev_hiv_15_49_yos","% HIV prevalence among ages 15-49","SH.DYN.AIDS.ZS",46,4.83,6.62,2018,2018
+"2_2_ncd_mort_a_s_COPD","COPD mortality per 100 000 popn, age-standardized","WHS2_131_GHE118",46,27.19,13.15,2012,2012
+"2_2_ncd_mort_a_s_NCDs_overall","NCDs overall mortality per 100 000 popn, age-standardized","WHS2_131_GHE060",48,654.43,111.84,2016,2016
+"2_2_ncd_mort_a_s_resp_infs","Resp inf mortality per 100 000 popn, age-standardized","WHS2_131_GHE038",46,165.01,68.88,2012,2012
+"2_2_prev_diabetes_20_79yos","% Diabetes prevalence among ages 20-79","SH.STA.DIAB.ZS",48,5.09,3.67,2019,2019
+"2_3_prev_anaemia_npws","% Anemia prevalence among NPW","ANEMIANPW",48,38.69,10.33,2016,2016
+"2_3_prev_overwt_bmi25_age_st","% Overweight prevalence among adults, age-standardized","NCD_BMI_25A",47,30.22,6.69,2016,2016
+"2_3_prev_undernourishment","% Undernourishment prevalence","SN.ITK.DEFC.ZS",40,22.84,13.81,2017,2017
+"2_3_raised_bp_age_st","% Raised blood pressure prevalence, age-standardized","BP_04",47,28.52,2.44,2015,2015
+"2_3_raised_chol_age_st","% Raised cholesterol prevalence, age-standardized","CHOL_02",47,25.02,8.94,2008,2008
+"2_3_raised_gluc_age_st","% Raised glucose prevalence, age-standardized","NCD_GLUC_04",47,7.36,1.73,2014,2014
+"2_4_air_mort_a_s_lung_cancers","Lung cancer air pollution mortality per 100 000 popn, age-standardized","SDGAIRBODA_ENVCAUSE068",48,1.56,1.4,2016,2016
+"2_4_mean_pm25_exp_urban_areas","Annual mean PM2.5 concentration ug/m3 in urban areas","SDGPM25_URB",48,32.13,12.62,2016,2016
+"2_6_p_handwashing_at_hh_urban","% Urban popn with handwashing facilities at home","WSH_HYGIENE_BASIC_URB",40,31.01,18.57,2010,2017
+"3_1_hale_age_60","Healthy life expectancy (HALE) at 60 (in years)","WHOSIS_000007",48,12.71,1.2,2016,2016
+"3_2_health_exp_che_per_cap","Health expenditure per capita in USD","GHED_CHE_pc_US_SHA2011",47,120,168.99,2017,2017
+"3_2_oop_exp_vs_che_p","% Health expenditures that are out-of-pocket","GHED_OOPSCHE_SHA2011",47,35.69,20.58,2017,2017
+"3_2_p_popn_below_pov_line","% of Popn below poverty line","SI_POV_DAY1",45,37.73,21.37,2007,2017
+"3_2_p_urb_popn_in_slums","% of Urban popn living in slums","EN.POP.SLUM.UR.ZS",46,59.75,17.96,1990,2014
