@@ -13,7 +13,7 @@ library("sf")
 library("RColorBrewer")
 
 # load and clean data
-health.indicators<-read.csv(here("data","processed","SSA.health.indicators.csv")) #from Ben's github
+health.indicators<-read.csv(here("data","processed","SSA.health.indicators.csv"),stringsAsFactors = F) #from Ben's github
 demog<-read.csv("world.pop.data.csv",stringsAsFactors = F) 
 
 
@@ -22,7 +22,7 @@ demog<-read.csv("world.pop.data.csv",stringsAsFactors = F)
 demog$Region..subregion..country.or.area..[45]<-"Ivory Coast"
 demog$Region..subregion..country.or.area..[52]<-"Democratic Republic of the Congo"
 demog$Region..subregion..country.or.area..[43]<-"Republic of Congo"
-demog$Region..subregion..country.or.area..[70]<-"Guinea Bissau"
+demog$Region..subregion..country.or.area..[80]<-"Guinea Bissau"
 demog$Region..subregion..country.or.area..[166]<-"Somalia"
 demog$Region..subregion..country.or.area..[62]<-"Swaziland"
 demog$Region..subregion..country.or.area..[88]<-"Iran"
@@ -39,6 +39,16 @@ north.africa.data.names<-north.africa.names
 
 demog<-cbind(demog,"pop"=rowSums(demog[,9:109])) #calculate total population
 demog<-cbind(demog,"p.60.plus"=rowSums(demog[,69:109])/demog$pop)
+
+## clean health indicators data
+health.indicators$COUNTRY_NAME[grep("Cote d Ivoire",health.indicators$COUNTRY_NAME)]<-"Ivory Coast"
+health.indicators$COUNTRY_NAME[grep("Djibouti ",health.indicators$COUNTRY_NAME)]<-"Djibouti"
+health.indicators$COUNTRY_NAME[grep("Eswatini",health.indicators$COUNTRY_NAME)]<-"Swaziland"
+health.indicators$COUNTRY_NAME[grep("Republic of the Congo",health.indicators$COUNTRY_NAME)]<-"Republic of Congo"
+health.indicators$COUNTRY_NAME[grep("Tanzania",health.indicators$COUNTRY_NAME)]<-"United Republic of Tanzania"
+
+##define hand wash data
+hand.wash<-subset(health.indicators,indicator_label_standard=="% Urban popn with handwashing facilities at home")
 
 # age structure 
 
