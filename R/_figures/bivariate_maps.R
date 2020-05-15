@@ -11,6 +11,7 @@ library("rnaturalearthdata")
 library("ggplot2")
 library("sf")
 library("RColorBrewer")
+library("TeachingDemos")
 
 # load and clean data
 health.indicators<-read.csv(here("data","processed","SSA.health.indicators.csv"),stringsAsFactors = F) #from Ben's github
@@ -114,8 +115,9 @@ for(i in (1:length(sub.sahara.index)))
 demog.percentile<-ecdf(demog.vals)
 indicator.percentile<-ecdf(indicator.vals)
 
-sp::plot(0,0,type="n",xlim=c(-18,64),ylim=c(-36,41),asp=1,axes=F,xlab="",ylab="")
-
+par(fig=c(.1,1,0,1),mar=c(0,0,0,0))
+sp::plot(0,0,type="n",xlim=c(-18,54),ylim=c(-36,30),asp=1,axes=F,xlab="",ylab="")
+mtext("hand washing and demography",side=3,line=-2,cex=2)
 for(i in (1:length(sub.sahara.index))[-2])
 {
 demog.val<-demog.percentile(get.value(i,sub.sahara.data.names,demog,"severe.cases"))
@@ -124,22 +126,22 @@ if(isTRUE(!is.na(demog.val) && !is.na(indicator.val))) {col<-color.func(demog.va
 sp::plot(ne_countries(country=sub.sahara.names[i]),add=T,col=col)
 }
 
-# plot color legend
-par(mar=c(4,4,4,4))
+par(fig=c(.1,.4,.2,.5),mar=c(0,0,0,0),new=T)
 plot(0,0,xlim=c(-.05,1.05),ylim=c(-.05,1.05),axes=F,xlab="",ylab="",type="n")
 for(i in seq(0,1,.1))
 {
   for(j in seq(0,1,.1))
-  {
-    rect(i-.05,j-.05,i+.05,j+.05,col=color.func(i,j))
-  }
+    {
+      rect(i-.05,j-.05,i+.05,j+.05,col=color.func(i,j),border=NA)
+    }
 }
-
-#axis(1,at=seq(.0,.5,.1),labels=c(10,50,100,500,1000,1500),lwd=0,line=-1)
-#axis(2,at=0:5)
-mtext(side=1,"demography",line=2)
-mtext(side=2,"health indicator",line=2.5)
-rect(.2,1.1,.25,1.15,col="grey60")
+rect(-.05,-.05,1.05,1.05,border="grey")
+axis(1)
+axis(2)
+mtext(side=1,"demography percentile",line=2)
+mtext(side=2,"health indicator percentile",line=2)
 par(xpd=T)
-text(.25,1.125,labels="insufficient / missing data",pos=4)
+rect(.05,1.1,.15,1.2,col="grey60")
+text(.15,1.15,labels="no data",pos=4)
+
 
