@@ -84,6 +84,21 @@ for (i in 1:nrow(demog))
 demog<-cbind(demog,"severe.cases"=severe.cases)
 demog<-cbind(demog,"severe.cases.per.capita"=demog$severe.cases/demog$pop)
 
+# plotting functions
+color.func<-function(x,y,alpha=(x+y)/2)
+{
+  if(x==0 && y==0)
+  {
+    col.val[1]=col.val[2]=col.val[3]=255
+  }
+  else
+  {
+    if (x>=y){col.val<-colorRamp(c("red","purple"))(y/x)}
+    if (x<y){col.val<-colorRamp(c("blue","purple"))(x/y)}
+  }
+  rgb(col.val[1],col.val[2],col.val[3],alpha=alpha*255,maxColorValue = 255)
+}
+
 # plot severe cases
 plot.max<-1750 #world max is 70000
 plot.col.pal<-colorRampPalette(RColorBrewer::brewer.pal(9,"YlOrRd"))
@@ -190,4 +205,25 @@ rect(left,bottom-space,right,top+space)
 segments(rep(right,5),seq(bottom,top,length.out = 5),rep(tick.x,5),seq(bottom,top,length.out = 5))
 text(rep(text.x,5),seq(bottom,top,length.out = 5),labels=seq(0,plot.max,length.out = 5),cex=.75,adj=0)
 mtext("% urban households\nwith handwashing facilities",cex=2)
+
+
+# plot color legend
+par(mar=c(4,4,4,4))
+plot(0,0,xlim=c(-.05,1.05),ylim=c(-.05,1.05),axes=F,xlab="",ylab="",type="n")
+for(i in seq(0,1,.1))
+{
+  for(j in seq(0,1,.1))
+  {
+    rect(i-.05,j-.05,i+.05,j+.05,col=color.func(i,j))
+  }
+}
+
+#axis(1,at=seq(.0,.5,.1),labels=c(10,50,100,500,1000,1500),lwd=0,line=-1)
+#axis(2,at=0:5)
+mtext(side=1,"demography",line=2)
+mtext(side=2,"health indicator",line=2.5)
+rect(.2,1.1,.25,1.15,col="grey60")
+par(xpd=T)
+text(.25,1.125,labels="insufficient / missing data",pos=4)
+
 
