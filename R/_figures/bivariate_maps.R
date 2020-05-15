@@ -14,8 +14,7 @@ library("RColorBrewer")
 
 # load and clean data
 health.indicators<-read.csv(here("data","processed","SSA.health.indicators.csv"),stringsAsFactors = F) #from Ben's github
-demog<-read.csv("world.pop.data.csv",stringsAsFactors = F) 
-
+demog<-read.csv(here("data","processed","world.pop.data.csv"),stringsAsFactors = F) 
 
 ## clean demog data
 
@@ -47,12 +46,16 @@ health.indicators$COUNTRY_NAME[grep("Eswatini",health.indicators$COUNTRY_NAME)]<
 health.indicators$COUNTRY_NAME[grep("Republic of the Congo",health.indicators$COUNTRY_NAME)]<-"Republic of Congo"
 health.indicators$COUNTRY_NAME[grep("Tanzania",health.indicators$COUNTRY_NAME)]<-"United Republic of Tanzania"
 
-##define hand wash data
-hand.wash<-subset(health.indicators,indicator_label_standard=="% Urban popn with handwashing facilities at home")
-hand.wash$value[which(is.na(hand.wash$YEAR_recent))]<-NA
 # age structure 
 
 ## convenience functions
+get.indicator.dat<-function(out.name,indicator_label_standard_name)
+{
+  assign("temp.out",subset(health.indicators,indicator_label_standard==indicator_label_standard_name))
+  temp.out$value[which(is.na(temp.out$YEAR_recent))]<-NA #put in NAs where data is missing
+  assign(out.name,temp.out,envir=.GlobalEnv)
+}
+
 get.value<-function(i,name.list,dataset,datacol,namescol="Region..subregion..country.or.area..")
 {
   dataset[which(dataset[,namescol]==name.list[i]),datacol]
@@ -157,6 +160,8 @@ plot.col.pal<-colorRampPalette(RColorBrewer::brewer.pal(9,"YlOrRd"))
 pop.cols<-plot.col.pal(plot.max)
 
 sp::plot(0,0,type="n",xlim=c(-18,64),ylim=c(-36,41),asp=1,axes=F,xlab="",ylab="")
+
+get.indicator.dat("hand.wash","% Urban popn with handwashing facilities at home")
 
 for(i in (1:length(sub.sahara.index))[-2])
 {
