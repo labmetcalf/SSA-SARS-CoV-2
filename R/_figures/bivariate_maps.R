@@ -43,7 +43,7 @@ demog<-cbind(demog,"p.60.plus"=rowSums(demog[,69:109])/demog$pop)
 health.indicators$COUNTRY_NAME[grep("Cote d Ivoire",health.indicators$COUNTRY_NAME)]<-"Ivory Coast"
 health.indicators$COUNTRY_NAME[grep("Djibouti ",health.indicators$COUNTRY_NAME)]<-"Djibouti"
 health.indicators$COUNTRY_NAME[grep("Eswatini",health.indicators$COUNTRY_NAME)]<-"Swaziland"
-health.indicators$COUNTRY_NAME[grep("Republic of the Congo",health.indicators$COUNTRY_NAME)]<-"Republic of Congo"
+health.indicators$COUNTRY_NAME[which(health.indicators$COUNTRY_NAME=="Republic of the Congo")]<-"Republic of Congo"
 health.indicators$COUNTRY_NAME[grep("Tanzania",health.indicators$COUNTRY_NAME)]<-"United Republic of Tanzania"
 
 # age structure 
@@ -85,127 +85,44 @@ demog<-cbind(demog,"severe.cases"=severe.cases)
 demog<-cbind(demog,"severe.cases.per.capita"=demog$severe.cases/demog$pop)
 
 # plotting functions
-color.func<-function(x,y,alpha=(x+y)/2)
+color.func<-function(x,y,alpha=.5*max(x,y)+.5*x*y)
 {
-  if(x==0 && y==0)
-  {
-    col.val[1]=col.val[2]=col.val[3]=255
-  }
-  else
-  {
-    if (x>=y){col.val<-colorRamp(c("red","purple"))(y/x)}
-    if (x<y){col.val<-colorRamp(c("blue","purple"))(x/y)}
-  }
+  col.val<-rep(NA,3)
+  if(x==0 && y==0) 
+    {
+      col.val[1]=col.val[2]=col.val[3]=255
+    }
+  else 
+    {
+      if (x>=y){col.val<-colorRamp(c("red2","purple3"))(y/x)}
+      if (x<y){col.val<-colorRamp(c("mediumblue","purple3"))(x/y)}
+    }
   rgb(col.val[1],col.val[2],col.val[3],alpha=alpha*255,maxColorValue = 255)
-}
+} 
 
-# plot severe cases
-plot.max<-1750 #world max is 70000
-plot.col.pal<-colorRampPalette(RColorBrewer::brewer.pal(9,"YlOrRd"))
-pop.cols<-plot.col.pal(plot.max)
-
-sp::plot(0,0,type="n",xlim=c(-18,64),ylim=c(-36,41),asp=1,axes=F,xlab="",ylab="")
-
-for(i in (1:length(sub.sahara.index))[-2])
-{
-  sp::plot(ne_countries(country=sub.sahara.names[i]),add=T,col=pop.cols[round(get.value(i,sub.sahara.data.names,demog,"severe.cases"))])
-}
-
-#for(i in 1:length(north.africa.names))
-#{
-#  sp::plot(ne_countries(country=north.africa.names[i]),add=T,col=pop.cols[round(get.value(i,north.africa.names,demog,"severe.cases"))])
-#}
-
-n.legend.points<-1000
-bottom=-37
-top=-2
-left=-15
-right=-10
-tick.x<-right+1.5
-text.x<-right+3
-y.cords<-seq(bottom,top,length.out = n.legend.points)
-space<-diff(y.cords)[1]/2
-for(i in 1:n.legend.points)
-{
-  rect(left,y.cords[i]-space,right,y.cords[i]+space,border = NA,col=plot.col.pal(n.legend.points)[i])
-}
-rect(left,bottom-space,right,top+space)
-segments(rep(right,5),seq(bottom,top,length.out = 5),rep(tick.x,5),seq(bottom,top,length.out = 5))
-text(rep(text.x,5),seq(bottom,top,length.out = 5),labels=seq(0,plot.max,length.out = 5),cex=.75,adj=0)
-mtext("Severe cases (in thousands)",cex=2)
-
-# plot severe cases per capita
-plot.max<-1700
-plot.col.pal<-colorRampPalette(RColorBrewer::brewer.pal(9,"YlOrRd"))
-pop.cols<-plot.col.pal(plot.max)
-
-sp::plot(0,0,type="n",xlim=c(-18,64),ylim=c(-36,41),asp=1,axes=F,xlab="",ylab="")
-
-for(i in (1:length(sub.sahara.index))[-2])
-{
-  sp::plot(ne_countries(country=sub.sahara.names[i]),add=T,col=pop.cols[round(100000*get.value(i,sub.sahara.data.names,demog,"severe.cases.per.capita"))])
-}
-
-#for(i in 1:length(north.africa.names))
-#{
-#  sp::plot(ne_countries(country=north.africa.names[i]),add=T,col=pop.cols[round(100000*get.value(i,north.africa.names,demog,"severe.cases.per.capita"))])
-#}
-
-n.legend.points<-1000
-bottom=-37
-top=-2
-left=-15
-right=-10
-tick.x<-right+1.5
-text.x<-right+3
-y.cords<-seq(bottom,top,length.out = n.legend.points)
-space<-diff(y.cords)[1]/2
-for(i in 1:n.legend.points)
-{
-  rect(left,y.cords[i]-space,right,y.cords[i]+space,border = NA,col=plot.col.pal(n.legend.points)[i])
-}
-rect(left,bottom-space,right,top+space)
-segments(rep(right,5),seq(bottom,top,length.out = 5),rep(tick.x,5),seq(bottom,top,length.out = 5))
-text(rep(text.x,5),seq(bottom,top,length.out = 5),labels=seq(0,plot.max/100000,length.out = 5),cex=.75,adj=0)
-mtext("Severe cases per capita",cex=2)
-
-# plot handwashing
-plot.max<-75 #world max is 70000
-plot.col.pal<-colorRampPalette(RColorBrewer::brewer.pal(9,"YlOrRd"))
-pop.cols<-plot.col.pal(plot.max)
-
-sp::plot(0,0,type="n",xlim=c(-18,64),ylim=c(-36,41),asp=1,axes=F,xlab="",ylab="")
-
+# plot bivariate
 get.indicator.dat("hand.wash","% Urban popn with handwashing facilities at home")
 
+demog.vals<-c()
+indicator.vals<-c()
+for(i in (1:length(sub.sahara.index)))
+{
+  demog.vals<-c(demog.vals,get.value(i,sub.sahara.data.names,demog,"severe.cases"))
+  indicator.vals<-c(indicator.vals,get.value(i,sub.sahara.data.names,hand.wash,"value","COUNTRY_NAME"))
+}
+
+demog.percentile<-ecdf(demog.vals)
+indicator.percentile<-ecdf(indicator.vals)
+
+sp::plot(0,0,type="n",xlim=c(-18,64),ylim=c(-36,41),asp=1,axes=F,xlab="",ylab="")
+
 for(i in (1:length(sub.sahara.index))[-2])
 {
-  sp::plot(ne_countries(country=sub.sahara.names[i]),add=T,col=pop.cols[get.value(i,sub.sahara.data.names,hand.wash,"value","COUNTRY_NAME")])
+demog.val<-demog.percentile(get.value(i,sub.sahara.data.names,demog,"severe.cases"))
+indicator.val<-indicator.percentile(get.value(i,sub.sahara.data.names,hand.wash,"value","COUNTRY_NAME"))
+if(isTRUE(!is.na(demog.val) && !is.na(indicator.val))) {col<-color.func(demog.val,indicator.val)} else {col<-"grey60"}
+sp::plot(ne_countries(country=sub.sahara.names[i]),add=T,col=col)
 }
-
-#for(i in 1:length(north.africa.names))
-#{
-#  sp::plot(ne_countries(country=north.africa.names[i]),add=T,col=pop.cols[round(get.value(i,north.africa.names,demog,"severe.cases"))])
-#}
-
-n.legend.points<-1000
-bottom=-37
-top=-2
-left=-15
-right=-10
-tick.x<-right+1.5
-text.x<-right+3
-y.cords<-seq(bottom,top,length.out = n.legend.points)
-space<-diff(y.cords)[1]/2
-for(i in 1:n.legend.points)
-{
-  rect(left,y.cords[i]-space,right,y.cords[i]+space,border = NA,col=plot.col.pal(n.legend.points)[i])
-}
-rect(left,bottom-space,right,top+space)
-segments(rep(right,5),seq(bottom,top,length.out = 5),rep(tick.x,5),seq(bottom,top,length.out = 5))
-text(rep(text.x,5),seq(bottom,top,length.out = 5),labels=seq(0,plot.max,length.out = 5),cex=.75,adj=0)
-mtext("% urban households\nwith handwashing facilities",cex=2)
-
 
 # plot color legend
 par(mar=c(4,4,4,4))
@@ -225,5 +142,4 @@ mtext(side=2,"health indicator",line=2.5)
 rect(.2,1.1,.25,1.15,col="grey60")
 par(xpd=T)
 text(.25,1.125,labels="insufficient / missing data",pos=4)
-
 
