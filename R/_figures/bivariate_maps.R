@@ -50,9 +50,9 @@ health.indicators$COUNTRY_NAME[grep("Tanzania",health.indicators$COUNTRY_NAME)]<
 # age structure 
 
 ## convenience functions
-get.indicator.dat<-function(out.name,indicator_label_standard_name)
+get.indicator.dat<-function(out.name,indicator_label_standard_name,data=health.indicators,colname="indicator_label_standard")
 {
-  assign("temp.out",subset(health.indicators,indicator_label_standard==indicator_label_standard_name))
+  assign("temp.out",data[which(data[,which(colnames(data)==colname)]==indicator_label_standard_name),])
   temp.out$value[which(is.na(temp.out$YEAR_recent))]<-NA #put in NAs where data is missing
   assign(out.name,temp.out,envir=.GlobalEnv)
 }
@@ -101,47 +101,77 @@ color.func<-function(x,y,alpha=.5*max(x,y)+.5*x*y)
   rgb(col.val[1],col.val[2],col.val[3],alpha=alpha*255,maxColorValue = 255)
 } 
 
-# plot bivariate
-get.indicator.dat("hand.wash","% Urban popn with handwashing facilities at home")
-
-demog.vals<-c()
-indicator.vals<-c()
-for(i in (1:length(sub.sahara.index)))
+# plot bivariate function
+plot.bivariate<-function(x.data.name,x.data.obj,y.data.name,y.data.obj,xlab,ylab,main)
 {
-  demog.vals<-c(demog.vals,get.value(i,sub.sahara.data.names,demog,"severe.cases"))
-  indicator.vals<-c(indicator.vals,get.value(i,sub.sahara.data.names,hand.wash,"value","COUNTRY_NAME"))
-}
-
-demog.percentile<-ecdf(demog.vals)
-indicator.percentile<-ecdf(indicator.vals)
-
-par(fig=c(.1,1,0,1),mar=c(0,0,0,0))
-sp::plot(0,0,type="n",xlim=c(-18,54),ylim=c(-36,30),asp=1,axes=F,xlab="",ylab="")
-mtext("hand washing and demography",side=3,line=-2,cex=2)
-for(i in (1:length(sub.sahara.index))[-2])
-{
-demog.val<-demog.percentile(get.value(i,sub.sahara.data.names,demog,"severe.cases"))
-indicator.val<-indicator.percentile(get.value(i,sub.sahara.data.names,hand.wash,"value","COUNTRY_NAME"))
-if(isTRUE(!is.na(demog.val) && !is.na(indicator.val))) {col<-color.func(demog.val,indicator.val)} else {col<-"grey60"}
-sp::plot(ne_countries(country=sub.sahara.names[i]),add=T,col=col)
-}
-
-par(fig=c(.1,.4,.2,.5),mar=c(0,0,0,0),new=T)
-plot(0,0,xlim=c(-.05,1.05),ylim=c(-.05,1.05),axes=F,xlab="",ylab="",type="n")
-for(i in seq(0,1,.1))
-{
-  for(j in seq(0,1,.1))
+  x.data<-eval(parse(text=x.data.obj))
+  y.data<-eval(parse(text=y.data.obj))
+  if(!x.data.obj=="demog") {get.indicator.dat("indicator.data1",x.data.name,data=x.data)}
+  if(!y.data.obj=="demog") {get.indicator.dat("indicator.data2",y.data.name,data=y.data)}
+  
+  x.vals<-c()
+  y.vals<-c()
+  for(i in (1:length(sub.sahara.index)))
+  {
+    if(x.data.obj=="demog") 
+      {
+        new.x.val<-get.value(i,sub.sahara.data.names,x.data,x.data.name)
+        if(length(new.x.val)==0) {new.x.val<-NA}
+        x.vals<-c(x.vals,new.x.val)
+      }
+    if(!x.data.obj=="demog") 
+      {
+        new.x.val<-get.value(i,sub.sahara.data.names,indicator.data1,"value","COUNTRY_NAME")
+        if(length(new.x.val)==0) {new.x.val<-NA}
+        x.vals<-c(x.vals,new.x.val)
+      }
+    if(y.data.obj=="demog") 
+      {
+        new.y.val<-get.value(i,sub.sahara.data.names,y.data,y.data.name)
+        if(length(new.y.val)==0) {new.y.val<-NA}
+        y.vals<-c(y.vals,new.y.val)
+      }    
+    if(!y.data.obj=="demog") 
+      {
+        new.y.val<-get.value(i,sub.sahara.data.names,indicator.data2,"value","COUNTRY_NAME")
+        if(length(new.y.val)==0) {new.y.val<-NA}
+        y.vals<-c(y.vals,new.y.val)
+    }   
+  }
+  
+  x.percentile<-ecdf(x.vals)
+  y.percentile<-ecdf(y.vals)
+  
+  par(fig=c(.1,1,0,1),mar=c(0,0,0,0))
+  sp::plot(0,0,type="n",xlim=c(-18,54),ylim=c(-36,30),asp=1,axes=F,xlab="",ylab="")
+  mtext(main,side=3,line=-2,cex=2)
+  
+  for(i in (1:length(sub.sahara.index))[-2])
+  {
+    x.val<-x.percentile(x.vals[i])
+    y.val<-y.percentile(y.vals[i])
+    if(isTRUE(!is.na(x.val) && !is.na(y.val))) {col<-color.func(x.val,y.val)} else {col<-"grey60"}
+    sp::plot(ne_countries(country=sub.sahara.names[i]),add=T,col=col)
+  }
+  
+  par(fig=c(.1,.4,.2,.5),mar=c(0,0,0,0),new=T)
+  plot(0,0,xlim=c(-.05,1.05),ylim=c(-.05,1.05),axes=F,xlab="",ylab="",type="n")
+  for(i in seq(0,1,.1))
+  {
+    for(j in seq(0,1,.1))
     {
       rect(i-.05,j-.05,i+.05,j+.05,col=color.func(i,j),border=NA)
     }
+  }
+  rect(-.05,-.05,1.05,1.05,border="grey")
+  axis(1)
+  axis(2)
+  mtext(side=1,xlab,line=2)
+  mtext(side=2,ylab,line=2)
+  par(xpd=T)
+  rect(.05,1.1,.15,1.2,col="grey60")
+  text(.15,1.15,labels="no data",pos=4)
 }
-rect(-.05,-.05,1.05,1.05,border="grey")
-axis(1)
-axis(2)
-mtext(side=1,"demography percentile",line=2)
-mtext(side=2,"health indicator percentile",line=2)
-par(xpd=T)
-rect(.05,1.1,.15,1.2,col="grey60")
-text(.15,1.15,labels="no data",pos=4)
 
+plot.bivariate("severe.cases","demog","% Urban popn with handwashing facilities at home","health.indicators","xlab","ylab","main")
 
