@@ -85,7 +85,7 @@ for (i in 1:nrow(demog))
 demog<-cbind(demog,"severe.cases"=severe.cases)
 demog<-cbind(demog,"severe.cases.per.capita"=demog$severe.cases/demog$pop)
 
-# plotting functions
+# color function
 color.func<-function(x,y,alpha=.5*max(x,y)+.5*x*y)
 {
   col.val<-rep(NA,3)
@@ -102,7 +102,7 @@ color.func<-function(x,y,alpha=.5*max(x,y)+.5*x*y)
 } 
 
 # plot bivariate function
-plot.bivariate<-function(x.data.name,x.data.obj,y.data.name,y.data.obj,xlab,ylab,main)
+plot.bivariate<-function(x.data.name,x.data.obj,x.rev=F,y.data.name,y.data.obj,y.rev=F,xlab,ylab,main)
 {
   x.data<-eval(parse(text=x.data.obj))
   y.data<-eval(parse(text=y.data.obj))
@@ -148,8 +148,10 @@ plot.bivariate<-function(x.data.name,x.data.obj,y.data.name,y.data.obj,xlab,ylab
   
   for(i in (1:length(sub.sahara.index))[-2])
   {
-    x.val<-x.percentile(x.vals[i])
-    y.val<-y.percentile(y.vals[i])
+    if(x.rev==F) {x.val<-x.percentile(x.vals[i])}
+    if(x.rev==T) {x.val<-1-x.percentile(x.vals[i])}
+    if(y.rev==F) {y.val<-y.percentile(y.vals[i])}
+    if(y.rev==T) {y.val<-1-y.percentile(y.vals[i])}
     if(isTRUE(!is.na(x.val) && !is.na(y.val))) {col<-color.func(x.val,y.val)} else {col<-"grey60"}
     sp::plot(ne_countries(country=sub.sahara.names[i]),add=T,col=col)
   }
@@ -173,5 +175,17 @@ plot.bivariate<-function(x.data.name,x.data.obj,y.data.name,y.data.obj,xlab,ylab
   text(.15,1.15,labels="no data",pos=4)
 }
 
-plot.bivariate("severe.cases","demog","% Urban popn with handwashing facilities at home","health.indicators","xlab","ylab","main")
+plot.bivariate(x.data.name="severe.cases",x.data.obj="demog",x.rev=F,
+               y.data.name="% Urban popn with handwashing facilities at home",y.data.obj="health.indicators",y.rev=T,
+               xlab="demog",ylab="no hand washing",main="")
+
+plot.bivariate(x.data.name="severe.cases",x.data.obj="demog",x.rev=F,
+               y.data.name="% of Popn below poverty line" ,y.data.obj="health.indicators",y.rev=F,
+               xlab="demog",ylab="poverty",main="")
+
+plot.bivariate(x.data.name="% Urban popn with handwashing facilities at home",x.data.obj="health.indicators",x.rev=T,
+               y.data.name="% of Popn below poverty line" ,y.data.obj="health.indicators",y.rev=F,
+               xlab="no hand wash",ylab="poverty",main="")
+
+
 
