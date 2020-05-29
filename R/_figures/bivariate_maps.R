@@ -95,8 +95,8 @@ color.func<-function(x,y,alpha=.5*max(x,y)+.5*x*y)
     }
   else 
     {
-      if (x>=y){col.val<-colorRamp(c("red2","purple3"))(y/x)}
-      if (x<y){col.val<-colorRamp(c("mediumblue","purple3"))(x/y)}
+      if (x>=y){col.val<-colorRamp(c("red2", "purple3"))(y/x)}
+      if (x<y){col.val<-colorRamp(c("mediumblue", "purple3"))(x/y)}
     }
   rgb(col.val[1],col.val[2],col.val[3],alpha=alpha*255,maxColorValue = 255)
 } 
