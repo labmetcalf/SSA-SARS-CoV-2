@@ -1,223 +1,236 @@
 # ---------------------------------------------------------------------------- #
-#' Proccessing NCD data from IHME     
+#' Fit gams to ncds & age & compare     
 # ---------------------------------------------------------------------------- #
 
+# Packages
 library(tidyverse)
-library(data.table)
 library(cowplot)
+library(patchwork)
+library(mgcv)
+library(here)
 
-ncds <- fread("data/raw/IHME_ageNCDs/IHME-GBD_2017_DATA-f8d93ddd-1.csv")
-iso_codes <- fread("output/iso_codes.csv")
-ifr_ests <- fread("data/raw/ifrs_from_lit.csv")
+# Data
+ifr_ests <- read_csv(here("data/raw/ifrs_from_lit.csv"))
+un_ages <- read_csv(here("data/processed/un_ages.csv"))
+iso_codes <- read_csv(here("output/iso_codes.csv"))
+ncds <- read_csv(here("data/processed/ihme_cleaned.csv"))
 
 # Fit age to IFR estimates ------------------------------------------------
-ifr_ests$age_mid <- (ifr_ests$age_lower + ifr_ests$age_upper)/2
+ifr_ests$predictor <- (ifr_ests$age_lower + ifr_ests$age_upper)/2
 ifr_ests$ifr_prop_est <- ifr_ests$ifr_perc_est/100
 
-library(mgcv)
-
-ifr_fit <- gam(ifr_prop_est ~ s(age_mid), family = betar(link="logit"), 
-               data = ifr_ests, method = "REML")
-ages <- seq(0, 99, by = 1)
-
-ifr_fit <- gam(ifr_prop_est ~ s(age_mid) + country_name, family = betar(link="logit"), 
+ifr_fit_age <- gam(ifr_prop_est ~ s(predictor), family = betar(link="logit"), 
                data = ifr_ests, method = "REML")
 
-ifr_preds <- predict(ifr_fit, 
-                     data.frame(age_mid = rep(ages, 3), 
-                                country_name = rep(c("Italy", "France", "China"),
-                                                   each = length(ages))), type = "response", se.fit = TRUE)
-ifrs_to_plot <- data.frame(ages = rep(ages, 3), 
-                           country_name = rep(c("Italy", "France", "China"),
-                                              each = length(ages)),
-                           est = ifr_preds$fit, upper = ifr_preds$fit + 2*ifr_preds$se.fit, 
-                           lower = ifr_preds$fit - 2*ifr_preds$se.fit)
-
-ggplot(data = ifrs_to_plot, aes(x = ages, color = country_name)) + 
-  geom_ribbon(aes(ymin = lower*100, ymax = upper*100, fill = country_name), alpha = 0.5) +
-  geom_line(aes(y = est*100)) +
-  geom_point(data = ifr_ests, 
-             aes(x = age_mid, y = ifr_perc_est, fill = country_name, shape = country_name), 
-             size = 2, color = "black") +
-  scale_color_brewer(aesthetics = c("fill", "color"), palette = "Set2", name = "Country") +
-  scale_shape_manual(values = c(21, 22, 23),name = "Country") +
-  theme_minimal_hgrid() +
-  labs(x = "Age (years)", y = "Infection fatality ratio (%)")
+ages <- seq(0, 100, by = 1)
+ifr_preds_age <- predict(ifr_fit_age,  data.frame(predictor = ages), 
+                     type = "response", se.fit = TRUE)
+ifrs_to_plot_age <- data.frame(ages = ages, 
+                           est = ifr_preds_age$fit, upper = ifr_preds_age$fit + 2*ifr_preds_age$se.fit, 
+                           lower = ifr_preds_age$fit - 2*ifr_preds_age$se.fit)
 
 # Fit ncd mortality/prevalence to ifr ests --------------------------------
-# Get deaths for the 4 causes by age
 ncds %>%
-  filter(location_name %in% ifr_ests$country_name, 
-         age_name != "Age-standardized", measure_name == "Prevalence") %>%
-  group_by(location_name, age_name) %>%
-  summarize(mean_val = mean(val), mean_upper = mean(upper), 
-            mean_lower = mean(lower)) %>%
   mutate(age_lower = sapply(strsplit(age_name, " "), 
-                          function (x) as.numeric(unlist(x)[1])),
+                            function (x) as.numeric(unlist(x)[1])),
          age_upper = sapply(strsplit(age_name, " "), 
                             function (x) as.numeric(unlist(x)[3])),
-         age_upper = case_when(age_lower == 80 ~ 99, 
-                               age_lower != 80 ~ age_upper)) %>%
-  ungroup() %>% 
+         age_upper = case_when(age_lower == 80 ~ 100, 
+                               age_lower != 80 ~ age_upper),
+         age_mid = (age_upper + age_lower)/2,
+         loc_type = case_when(!(location_name %in% c("Italy", "China", "France")) ~ "SSA",
+                              location_name %in% c("Italy", "China", "France") ~ location_name)) -> ncds
+
+# Get deaths for the 4 causes by age and match to age bins in studies
+ncds %>%
+  filter(measure_name == "Prevalence", location_name %in% c("Italy", "France", "China")) %>%
   mutate(age_bin = pmap_chr(list(age_lower, age_upper, location_name), 
        function(first, second, third) {
          ifr_ests$age_bin[which(first >= ifr_ests$age_lower & 
                                   second <= ifr_ests$age_upper & 
                                   third == ifr_ests$country_name)]
         })) %>%
-  group_by(location_name, age_bin) %>%
-  summarize_at(vars(starts_with("mean")), mean) %>%
-  right_join(ifr_ests, by = c("location_name" = "country_name", 
+  group_by(location_name, iso, age_bin) %>%
+  summarize(predictor = mean(mean_100k)) %>%
+  right_join(select(ifr_ests, -predictor), 
+             by = c("location_name" = "country_name", 
                               "age_bin" = "age_bin")) -> ncds_mean_prev
 
+ifr_fit_ncd <- gam(ifr_prop_est ~ s(predictor), family = betar(link="logit"), 
+               data = ncds_mean_prev, method = "REML")
+
+ncd_prev_seq <- seq(min(ncds_mean_prev$predictor), max(ncds_mean_prev$predictor), length.out = 100)
+
+ifr_preds_ncd <- predict(ifr_fit_ncd, 
+                     data.frame(predictor = ncd_prev_seq),  
+                     type = "response", se.fit = TRUE)
+
+ifrs_to_plot_ncd <- data.frame(ncd_prev = ncd_prev_seq,  
+                           est = ifr_preds_ncd$fit, upper = ifr_preds_ncd$fit + 2*ifr_preds_ncd$se.fit, 
+                           lower = ifr_preds_ncd$fit - 2*ifr_preds_ncd$se.fit)
+
+# Translate to ifr estimates by country --------------------------------
+predict_ifr <- function(predictor, gam = ifr_fit_age) {
+  predict(gam, newdata = data.frame(predictor = predictor), type = "response")
+}
+
+un_ages %>%
+  filter(iso %in% iso_codes$iso) %>%
+  mutate(ifr_est = predict_ifr(predictor = age, gam = ifr_fit_age), 
+         burden = pop*0.20*ifr_est) %>%
+  group_by(country, iso) %>%
+  summarize(burden_age = sum(burden), 
+            pop = sum(pop)) -> burden_by_age
 ncds %>%
-  filter(location_name %in% ifr_ests$country_name, 
-         age_name != "Age-standardized", measure_name == "Deaths") %>%
-  group_by(location_name, age_name) %>%
-  summarize(sum_val = sum(val), sum_upper = sum(upper), 
-            sum_lower = sum(lower)) %>%
-  mutate(age_lower = sapply(strsplit(age_name, " "), 
-                            function (x) as.numeric(unlist(x)[1])),
-         age_upper = sapply(strsplit(age_name, " "), 
-                            function (x) as.numeric(unlist(x)[3])),
-         age_upper = case_when(age_lower == 80 ~ 99, 
-                               age_lower != 80 ~ age_upper)) %>%
-  ungroup() %>% 
-  mutate(age_bin = pmap_chr(list(age_lower, age_upper, location_name), 
-                            function(first, second, third) {
-                              ifr_ests$age_bin[which(first >= ifr_ests$age_lower & 
-                                                       second <= ifr_ests$age_upper & 
-                                                       third == ifr_ests$country_name)]
+  select(age_name, age_lower, age_upper) %>%
+  group_by(age_name) %>%
+  distinct() -> age_bins
+
+un_ages %>%
+  mutate(age_name = pmap_chr(list(age = age), function(age) {
+                              if(age == 0) {
+                                return("1 to 4")
+                              } else {
+                                return(age_bins$age_name[which(age >= age_bins$age_lower & 
+                                                          age <= age_bins$age_upper)])
+                              }
                             })) %>%
-  group_by(location_name, age_bin) %>%
-  summarize_at(vars(starts_with("sum")), sum) %>%
-  right_join(ifr_ests, by = c("location_name" = "country_name", 
-                              "age_bin" = "age_bin")) -> ncds_sum_death
+  group_by(age_name, country, iso) %>%
+  summarize(pop = sum(pop)) -> un_pops
 
-ifr_fit <- gam(ifr_prop_est ~ s(mean_val) + location_name, family = betar(link="logit"), 
-               data = ncds_mean_prev, method = "REML")
+ncds %>%
+  left_join(un_pops) %>%
+  filter(iso %in% iso_codes$iso, measure_name == "Prevalence") %>%
+  mutate(ifr_est = predict_ifr(predictor = mean_100k, gam = ifr_fit_ncd), 
+         burden = pop*0.20*ifr_est) %>%
+  group_by(iso) %>%
+  summarize(burden_ncd = sum(burden)) %>%
+  left_join(burden_by_age) %>%
+  filter(!is.na(country)) %>%
+  mutate(country = gsub("CIte d'Ivoire", "Cote d'Ivoire", country)) -> burden_all
 
-ncd_death_seq <- seq(min(ncds_mean_prev$mean_val), max(ncds_mean_prev$mean_val), length.out = 100)
+burden_all %>%
+  pivot_longer(c("burden_ncd", "burden_age")) -> burden_long
 
-ifr_preds <- predict(ifr_fit, 
-                     data.frame(mean_val = rep(ncd_death_seq, 3), 
-                                location_name = rep(c("Italy", "France", "China"),
-                                                   each = length(ncd_death_seq))), 
-                     type = "response", se.fit = TRUE)
+# Put it all together in a figure --------------------------------
 
-ifrs_to_plot <- data.frame(ncd_deaths = rep(ncd_death_seq, 3), 
-                           country_name = rep(c("Italy", "France", "China"),
-                                              each = length(ncd_death_seq)),
-                           est = ifr_preds$fit, upper = ifr_preds$fit + 2*ifr_preds$se.fit, 
-                           lower = ifr_preds$fit - 2*ifr_preds$se.fit)
+# Country colors
+country_cols <- c("#1b9e77", "#d95f02", "#7570b3")
+names(country_cols) <- c("Italy", "China", "France")
 
-ggplot(data = ifrs_to_plot, aes(x = ncd_deaths, color = country_name)) + 
-  geom_ribbon(aes(ymin = lower*100, ymax = upper*100, fill = country_name), alpha = 0.5) +
+# Age vs IFR
+ggplot(data = ifrs_to_plot_age, aes(x = ages)) + 
+  geom_ribbon(aes(ymin = lower*100, ymax = upper*100), alpha = 0.5) +
   geom_line(aes(y = est*100)) +
-  geom_point(data = ncds_mean_prev, 
-             aes(x = mean_val, y = ifr_perc_est, fill = location_name, shape = location_name), 
-             size = 2, color = "black") +
-  scale_color_brewer(aesthetics = c("fill", "color"), palette = "Set2", name = "Country") +
-  scale_shape_manual(values = c(21, 22, 23),name = "Country") +
+  geom_line(data = ifr_ests, aes(x = predictor, y = ifr_perc_est,
+                                 color = country_name), alpha = 0, size = 1) + # Dummy for legend
+  geom_hline(aes(linetype = "SSA", yintercept = 0), alpha = 0, color = "grey", 
+             show.legend = TRUE) +
+  geom_hline(aes(linetype = "GAM fit", yintercept = 0), alpha = 0, color = "black", 
+             show.legend = TRUE) +
+  geom_point(data = ifr_ests, 
+             aes(x = predictor, y = ifr_perc_est, fill = country_name, shape = country_name), 
+             size = 2.5, color = "black") +
+  scale_fill_manual(aesthetics = c("color", "fill"), values = country_cols, 
+                    name = "") + 
+  scale_shape_manual(values = c(21, 22, 23), name = "") +
+  scale_linetype(name = "") +
   theme_minimal_hgrid() +
-  labs(x = "Mean prevalence of target NCDs \n per 100,000 persons", 
-       y = "Infection fatality ratio (%)")
+  labs(x = "Age (years)", y = "Infection fatality ratio (%)", tag = "A") +
+  guides(color = guide_legend(override.aes = list(alpha = 1)),
+         linetype = guide_legend(override.aes = list(color = c("black", "grey"), 
+                                                     alpha = 1, linetype = 1))) +
+  theme(text = element_text(size = 12)) -> ncd_fig_A
 
+# NCDs vs Age by country
+ncds %>%
+  filter(measure_name == "Prevalence") -> ncds_mean_all
 
-ifr_fit <- gam(ifr_prop_est ~ s(mean_val), family = betar(link="logit"), 
-               data = ncds_mean_prev, method = "REML")
+ggplot() +
+  geom_line(data = filter(ncds_mean_all, loc_type == "SSA"), 
+            aes(x = age_mid, y = mean_100k, group = location_name), color = "grey", alpha = 0.25, 
+            size = 1) +
+  geom_line(data = filter(ncds_mean_all, loc_type != "SSA"), 
+            aes(x = age_mid, y = mean_100k, group = location_name, color = location_name),
+            alpha = 1, size = 1) +
+  scale_color_manual(values = country_cols,
+                     guide = "none") +
+  scale_alpha_manual(values = c(1, 1, 1, 0.25), guide = "none") +
+  theme_minimal_hgrid() +
+  labs(x = "Age (midpoint of bracket)", 
+       y = str_wrap("Mean prevalence of target NCDs per 100,000 persons", 25), tag = "B") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        text = element_text(size = 12)) -> ncd_fig_B
 
-ncd_death_seq <- seq(min(ncds_mean_prev$mean_val), max(ncds_mean_prev$mean_val), length.out = 100)
-
-ifr_preds <- predict(ifr_fit, 
-                     data.frame(mean_val = ncd_death_seq), 
-                     type = "response", se.fit = TRUE)
-
-ifrs_to_plot <- data.frame(ncd_deaths = ncd_death_seq, 
-                           est = ifr_preds$fit, upper = ifr_preds$fit + 2*ifr_preds$se.fit, 
-                           lower = ifr_preds$fit - 2*ifr_preds$se.fit)
-
-ggplot(data = ifrs_to_plot, aes(x = ncd_deaths)) + 
+# NCDs vs IFR
+ggplot(data = ifrs_to_plot_ncd, aes(x = ncd_prev)) + 
   geom_ribbon(aes(ymin = lower*100, ymax = upper*100), alpha = 0.5) +
   geom_line(aes(y = est*100)) +
   geom_point(data = ncds_mean_prev, 
-             aes(x = mean_val, y = ifr_perc_est, fill = location_name, shape = location_name), 
+             aes(x = predictor, y = ifr_perc_est, fill = location_name, shape = location_name), 
              size = 2, color = "black") +
-  scale_color_brewer(aesthetics = c("fill", "color"), palette = "Set2", name = "Country") +
-  scale_shape_manual(values = c(21, 22, 23),name = "Country") +
+  scale_color_manual(aesthetics = c("fill", "color"), values = country_cols, 
+                     guide = "none") +
+  scale_shape_manual(values = c(21, 22, 23), guide = "none") +
   theme_minimal_hgrid() +
-  labs(x = "Mean prevalence of target NCDs \n per 100,000 persons", 
-       y = "Infection fatality ratio (%)")
+  labs(x = str_wrap("Mean prevalence of target NCDs per 100,000 persons", 25), 
+       y = "Infection fatality ratio (%)", tag = "C") +
+  theme(text = element_text(size = 12)) -> ncd_fig_C
 
-ggplot(data = ncds_mean_prev, aes(x = age_mid, y = mean_val)) +
-  geom_pointrange(aes(ymin = mean_lower, ymax = mean_upper,
-                      fill = location_name, shape = location_name), 
-                  fatten = 4, color = "black", alpha = 1,
-                  position = position_dodge(width = 0.2)) +
-  scale_color_brewer(aesthetics = c("fill", "color"), palette = "Set2", name = "Country") +
-  scale_shape_manual(values = c(21, 22, 23),name = "Country") +
+ggplot(data = burden_all, aes(x = reorder(country, burden_age))) +
+  geom_linerange(aes(ymax = burden_ncd, ymin = burden_age)) +
+  geom_point(data = burden_long, aes(x = country, y = value, color = name)) +
+  coord_flip() +
+  scale_color_manual(values = c("#e7298a", "#66a61e"), 
+                     labels = c("IFR by age", "IFR by NCD prevalence"), 
+                     name = "Predictor of burden") +
+  scale_y_continuous(trans = "log", breaks = c(100, 1000, 10000, 1e5)) +
   theme_minimal_hgrid() +
-  labs(x = "Age", 
-       y = "Mean prevalence of target NCDs \n per 100,000 persons") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  labs(x = "", y = "Burden of deaths", tag = "D") +
+  theme(axis.text = element_text(size = 8), 
+        axis.text.x = element_text(angle = 45, hjust = 1), text = element_text(size = 12)) -> ncd_fig_D
 
+ncd_fig <- 
+  (((ncd_fig_A | ncd_fig_B | ncd_fig_C) + plot_layout(guides = "collect")) / 
+     cowplot::as_grob(ncd_fig_D)) + 
+  plot_layout(heights = c(1, 2))
 
-# Translate to ifr estimates by country --------------------------------
-ihme_countries <- unique(ncds$location_name)
-iso_codes$ihme_countries <- ihme_countries[apply(adist(iso_codes$country, 
-                                                       ihme_countries, 
-                                                       partial = FALSE), 1, 
-                                                 which.min)]
-# Manual fixes
-iso_codes %>%
-  case_when(ihme_countries == "Gambia", "The Gambia", 
-            country %in% c("Mayotte", "Saint Helena", "Reunion", 
-                           "Western Sahara") ~ NA, 
-            !(country %in% c("Mayotte",
-                             "Saint Helena", "Reunion", "Western Sahara", 
-                             "Gambia")) ~ ihme_countries) -> iso_codes
+ggsave(here("figs/main/ncds_age.jpeg"), ncd_fig, width = 8, height = 8)
 
+# Supplementary Figure: look at deaths & prev for the 4 main ones  ----------------------------
 ncds %>%
-  filter(location_name %in% iso_codes$ihme_countries | location_name %in% c("Italy", "China", "France"), 
-         age_name != "Age-standardized", measure_name == "Prevalence") %>%
-  group_by(location_name, age_name) %>%
-  summarize(mean_val = mean(val), mean_upper = mean(upper), 
-            mean_lower = mean(lower)) %>%
-  ungroup() %>%
-  mutate(age_lower = sapply(strsplit(age_name, " "), 
-                            function (x) as.numeric(unlist(x)[1])),
-         age_upper = sapply(strsplit(age_name, " "), 
-                            function (x) as.numeric(unlist(x)[3])),
-         age_upper = case_when(age_lower == 80 ~ 99, 
-                               age_lower != 80 ~ age_upper), 
-         age_mid = (age_upper + age_lower)/2,
-         loc_type = case_when(location_name %in% iso_codes$ihme_countries ~ "SSA",
-                                   location_name %in% c("Italy", "China", "France") ~ location_name)) -> ncds_mean_prev
+  pivot_longer(`Diabetes mellitus`:`Chronic respiratory diseases (-Asthma)`, 
+               names_to = "cause") -> ncds_long
 
-
-ggplot(data = ncds_mean_prev, aes(x = age_mid, y = mean_val, group = location_name)) +
-  geom_line(aes(color = loc_type)) +
-  scale_color_manual(values = c("blue", "red", "purple", alpha("grey", 0.25)),
-                     name = "Country") +
+ggplot(data = filter(ncds_long, measure_name == "Prevalence"), 
+       aes(x = reorder(age_name, age_mid), 
+           y = value, group = location_name)) +
+  geom_line(aes(color = loc_type, alpha = loc_type)) +
+  scale_color_manual(values = c("#1b9e77", "#d95f02", "#7570b3", "grey"),
+                     guide = "none") +
+  scale_alpha_manual(values = c(1, 1, 1, 0.25), guide = "none") +
   theme_minimal_hgrid() +
   labs(x = "Age", 
-       y = "Mean prevalence of target NCDs \n per 100,000 persons") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+       y = "Prevalence \n per 100,000 persons", tag = "A") +
+  facet_grid(cause ~ measure_name, scales = "free", labeller = labeller(cause = label_wrap_gen(10))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+        strip.text.y = element_blank(), strip.text.x = element_blank()) -> sfig_ncds_age_A
 
-ggplot(data = ncds_mean_prev, aes(x = reorder(age_name, age_mid), 
-                                  y = mean_val, group = location_name)) +
-  geom_pointrange(aes(ymin = mean_lower, ymax = mean_upper,
-                      color = loc_type), fatten = 4,
-                  position = position_dodge(width = 0.5)) +
-  scale_color_manual(values = c("blue", "red", "purple", alpha("grey", 0.25)),
-                     name = "Country") +
+
+ggplot(data = filter(ncds_long, measure_name == "Deaths"), 
+       aes(x = reorder(age_name, age_mid), 
+           y = value, group = location_name)) +
+  geom_line(aes(color = loc_type, alpha = loc_type)) +
+  scale_color_manual(values = c("#1b9e77", "#d95f02", "#7570b3", "grey"),
+                     name = "Location") +
+  scale_alpha_manual(values = c(1, 1, 1, 0.25), guide = "none") +
   theme_minimal_hgrid() +
   labs(x = "Age", 
-       y = "Mean prevalence of target NCDs \n per 100,000 persons") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+       y = "Annual deaths attributable \n per 100,000 persons", tag = "B") +
+  facet_grid(cause ~ measure_name, scales = "free", labeller = labeller(cause = label_wrap_gen(10))) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8), 
+        strip.text.x = element_blank()) -> sfig_ncds_age_B
 
-# Do the countries to compare have data for each metric? (Add iso codes to this table!)
+sfig_ncds_age <- sfig_ncds_age_A | sfig_ncds_age_B
 
-
-# Subtract out asthma from respiratory diseases
-
+ggsave(here("figs/supplement/SX_ncds_age.jpeg"), sfig_ncds_age, device = "jpeg", height = 8, width = 8)

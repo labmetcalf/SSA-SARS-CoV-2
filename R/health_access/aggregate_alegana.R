@@ -11,8 +11,9 @@ Sys.time()
 
 # libraries
 library(raster)
+library(here)
 
-directories <- c("wp_data/Probability.tif", "wp_data/Traveltime")
+directories <- c("data/raw/alegana_pseek", "data/raw/alegana_ttimes")
 
 files <- list.files(directories, recursive = TRUE, full.names = TRUE)
 names <- list.files(directories, recursive = TRUE)
@@ -21,10 +22,10 @@ names <- gsub(".tif", "", names[grepl(".tif$", names)])
 
 foreach(i = 1:length(files), .packages = "raster",
         .export = c("files", "names")) %dopar% {
-          toagg <- raster(files[i])
+          toagg <- raster(here(files[i]))
           agg <- aggregate(toagg, fact = 10, fun = mean, na.rm = TRUE) # take mean 
           names(agg) <- names[i]
-          writeRaster(agg, filename = paste0("output/alegana", names[i], "10x10.tif"), overwrite = TRUE)
+          writeRaster(agg, filename = paste0(here("data/processed/alegana/"), names[i], "10x10.tif"), overwrite = TRUE)
   }
 
 # Close out

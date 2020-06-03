@@ -1,28 +1,30 @@
 # ------------------------------------------------------------------------------------------------ #
-#' Write out simplified shapefiles for cluster                  
+#' Write out simplified shapefiles for use throughout project                  
 # ------------------------------------------------------------------------------------------------ #
 
 library(rgdal)
 library(malariaAtlas)
 library(rmapshaper)
+library(tidyverse)
+library(here)
 
 # metadata
-metadata <- read.csv("wp_data/Africa_1km_Age_structures_2020/Demographic_data_organisation_per country_AFRICA.csv")
+metadata <- read_csv(here("data/raw/Africa_1km_Age_structures_2020/Demographic_data_organisation_per country_AFRICA.csv"))
 iso_codes <- data.frame(iso = metadata$ISO_3, country = metadata$name_english)
-write.csv(iso_codes, "output/iso_codes.csv", row.names = FALSE)
+write_csv(iso_codes, here("output/iso_codes.csv"))
 
 # Country level
 countries <- getShp(ISO = metadata$ISO_3)
 countries@data <- data.frame(apply(countries@data, 2, iconv, from ='utf-8', to ='ascii', sub=''))
 countries <- ms_simplify(countries, keep_shapes = TRUE, sys = TRUE)
-writeOGR(countries, dsn = "shapefiles", layer = "country", 
+writeOGR(countries, dsn = here("data/processed/shapefiles"), layer = "country", 
          driver = "ESRI Shapefile", overwrite_layer = TRUE)
 
 # Admin 1
 admin1 <- getShp(ISO = metadata$ISO_3, admin_level = "admin1")
 admin1@data <- data.frame(apply(admin1@data, 2, iconv, from ='utf-8', to ='ascii', sub=''))
 admin1 <- ms_simplify(admin1, keep_shapes = TRUE, sys = TRUE)
-writeOGR(admin1, dsn = "shapefiles", layer = "admin1", 
+writeOGR(admin1, dsn = here("data/processed/shapefiles"), layer = "admin1", 
          driver = "ESRI Shapefile", overwrite_layer = TRUE)
 
 # Admin 2
@@ -40,7 +42,7 @@ admin2@data %>%
          min_admin_type = case_when(is.na(type_1) ~ as.character(type_0),
                                     is.na(type_2) ~ as.character(type_1),
                                     !is.na(type_2) ~ as.character(type_2))) -> admin2@data
-writeOGR(admin2, dsn = "shapefiles", layer = "admin2", 
+writeOGR(admin2, dsn = here("data/processed/shapefiles"), layer = "admin2", 
          driver = "ESRI Shapefile", overwrite_layer = TRUE)
 
 # Admin 3
@@ -50,7 +52,7 @@ writeOGR(admin2, dsn = "shapefiles", layer = "admin2",
 admin3 <- getShp(ISO = metadata$ISO_3, admin_level = "admin3")
 admin3@data <- data.frame(apply(admin3@data, 2, iconv, from ='utf-8', to ='ascii', sub=''))
 admin3 <- ms_simplify(admin3, keep_shapes = TRUE, sys = TRUE)
-writeOGR(admin3, dsn = "shapefiles", layer = "admin3", 
+writeOGR(admin3, dsn = here("data/processed/shapefiles"), layer = "admin3", 
          driver = "ESRI Shapefile", overwrite_layer = TRUE)
 
 # Master shapefile (finest admin unit available)
@@ -70,5 +72,5 @@ admin3@data %>%
                                     !is.na(type_3) ~ as.character(type_3),
                                     is.na(type_3) ~ as.character(type_2))) -> admin3@data
 
-writeOGR(admin3, dsn = "shapefiles", layer = "master", 
+writeOGR(admin3, dsn = here("data/processed/shapefiles"), layer = "master", 
          driver = "ESRI Shapefile", overwrite_layer = TRUE)
