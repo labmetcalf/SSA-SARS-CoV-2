@@ -45,15 +45,18 @@ write_csv(un_ages, here("data/processed/un_ages.csv"))
 # TO DO
 
 # Summarize prop over 65 -----------------------------------------------------------------
-un_ages %>%
-  group_by(country, iso) %>%
-  summarize(pop_total = sum(pop), pop_over60 = sum(pop[as.numeric(age) > 60]),
-            prop_over60 = pop_over60/pop_total) -> pop_over60
-
 indicators <- read_csv(here("data/processed/SSA.health.indicators.csv"))
 
+un_ages %>%
+  group_by(iso) %>%
+  summarize(pop_total = sum(pop), pop_over60 = sum(pop[as.numeric(age) > 60]),
+            prop_over60 = pop_over60/pop_total) %>%
+  filter(!is.na(iso)) %>%
+  left_join(distinct(select(indicators, COUNTRY_CODE, COUNTRY_NAME)), 
+            by = c("iso" = "COUNTRY_CODE")) -> pop_over60
+
 pop_over60 %>%
-  select(COUNTRY_CODE = iso, COUNTRY_NAME = country, value = prop_over60) %>%
+  select(COUNTRY_CODE = iso, value = prop_over60) %>%
   mutate(alias = "prop_over60", 
          indicator_label_standard = "Proportion of population over age 60") %>%
   bind_rows(indicators) -> indicators

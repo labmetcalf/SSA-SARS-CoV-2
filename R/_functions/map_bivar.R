@@ -51,12 +51,12 @@ map_bivariate <- function(x, y, lab_x, lab_y, loc_labs, loc_ids, sf_obj,
              "high-low" = "#DE4FA6", "high-mid" = "#B03598", "high-high" = "#2A1A8A")
     
     bivar_df %>%
-      mutate(class_x = case_when(x_perc_map <= probs_x[1] ~ "low", 
-                                 x_perc_map > probs_x[1] & x_perc_map < probs_x[2] ~ "mid", 
-                                 x_perc_map >= probs_x[2] ~ "high"),
-             class_y = case_when(y_perc_map <= probs_y[1] ~ "low", 
-                                 y_perc_map > probs_y[1] & y_perc_map < probs_y[2] ~ "mid", 
-                                 y_perc_map >= probs_y[2] ~ "high"),
+      mutate(class_x = case_when(x_perc_map <= probs_x[1] & !is.na(x_perc_map) ~ "low", 
+                                 x_perc_map > probs_x[1] & x_perc_map < probs_x[2] & !is.na(x_perc_map) ~ "mid", 
+                                 x_perc_map >= probs_x[2] & !is.na(x_perc_map) ~ "high"),
+             class_y = case_when(y_perc_map <= probs_y[1] & !is.na(y_perc_map) ~ "low", 
+                                 y_perc_map > probs_y[1] & y_perc_map < probs_y[2] & !is.na(y_perc_map) ~ "mid", 
+                                 y_perc_map >= probs_y[2] & !is.na(y_perc_map) ~ "high"),
              color = pal[match(paste(class_x, class_y, sep = "-"), names(pal))]) -> bivar_df
     
     legend_df <-  data.frame(color = pal, x_coord = rep(c(0, 1, 2), each = 3), 
@@ -70,6 +70,7 @@ map_bivariate <- function(x, y, lab_x, lab_y, loc_labs, loc_ids, sf_obj,
   }
   
   if(continuous == TRUE) {
+    
     bivar_df %>%
       mutate(color = pmap_chr(list(x_perc = x_perc_map, y_perc = y_perc_map), 
                           get_color_continuous)) -> bivar_df
@@ -174,14 +175,20 @@ map_bivariate <- function(x, y, lab_x, lab_y, loc_labs, loc_ids, sf_obj,
 #' @param y_perc the percentile of the y variable (from ecdf)
 #' @return colors for each 
 #' @section Dependencies: none
-#'  
+#'  To Do: catch & process NAs correctly
 get_color_continuous <- function(x_perc, y_perc) {
   
     alpha <- 0.5*max(x_perc, y_perc) + 0.5*x_perc*y_perc
+    if(x_perc >= y_perc & !is.na(x_perc) & !is.na(y_perc)) col.val <- colorRamp(c("#B03598", "#2A1A8A"))(y_perc / x_perc)
+    if(x_perc < y_perc  & !is.na(x_perc) & !is.na(y_perc))  col.val <- colorRamp(c("#3983BB", "#2A1A8A"))(x_perc / y_perc) 
+    if(x_perc >= y_perc & !is.na(x_perc) & !is.na(y_perc)) col.val <- colorRamp(c("#B03598", "#2A1A8A"))(y_perc / x_perc)
     
-    if(x_perc >= y_perc) col.val <- colorRamp(c("#B03598", "#2A1A8A"))(y_perc / x_perc)
-    if(x_perc < y_perc)  col.val <- colorRamp(c("#3983BB", "#2A1A8A"))(x_perc / y_perc) 
-    if(x_perc == 0 & y_perc == 0) col.val <- rep(255, 3)
+    if(is.na(x_perc) | is.na(y_perc)) {
+      col.val <- c(169, 169, 169)
+      alpha <- 1
+    }
+    
+    if(x_perc == 0 & y_perc == 0 & !is.na(x_perc) & !is.na(y_perc)) col.val <- rep(255, 3)
     
     rgb(col.val[1], col.val[2], col.val[3], alpha = alpha*255, maxColorValue = 255)
 }
