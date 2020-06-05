@@ -1,0 +1,2010 @@
+---
+title: "CRS Prevalence Manuscript v7 scripts"
+author: "Benny Rice"
+date: "05/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE, eval = TRUE}
+knitr::opts_chunk$set(echo = FALSE, eval = FALSE)
+```
+
+***
+***
+<style>
+div.green { background-color:#d1ebd6; border-radius: 5px; padding: 10px;}
+</style>
+<div class = "green">
+
+## HEADER INFO
+
+- Benny Rice | Department of Ecology and Evolutionary Biology | Princeton University
+- b.rice@princeton.edu
+- Code associated with analysis of malaria prevalence RDT surveys
+- Apologies in advance for amateurish code (ie all the loops and clunkiness)
+
+</div>
+
+***
+(Set up: Defining main working directory, loading necessary packages)
+```{r define mainDir + packages, echo = FALSE, message = FALSE, eval = TRUE}
+mainDir <- '/Users/blrice/Dropbox/Lab Projects/Publishing/2018 10 01 Darwin CRS Prevalence Paper/R code/'
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(reshape2)
+library(ggpubr)
+library(geosphere)
+library(ggalt)
+library(ggrepel)
+```
+
+***
+
+#### GENERAL NOTES
+
+##### Notes on document layot:
+
+- Items/errors requiring attention are denoted with "**FIX**"
+
+##### 2020 05 24 Notes
+
+- Darwin data cleaning: Check on TP1, TP2, and TP3 issue
+
+
+***
+
+#### OUTLINE:
+
+- Section 1:
+- Section 2:
+- Section 3:
+- Section 4:
+- Section 5:
+
+
+**FIX** Update outline at the end (Figures and tables interspersed ^)
+
+***
+***
+
+<style>
+div.green { background-color:#d1ebd6; border-radius: 5px; padding: 10px;}
+</style>
+<div class = "green">
+
+### Section 1 | Reading in and cleaning data
+
+</div>
+
+***
+***
+
+##### (1.01) `makira_data`: Data from Region 1 (Maroantsetra) 2013-2014 (the MAHERY Makira Cohort Study)
+
+##### Extracting and cleaning demographic (age, sex, household) data and RDT result data from data sheet
+
+- Sourcing data from: Bapu Vaitla's github for the Makira Cohort Study (Downloaded 22 May 2020)
+- Reference: Golden et al 2017. Cohort Profile: The Madagascar Health and Environmental Research (MAHERY) study in north-eastern Madagascar. International Journal of Epidemiology, Volume 46, Issue 6, December 2017, Pages 1747–1748d. [PMID: 29040632](https://pubmed.ncbi.nlm.nih.gov/29040632/)
+
+```{r 1.01.1, eval = TRUE}
+filename_makira_data <- "indT3 data downloaded from Bapu github 2020 05 22.csv"
+untrimmed.makira_data <- read.csv(file.path(mainDir, filename_makira_data), stringsAsFactors = FALSE)
+
+makira.data_subset_variables <- c("vill", "hh", "ind", "clin_tp", "sex", "ageyears", "malaria_valid", "malaria_pos")
+trimmed.makira_data <- untrimmed.makira_data[makira.data_subset_variables]
+```
+
+##### Cleaning the `makira_data`:
+
+1. Combining site, household, and individual ID codes into a unique_ind_id matching the format of the other data sets
+2. Adding a calculated age in years (at midpoint of the study, by taking the mean) for all individual time point records
+3. Adding a new column specifying sex as male or female
+4. Removing rows without RDT test results (corresponding to time points for which an individual did not complete a blood sample)
+5. Decomposing unique_ind_id into standardized region, site, and hh ids
+6. Standardizing site ID codes and names so as to not overlap with the Darwin Cohort site codes. Per the table below:
+
+| site_id | site_code | site_name          |
+| ------- | --------- | ------------------ |
+| `101`   | `R1.01`   | `R1_V1_Antaravato` |
+| `102`   | `R1.02`   | `R1_V2_Vinanibe`   |
+
+7. Coding `time_point` per the sampling intervals in the table below:
+ 
+| time_point | Dates                     |
+| ---------- | ------------------------- |
+| `1`        | 01 Jul 2013 - 08 Aug 2013 |
+| `2`        | 10 Nov 2013 - 31 Dec 2013 |
+| `3`        | 05 Mar 2014 - 28 Mar 2014 |
+
+8. Coding `rdt_result` per the table below:
+
+| rdt_result | Notes                       |
+| ---------- | --------------------------- |
+| `0`        | Negative RDT                |
+| `1`        | Positive RDT (Pan or PanPf) |
+| `-1`       | Invalid RDT                 |
+
+
+```{r 1.01.2, eval = TRUE}
+clean.makira_data <- trimmed.makira_data %>% 
+  mutate(unique_ind_id = as.numeric(paste0("10", vill, ifelse(hh > 9, "00", "000"), hh, ifelse(ind > 9, "0", "00"), ind))) %>%
+  group_by(unique_ind_id) %>%
+  mutate(ageyears = mean(ageyears, na.rm=TRUE), sex = ifelse(sex[1] == 1, "male", "female")) %>% ungroup()
+clean.makira_data <- clean.makira_data[!is.na(clean.makira_data$malaria_valid), ]
+clean.makira_data <- clean.makira_data[clean.makira_data$malaria_valid == 1 | clean.makira_data$malaria_pos == "INVALID", ]
+clean.makira_data <- clean.makira_data %>% 
+  mutate(malaria_pos = case_when(
+           malaria_pos == "0"       ~  0,
+           malaria_pos == "1"       ~  1,
+           malaria_pos == "INVALID" ~ -1),
+         rdt_result = malaria_pos,
+         time_point = clin_tp,
+         region_id = 1,
+         region_name = "R1 (NE) Maroantsetra",
+         site_id   = round(unique_ind_id/10000000),
+         hh_id     = round(unique_ind_id/1000),
+         site_name = ifelse(site_id == 101, "R1_V1_Antaravato", ifelse(site_id == 102, "R1_V2_Vinanibe", NA))
+         ) %>% 
+  select(unique_ind_id, region_id, region_name, site_name, site_id, hh_id, ageyears, sex, time_point, rdt_result)
+clean.makira_data <- clean.makira_data[order(clean.makira_data$time_point, clean.makira_data$unique_ind_id), ]
+#Removing individuals without age, sex, or RDT data
+clean.makira_data <- clean.makira_data[!is.na(clean.makira_data$ageyears), ]
+clean.makira_data <- clean.makira_data[!is.na(clean.makira_data$sex), ]
+clean.makira_data <- clean.makira_data[!is.na(clean.makira_data$rdt_result), ]
+#Removing invalid individuals
+clean.makira_data <- clean.makira_data[clean.makira_data$rdt_result != -1, ]
+```
+
+***
+
+##### (1.02) `darwin_data`: Data from Region 1 (Maroantsetra) 2016-2017 (the MAHERY Darwin (Antongil Bay) Cohort Study)
+
+##### Extracting and cleaning demographic (age, sex, household) data and RDT result data from data sheets
+
+- Sourcing RDT result data for time points 2 and 3 from: Darwin Data Dropbox folder (Downloaded 02 March 2020) `RDT_Anemia.xlsx`
+- Sourcing age-sex data and RDT result data for time point 1 from: Darwin Data Dropbox folder (Downloaded 02 March 2020) `Coded Individuals List (Darwin) Ben 20180823.xlsx`
+- Reference: Golden et al 2019. Cohort Description of the Madagascar Health and Environmental Research-Antongil (MAHERY-Antongil) Study in Madagascar. Front Nutr. 2019 Jul 19;6:109. [PMID: 31428615](https://pubmed.ncbi.nlm.nih.gov/31428615/)
+
+```{r 1.02.1, eval = TRUE}
+#RDT result data
+#Reading in csv
+filename_darwin_rdt_data <- "RDT_Anemia.csv"
+untrimmed.darwin_rdt_data <- read.csv(file.path(mainDir, filename_darwin_rdt_data), stringsAsFactors = FALSE)
+#Trimming out unnecessary columns
+darwin.rdt_data_subset_variables <- c("Village.Name", "unique_ind_id", "tp", "Rdt_date", "RDT_results")
+trimmed.darwin_rdt_data <- untrimmed.darwin_rdt_data[darwin.rdt_data_subset_variables]
+#Deleting time point 1 data (will use the data from "Coded Individuals List (Darwin) Ben 20180823.csv" for TP1)
+trimmed.darwin_rdt_data <- trimmed.darwin_rdt_data[trimmed.darwin_rdt_data$tp != 1, ]
+
+#Demographic data
+filename_darwin_demo_data <- "Coded Individuals List (Darwin) Ben 20180823.csv"
+untrimmed.darwin_demo_data <- read.csv(file.path(mainDir, filename_darwin_demo_data), stringsAsFactors = FALSE)
+
+darwin.demo_data_subset_variables <- c("Village.Name", "Village.Code", "Household.Code", "Individual.Code", "Sex", "Calculated.Age", "unique_ind_id",  "RDT.Result...Coded...........................Not.sampled...0..No.Data...1..Negative...2..Invalid...3..Pan...4..Pf...5..PanPf...6.")
+trimmed.darwin_demo_data <- untrimmed.darwin_demo_data[darwin.demo_data_subset_variables]
+trimmed.darwin_demo_data <- trimmed.darwin_demo_data %>% mutate(TP1_RDT_result = RDT.Result...Coded...........................Not.sampled...0..No.Data...1..Negative...2..Invalid...3..Pan...4..Pf...5..PanPf...6.) %>%
+  select(Village.Name, Village.Code, Household.Code, Individual.Code, Sex, Calculated.Age, unique_ind_id, TP1_RDT_result)
+```
+
+##### Cleaning the `darwin_data`:
+
+1. RDT data: Deleting rows with "NA" or "ND" for rdt_result. Standardizing column names
+
+2. RDT data: Standardizing site ID codes and names so as to not overlap with the Darwin Cohort site codes. Per the table below:
+
+| site_id | site_code | site_name           |
+| ------- | --------- | ------------------- |
+| `111`   | `R1.11`   | `R1_V1_Rantohely`   |
+| `112`   | `R1.12`   | `R1_V2_Maintimbato` |
+| `113`   | `R1.13`   | `R1_V3_Iharaka`     |
+| `114`   | `R1.14`   | `R1_V4_Marofototra` |
+| `115`   | `R1.15`   | `R1_V5_Ambodipaka`  |
+
+
+3. RDT data: Coding `time_point` per the sampling intervals in the table below
+
+| time_point | Dates                     |
+| ---------- | ------------------------- |
+| `1`        | 09 Aug 2016 - 12 Sep 2016 |
+| `2`        | 27 Oct 2016 - 04 Dec 2016 |
+| `3`        | 01 Apr 2017               |
+
+
+4. RDT data: Coding `rdt_result` per the table below:
+
+| rdt_result | Notes                       |
+| ---------- | --------------------------- |
+| `0`        | Negative RDT                |
+| `1`        | Positive RDT (Pan or PanPf) |
+| `-1`       | Invalid RDT                 |
+
+5. RDT data: Standardizing region, site, hh, unique_ind_id, sex codes
+
+6. RDT data: Checking for duplicates
+  - Data issues corrected:
+    - 9 duplicated unique_ind_ids for TP2
+      - 7 of the TP2 duplicates were listed as V3 Iharaka but are instead from V4 Marofototra (changed by hardcoding)
+      - Two duplicates from TP2 (`104032001` and `104033004`) are errors (no record of those individuals participating in blood draws on that date), both rows were deleted
+    - 2 duplicated unique_ind_ids for TP3
+      - For the first duplicate (`102017002`), one is RDT negative, the other is RDT positive. To be conservative, both rows were deleted
+      - For the other duplicate (`104047002`), both are RDT negative. To be conservative, both rows were deleted
+
+6. Cleaning Darwin demographic data by standardizing age data and ID codes. Correcting duplicate ID codes by hardcoding
+  - Correcting individual `101060001` to `101060002` by hardcoding (as determined by individual age, individual was assigned wrong ID code at first)
+
+7. Joining `rdt_result` data with demographic data by the `unique_ind_id`
+  - `unique_ind_id` not matching with an `rdt_result`: Not all individuals were sampled, row deleted
+  - `rdt_result` not matching with a `unique_ind_id`: Error in recording ID code during sampling, row deleted
+
+```{r 1.02.2, eval = TRUE}
+#Cleaning rdt_result data first
+clean.darwin_rdt_data <- trimmed.darwin_rdt_data[trimmed.darwin_rdt_data$RDT_results != "ND", ]
+#Hardcoding to correct for V3 vs V4 error for samples taken November 30, 2016
+clean.darwin_rdt_data <- clean.darwin_rdt_data %>% 
+  mutate(
+    unique_ind_id = case_when(
+      #Adding 1000000 to the numeric ID code changes the unique_ind_id such that it is in V4 instead of V3
+      Rdt_date == "2016-11-30" ~ unique_ind_id + 1000000,
+      TRUE ~ as.numeric(unique_ind_id)),
+    Village.Name = case_when(
+      Rdt_date == "2016-11-30" ~ "Marofototra",
+      TRUE ~ as.character(Village.Name))
+  )
+#Deleting two TP2 duplicates
+clean.darwin_rdt_data <- clean.darwin_rdt_data[
+  !(clean.darwin_rdt_data$unique_ind_id == 104032001 & clean.darwin_rdt_data$Rdt_date == "2016-12-04"), ]
+clean.darwin_rdt_data <- clean.darwin_rdt_data[
+  !(clean.darwin_rdt_data$unique_ind_id == 104033004 & clean.darwin_rdt_data$Rdt_date == "2016-12-04"), ]
+#Deleting two TP3 duplicates
+clean.darwin_rdt_data <- clean.darwin_rdt_data[
+  !(clean.darwin_rdt_data$unique_ind_id == 102017002), ]
+clean.darwin_rdt_data <- clean.darwin_rdt_data[
+  !(clean.darwin_rdt_data$unique_ind_id == 104047002), ]
+#Finishing cleaning
+clean.darwin_rdt_data <- clean.darwin_rdt_data %>% 
+  mutate(RDT_results = as.numeric(case_when(
+           RDT_results == "n"     ~  0,
+           RDT_results == "pan"   ~  1,
+           RDT_results == "panpf" ~  1,
+           RDT_results == "pf"    ~  1,
+           RDT_results == "pos"   ~  1,
+           RDT_results == "i"     ~ -1)),
+         rdt_result = RDT_results,
+         time_point = tp,
+         site_name = case_when(
+           Village.Name == "Rantohely"   ~ "R1_V1_Rantohely",
+           Village.Name == "Maintimbato" ~ "R1_V2_Maintimbato",
+           Village.Name == "Iharaka"     ~ "R1_V3_Iharaka",
+           Village.Name == "Marofototra" ~ "R1_V4_Marofototra",
+           Village.Name == "Ambodipaka"  ~ "R1_V5_Ambodipaka"),
+         site_id = case_when(
+           Village.Name == "Rantohely"   ~ 111,
+           Village.Name == "Maintimbato" ~ 112,
+           Village.Name == "Iharaka"     ~ 113,
+           Village.Name == "Marofototra" ~ 114,
+           Village.Name == "Ambodipaka"  ~ 115),
+         region_id = 1,
+         region_name = "R1 (NE) Maroantsetra",
+         unique_ind_id = as.numeric(paste0(site_id, "0", substring(unique_ind_id, 4, 9))),
+         hh_id     = round(unique_ind_id/1000),
+         ) %>% 
+  select(unique_ind_id, region_id, region_name, site_name, site_id, hh_id, time_point, rdt_result)
+clean.darwin_rdt_data <- clean.darwin_rdt_data[!is.na(clean.darwin_rdt_data$rdt_result), ]
+clean.darwin_rdt_data <- clean.darwin_rdt_data[order(clean.darwin_rdt_data$time_point, clean.darwin_rdt_data$unique_ind_id), ]
+
+#Cleaning demographic data second
+#Dropping rows with NAs
+clean.darwin_demo_data <- trimmed.darwin_demo_data[!is.na(trimmed.darwin_demo_data$Village.Code), ]
+#Fixing one ID code
+clean.darwin_demo_data$unique_ind_id[clean.darwin_demo_data$unique_ind_id == "101060001" & 
+                                       clean.darwin_demo_data$Calculated.Age == "3.1"] <- "101060002"
+#Finishing cleaning
+clean.darwin_demo_data <- clean.darwin_demo_data[!is.na(clean.darwin_demo_data$unique_ind_id), ]
+clean.darwin_demo_data <- clean.darwin_demo_data[clean.darwin_demo_data$unique_ind_id != "ND", ]
+clean.darwin_demo_data <- clean.darwin_demo_data %>% 
+  mutate(ageyears = as.numeric(ifelse(Calculated.Age == "ND", NA, Calculated.Age)),
+    sex = case_when(
+      Sex == "L" ~ "male",
+      Sex == "V" ~ "female",
+      Sex == "ND" ~ NA_character_),
+    site_name = case_when(
+      Village.Name == "Rantohely"   ~ "R1_V1_Rantohely",
+      Village.Name == "Maintimbato" ~ "R1_V2_Maintimbato",
+      Village.Name == "Iharaka"     ~ "R1_V3_Iharaka",
+      Village.Name == "Marofototra" ~ "R1_V4_Marofototra",
+      Village.Name == "Ambodipaka"  ~ "R1_V5_Ambodipaka"),
+    site_id = case_when(
+      Village.Name == "Rantohely"   ~ 111,
+      Village.Name == "Maintimbato" ~ 112,
+      Village.Name == "Iharaka"     ~ 113,
+      Village.Name == "Marofototra" ~ 114,
+      Village.Name == "Ambodipaka"  ~ 115),
+    region_id     = 1,
+    region_name   = "R1 (NE) Maroantsetra",
+    unique_ind_id = as.numeric(paste0(site_id, "0", substring(unique_ind_id, 4, 9))),
+    hh_id         = round(unique_ind_id/1000),
+    time_point    = 1,
+    #Recoding: RDT.Result.Coded: Not.sampled = 0, No.Data.= 1, Negative = 2, Invalid = 3, Pan Pf PanPf = 6
+    TP1_RDT_result = as.numeric(case_when(
+           TP1_RDT_result == "0" ~ NA_real_,
+           TP1_RDT_result == "1" ~ NA_real_,
+           TP1_RDT_result == "2" ~  0,
+           TP1_RDT_result == "3" ~ -1,
+           TP1_RDT_result == "4" ~  1,
+           TP1_RDT_result == "5" ~  1,
+           TP1_RDT_result == "6" ~  1)),
+    rdt_result = TP1_RDT_result) %>% 
+  select(unique_ind_id, region_id, region_name, site_name, site_id, hh_id, ageyears, sex, time_point, rdt_result)
+
+#Joining RDT result and demographic data 1 time point at a time
+tp1.clean.darwin_data <- clean.darwin_demo_data
+
+tp2.clean.darwin_data <- full_join(
+  subset(clean.darwin_demo_data, select = -c(time_point, rdt_result)), 
+  clean.darwin_rdt_data[clean.darwin_rdt_data$time_point == 2, ],
+  by = c("unique_ind_id", "region_id", "region_name", "site_name", "site_id", "hh_id"))
+
+tp3.clean.darwin_data <- full_join(
+  subset(clean.darwin_demo_data, select = -c(time_point, rdt_result)), 
+  clean.darwin_rdt_data[clean.darwin_rdt_data$time_point == 3, ],
+  by = c("unique_ind_id", "region_id", "region_name", "site_name", "site_id", "hh_id"))
+
+#Binding the joined dataframes together
+clean.darwin_data <- rbind(tp1.clean.darwin_data, tp2.clean.darwin_data, tp3.clean.darwin_data)
+#Removing individuals without age, sex, or RDT data
+clean.darwin_data <- clean.darwin_data[!is.na(clean.darwin_data$ageyears), ]
+clean.darwin_data <- clean.darwin_data[!is.na(clean.darwin_data$sex), ]
+clean.darwin_data <- clean.darwin_data[!is.na(clean.darwin_data$rdt_result), ]
+#Remove invalid individuals
+clean.darwin_data <- clean.darwin_data[clean.darwin_data$rdt_result != -1, ]
+```
+
+***
+
+##### (1.03) `crs2017_data`: Data from Regions 2-5 (SE, SW, WC, HP) 2017 (the CRS 2017 Cross-sectional Study)
+
+##### Extracting and cleaning demographic (age, sex, household) data and RDT result data from data sheets
+
+- Sourcing data from: CRS Data Cleaning Folder (Downloaded 23 May 2020)
+- Reference: Golden, Rice et al 2020. A cross-sectional study of the social, demographic, and ecological variation of nutrition and disease across Madagascar (submitted to Frontiers in Public Health) 
+
+```{r 1.03.1, eval = TRUE}
+#RDT data
+filename_crs_rdt_data <- "CRS2017_clinical_data_20200523.csv"
+untrimmed.crs_rdt_data <- read.csv(file.path(mainDir, filename_crs_rdt_data), stringsAsFactors = FALSE)
+
+crs_rdt.data_subset_variables <- c("unique_ind_id", "rdt_result")
+trimmed.crs_rdt_data <- untrimmed.crs_rdt_data[crs_rdt.data_subset_variables]
+
+#Demographic data
+filename_crs_demo_data <- "CRS2017_master_individual_list_20200523.csv"
+untrimmed.crs_demo_data <- read.csv(file.path(mainDir, filename_crs_demo_data), stringsAsFactors = FALSE)
+
+crs_demo.data_subset_variables <- c("unique_ind_id", "sex", "calculated_age", "enrolled")
+trimmed.crs_demo_data <- untrimmed.crs_demo_data[crs_demo.data_subset_variables]
+```
+
+##### Cleaning the `crs2017_data`:
+
+1. Joining the RDT result and demographic data
+2. Decomposing unique_ind_id into standardized region, site, and hh ids
+3. Removing rows without RDT test results (corresponding to individuals that did not complete a blood sample)
+4. Decomposing unique_ind_id into standardized region, site, and hh ids
+
+5. Coding `rdt_result` per the table below:
+
+| rdt_result | Notes                       |
+| ---------- | --------------------------- |
+| `0`        | Negative RDT (n or N)       |
+| `1`        | Positive RDT (pan or panpf) |
+| `-1`       | Invalid RDT (i)             |
+
+```{r 1.03.2, eval = TRUE}
+#Joining
+clean.crs_data <- full_join(trimmed.crs_demo_data, trimmed.crs_rdt_data, by = "unique_ind_id")
+#Removing unenrolled individuals
+clean.crs_data <- clean.crs_data[clean.crs_data$enrolled == 1, ]
+#Cleaning
+clean.crs_data <- clean.crs_data %>% mutate(
+  region_id = round(unique_ind_id/1000000000),
+  region_name = case_when(
+    region_id == 2 ~ "R2 (SE) Mananjary",
+    region_id == 3 ~ "R3 (SW) Toliara",
+    region_id == 4 ~ "R4 (WC) Morombe",
+    region_id == 5 ~ "R5 (HP) Ambositra"),
+  site_id   = round(unique_ind_id/10000000),
+  site_name = case_when(
+    site_id == 201 ~ "R2_V1_Tsaravary",
+    site_id == 202 ~ "R2_V2_Amboanato",
+    site_id == 203 ~ "R2_V3_Manampotsy",
+    site_id == 204 ~ "R2_V4_Ambalavontaka",
+    site_id == 205 ~ "R2_V5_Marohita",
+    site_id == 206 ~ "R3_V6_Madiolamba",
+    site_id == 301 ~ "R3_V1_Tsianisiha II",
+    site_id == 302 ~ "R3_V2_Ankatsaka",
+    site_id == 303 ~ "R3_V3_Ankoririaka",
+    site_id == 304 ~ "R3_V4_Amboaboaka",
+    site_id == 305 ~ "R3_V5_Ambotsibotsike",
+    site_id == 306 ~ "R3_V6_Belitsake Tanindraza",
+    site_id == 401 ~ "R4_V1_Mangolovolo",
+    site_id == 402 ~ "R4_V2_Andrenalahamba-Ambalakonazy",
+    site_id == 403 ~ "R4_V3_Ankida",
+    site_id == 404 ~ "R4_V4_Bevondro Kilambaia",
+    site_id == 405 ~ "R4_V5_Andranodehoky",
+    site_id == 406 ~ "R4_V6_Maharihy",
+    site_id == 501 ~ "R5_V1_Alakamisy",
+    site_id == 502 ~ "R5_V2_Andraraopy",
+    site_id == 503 ~ "R5_V3_Ampanenjanana",
+    site_id == 504 ~ "R5_V4_Tsiefa",
+    site_id == 505 ~ "R5_V5_Soavina",
+    site_id == 506 ~ "R5_V6_Laisada"),
+  hh_id =  round(unique_ind_id/1000),
+  ageyears = calculated_age,
+  time_point = 3, #setting to 3 to line up with rainy season
+  rdt_result = as.numeric(case_when(
+    rdt_result == "n"     ~  0,
+    rdt_result == "N"     ~  0,
+    rdt_result == "pan"   ~  1,
+    rdt_result == "panpf" ~  1,
+    rdt_result == "i"     ~ -1))) %>%
+  select(unique_ind_id, region_id, region_name, site_name, site_id, hh_id, ageyears, sex, time_point, rdt_result)
+#Removing individuals without age, sex, or RDT data
+clean.crs_data <- clean.crs_data[!is.na(clean.crs_data$ageyears), ]
+clean.crs_data <- clean.crs_data[!is.na(clean.crs_data$sex), ]
+clean.crs_data <- clean.crs_data[!is.na(clean.crs_data$rdt_result), ]
+#Remove invalid individuals
+clean.crs_data <- clean.crs_data[clean.crs_data$rdt_result != -1, ]
+```
+
+***
+
+##### (1.04) Combining `makira_data` + `darwin_data` + `crs2017_data`: Data from Regions 1-5 (NE, SE, SW, WC, HP) 2013-2017
+```{r 1.04, eval = TRUE}
+#Binding the joined dataframes together
+rdt_data <- rbind(clean.makira_data, clean.darwin_data, clean.crs_data)
+rdt_data <- rdt_data %>% mutate(site_code = paste0("R", region_id, ".", substring(as.character(site_id), 2, 3))) %>%
+  select(unique_ind_id, region_id, region_name, site_name, site_code, site_id, hh_id, ageyears, sex, time_point, rdt_result)
+rdt_data <- rdt_data[order(rdt_data$unique_ind_id, rdt_data$time_point), ]
+```
+
+
+***
+***
+
+<style>
+div.green { background-color:#d1ebd6; border-radius: 5px; padding: 10px;}
+</style>
+<div class = "green">
+
+### Section 2 | Summarizing prevalence by site (and time point)
+
+</div>
+
+***
+***
+
+##### (2.01) Making the `prev_by_site_table`:
+
+- Data table columns:
+    - `site_code`
+    - `time_point`
+    - `region_id`, `region_name`
+    - `n_hh_site`: Number of households for the site
+    - `n_site`: Sample size for the site
+    - `n_rdt_pos_site`: Number of RDT positive individuals at the site
+    - `prev_site`: % of sampled individuals that are RDT positive at the site
+
+```{r 2.01, eval = TRUE}
+#Making the prev_by_site_table
+prev_by_site_table <- rdt_data %>% group_by(site_code, time_point) %>% summarize(
+  region_id      = unique(region_id), region_name = unique(region_name),
+  n_hh_site      = length(unique(hh_id)),
+  n_site         = length(rdt_result),
+  n_rdt_pos_site = sum(rdt_result),
+  prev_site      = sum(rdt_result) / length(rdt_result) * 100
+) %>% ungroup()
+#Printing the prev_by_site_table
+kable(prev_by_site_table, caption = "Table 2.01: Prevalence by site (and time point") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"), font_size = 8)
+```
+
+***
+***
+
+<style>
+div.green { background-color:#d1ebd6; border-radius: 5px; padding: 10px;}
+</style>
+<div class = "green">
+
+### Section 3 | Summarizing prevalence by household
+
+</div>
+
+***
+***
+
+##### (3.01) Making the `hh_rdt_pos_table`:
+
+- For each household, calculate number of individuals sampled and number of RDT positives
+- Data table columns:
+  - `hh_id`
+  - `time_point`
+  - `region_id`, `region_name`
+  - `site_code`
+  - `hh_ind_count`: Number of individuals sampled in the household (household size)
+  - `hh_rdt_pos_count`: Number of RDT positive individuals sampled in the household
+  - `hh_prevalence`: % of individuals RDT positive in the household
+  
+```{r 3.01, eval = TRUE}
+hh_rdt_pos_table <- rdt_data %>% group_by(time_point, hh_id) %>% summarise(
+  region_id        = unique(region_id), region_name = unique(region_name),
+  site_code        = unique(site_code),
+  hh_ind_count     = length(hh_id),
+  hh_rdt_pos_count = sum(rdt_result),
+  hh_prevalence    = sum(rdt_result) / length(hh_id) * 100
+) %>% ungroup()
+#Removing households with only 1 individual who completed the blood sample
+hh_rdt_pos_table <- hh_rdt_pos_table[hh_rdt_pos_table$hh_ind_count > 1, ]
+#Previewing the hh_rdt_pos_table
+hh_rdt_pos_table_fp <- hh_rdt_pos_table[1:200, ]
+kable(hh_rdt_pos_table_fp, caption = "Table 3.01: Preview of the hh_rdt_pos_table") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"), font_size = 8) %>% scroll_box(width = "100%", height = "300px")
+```
+
+***
+
+##### (3.02) Making the `hh_infs_site_table`:
+
+- For each site (and time point), number and % of households with 0, 1, 2, 3 infections and 1+, 2+, 3+, and 4+ infection
+- Data table columns:
+  - `site_code`
+  - `time_point`
+  - `region_id`
+  - `n_hh_site`: Number of households for the site
+  - `n_hh_0_pos`...`prev_hh_4plus_pos`: Number and percentage of households with a given number of positives
+
+```{r 3.02, eval = TRUE}
+hh_infs_site_table <- hh_rdt_pos_table %>% group_by(time_point, site_code) %>% summarise(
+  region_id         = unique(region_id), region_name = unique(region_name),
+  n_hh_site         = length(hh_id),
+  
+  n_hh_0_pos        = length(which(hh_rdt_pos_count == '0')),
+  n_hh_1_pos        = length(which(hh_rdt_pos_count == '1')),
+  n_hh_2_pos        = length(which(hh_rdt_pos_count == '2')),
+  n_hh_3_pos        = length(which(hh_rdt_pos_count == '3')),
+  
+  n_hh_1plus_pos    = length(which(hh_rdt_pos_count >= '1')),
+  n_hh_2plus_pos    = length(which(hh_rdt_pos_count >= '2')),
+  n_hh_3plus_pos    = length(which(hh_rdt_pos_count >= '3')),
+  n_hh_4plus_pos    = length(which(hh_rdt_pos_count >= '4')),
+  
+  prev_hh_0_pos     = n_hh_0_pos     / n_hh_site * 100,
+  prev_hh_1_pos     = n_hh_1_pos     / n_hh_site * 100,
+  prev_hh_2_pos     = n_hh_2_pos     / n_hh_site * 100,
+  prev_hh_3_pos     = n_hh_3_pos     / n_hh_site * 100,
+  
+  prev_hh_1plus_pos = n_hh_1plus_pos / n_hh_site * 100,
+  prev_hh_2plus_pos = n_hh_2plus_pos / n_hh_site * 100,
+  prev_hh_3plus_pos = n_hh_3plus_pos / n_hh_site * 100,
+  prev_hh_4plus_pos = n_hh_4plus_pos / n_hh_site * 100
+) %>% ungroup()
+
+#Printing the hh_infs_site_table
+kable(hh_infs_site_table, caption = "Table 3.02: Infections by households (hh_infs_site_table)") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"), font_size = 8) %>% scroll_box(width = "100%", height = "300px")
+```
+
+
+***
+
+##### (3.03) Visualizing the observed distribution of infections among households
+
+(3.03.1) Using stacked bars to show the % of households with a given number of infections
+
+- Selecting time point 3 (March-April) for Region 1 to standardize across regions
+
+(3.03.1.1) Arranging a data table for plotting: SITE
+```{r 3.03.1.1, eval = TRUE}
+#Selecting time point 3 to standardize across regions
+plot.hh_infs_site_table <- hh_infs_site_table[hh_infs_site_table$time_point == 3, ]
+#Selecting relevant columns from the hh_infs_site_table:
+plot.hh_infs_site_table <- plot.hh_infs_site_table %>% select(
+  region_id, region_name,
+  site_code,
+  n_hh_site,
+  n_hh_0_pos:n_hh_3_pos,
+  n_hh_4plus_pos,
+  prev_hh_0_pos:prev_hh_3_pos,
+  prev_hh_4plus_pos
+)
+```
+
+
+(3.03.1.2) Arranging a data table for plotting: REGION
+```{r 3.03.1.2, eval = TRUE}
+#Selecting time point 3 to standardize across regions
+plot.hh_infs_region_table <- hh_infs_site_table[hh_infs_site_table$time_point == 3, ]
+#Calculating the overall regional average for 0, 1, 2, 3, 4+ infections: Using group_by(region_id) on hh_infs_site_table
+plot.hh_infs_region_table <- plot.hh_infs_region_table %>% group_by(region_id, region_name) %>% summarise(
+  n_hh_region       = sum(n_hh_site),
+  n_hh_0_pos        = sum(n_hh_0_pos),
+  n_hh_1_pos        = sum(n_hh_1_pos),
+  n_hh_2_pos        = sum(n_hh_2_pos),
+  n_hh_3_pos        = sum(n_hh_3_pos),
+  n_hh_4plus_pos    = sum(n_hh_4plus_pos),
+  
+  prev_hh_0_pos     = sum(n_hh_0_pos)     / n_hh_region * 100,
+  prev_hh_1_pos     = sum(n_hh_1_pos)     / n_hh_region * 100,
+  prev_hh_2_pos     = sum(n_hh_2_pos)     / n_hh_region * 100,
+  prev_hh_3_pos     = sum(n_hh_3_pos)     / n_hh_region * 100,
+  prev_hh_4plus_pos = sum(n_hh_4plus_pos) / n_hh_region * 100
+  ) %>% ungroup()
+```
+
+***
+
+Figure 3.03.1.3 | % of households with a given number of infections, by region and site
+
+```{r 3.03.1.3, eval = TRUE, fig.width = 10, warning = FALSE}
+#REGION
+#Melting the data to get it into a format to plot (after trimming it)
+plot.hh_infs_region_table.m1 <- plot.hh_infs_region_table %>% 
+  select(region_id, region_name, prev_hh_0_pos:prev_hh_4plus_pos) %>%
+  melt(id.vars = c("region_id", "region_name")) %>%
+  mutate(Infections = case_when(
+    variable  == 'prev_hh_0_pos'     ~ "0",
+    variable  == 'prev_hh_1_pos'     ~ "1",
+    variable  == 'prev_hh_2_pos'     ~ "2",
+    variable  == 'prev_hh_3_pos'     ~ "3",
+    variable  == 'prev_hh_4plus_pos' ~ "4+"
+    ),
+    prev_variable = variable,
+    prev_value = value) %>%
+  select(region_id, region_name, Infections, prev_variable, prev_value)
+#Bringing in the sample size
+plot.hh_infs_region_table.m2 <- plot.hh_infs_region_table %>% 
+  select(region_id, n_hh_0_pos:n_hh_4plus_pos) %>%
+  melt(id.vars = "region_id") %>%
+  mutate(n_variable = variable,
+         #Not plotting 0 values
+         n_value = ifelse(value < 1, NA, value)) %>%
+  select(n_variable, n_value)
+#Binding
+plot.hh_infs_region_table.m <- cbind(plot.hh_infs_region_table.m1, plot.hh_infs_region_table.m2)
+
+
+#SITE
+#Melting the data to get it into a format to plot (after trimming it)
+plot.hh_infs_site_table.m1 <- plot.hh_infs_site_table %>% 
+  select(site_code, region_name, prev_hh_0_pos:prev_hh_4plus_pos) %>%
+  melt(id.vars = c("site_code", "region_name")) %>%
+  mutate(Infections = case_when(
+    variable  == 'prev_hh_0_pos'     ~ "0",
+    variable  == 'prev_hh_1_pos'     ~ "1",
+    variable  == 'prev_hh_2_pos'     ~ "2",
+    variable  == 'prev_hh_3_pos'     ~ "3",
+    variable  == 'prev_hh_4plus_pos' ~ "4+"),
+    prev_variable = variable,
+    prev_value = value) %>%
+  select(site_code, region_name, Infections, prev_variable, prev_value)
+#Bringing in the sample size
+plot.hh_infs_site_table.m2 <- plot.hh_infs_site_table %>% 
+  select(site_code, n_hh_0_pos:n_hh_4plus_pos) %>%
+  melt(id.vars = "site_code") %>%
+  mutate(n_variable = variable,
+         #Not plotting 0 values
+         n_value = ifelse(value < 1, NA, value)) %>%
+  select(n_variable, n_value)
+#Binding
+plot.hh_infs_site_table.m <- cbind(plot.hh_infs_site_table.m1, plot.hh_infs_site_table.m2)
+#Manually setting order to plot by specifying prevalence from highest to lowest within a region
+df.order <- data.frame(site_code = c("R1.01", "R1.02", "R1.12", "R1.13", "R1.14", "R1.11", "R1.15", 
+                                     "R2.06", "R2.05", "R2.04", "R2.02", "R2.01", "R2.03", 
+                                     "R3.03", "R3.06", "R3.05", "R3.01", "R3.02", "R3.04", 
+                                     "R4.02", "R4.04", "R4.05", "R4.01", "R4.03", "R4.06", 
+                                     "R5.02", "R5.03", "R5.01", "R5.05", "R5.04", "R5.06"),
+                       plot_order = 1:31)
+#Using joing to apply the order for plotting across all rows
+plot.hh_infs_site_table.m <- full_join(plot.hh_infs_site_table.m, df.order, by = "site_code")
+
+#Plotting the region data
+ggplot(plot.hh_infs_region_table.m, aes(x = region_id, y = prev_value, fill = Infections)) +
+  geom_bar(stat='identity', width=0.8) + 
+  scale_fill_manual(values=c("#D6D6D6", "#E74C3C", "#A93226", "#922B21", "#641E16")) +
+  theme(legend.position="top") +
+  labs(y = "Percent of households") +
+  facet_wrap(~region_name, nrow = 1, scales = "free_x") +
+  rremove("grid") + rremove("x.ticks") + rremove("x.text") + rremove("xlab") +
+  theme(panel.background = element_rect(fill = "gray97"), 
+        strip.background = element_rect(fill = "#7E7E7E59")) +
+  geom_text(aes(label = n_value), position = position_stack(vjust = 0.5), color = "white", size = 2)
+
+#Plotting the site data
+ggplot(plot.hh_infs_site_table.m, aes(x = reorder(site_code, -plot_order), y = prev_value, fill = Infections)) +
+  geom_bar(stat='identity', width=0.75) + 
+  scale_fill_manual(values=c("#D6D6D6", "#E74C3C", "#A93226", "#922B21", "#641E16")) +
+  theme(legend.position="top") +
+  labs(y = "Percent of households") +
+  facet_wrap(~region_name, nrow = 1, scales = "free_x") +
+  rremove("grid") + rremove("x.ticks") + rremove("legend") + rremove("x.text") + rremove("xlab") +
+  theme(panel.background = element_rect(fill = "gray97"), 
+        strip.background = element_blank(), strip.text.x = element_blank()) +
+  geom_text(aes(label = n_value), position = position_stack(vjust = 0.5), color = "white", size = 2) +
+  geom_text(aes(label = site_code, y = -5), angle = 90, color = "#707070B8", size = 3)
+```
+
+***
+
+##### (4.03.2) Comparing prevalence among individuals in a community to prevalence at the household level
+
+(4.03.2.1) Plotting site prevalence versus hh prevalence
+
+```{r 4.03.2.1, eval = FALSE}
+prev_site_vs_hh.plot <- data.frame(
+  site_id           = prev_by_site_table$site_code[prev_by_site_table$time_point == 3],
+  prev_site         = prev_by_site_table$prev_site[prev_by_site_table$time_point == 3],
+  hh_prev_1plus_pos = hh_infs_site_table$prev_hh_1plus_pos[hh_infs_site_table$time_point == 3]
+)
+
+#Check by making a simple plot 
+par(mar=c(4.25, 4.1, 0.7, 2.1))
+plot(prev_site_vs_hh.plot$prev_site, prev_site_vs_hh.plot$hh_prev_1plus_pos)
+```
+
+- Notes:
+  - Compare three things:
+    - Show with empirical data how hh prevalence scales with individual prevalence for a community
+    - Fit the expected line under a fully independent model: see below for binomial distribution
+    - Verbally to the dot expected from the MIS regional average prevalence + the dot expected from averaging across the 6-7 sites studied here
+  - Color dots by region and add site code labels with ggrepel
+  
+Binomial distribution: Notes on comparing the prevalence at a site to hh prevalence
+```{r NOTE1, eval = FALSE}
+#Notes on doing summation in r
+x <- 2:5
+p <- 10
+px <- 25
+n <- 100
+
+sum((1-((1-p/100)^x))*(px/n))
+
+((1-(0.9)^2) * 0.25) + ((1-(0.9)^3) * 0.25) + ((1-(0.9)^4) * 0.25) + ((1-(0.9)^5) * 0.25)
+```
+
+- Notes:
+  - The formula:
+  - Sum(from i = to max HH size) [1-(1-prev/100)^i] * (n HH size i / n HH)
+  - Gives the percentage of households, for a given % of households that are certain sizes, for a given prevalence level, that are expected to have 1+ infected individual in them
+  - You could come up with the formula for 2+, 3+ etc
+
+***
+***
+#### END Section 4 (Prevalence by household)
+***
+
+
+***
+
+# (5) Prevalence by distance analysis
+
+***
+
+- Notes
+  - Euclidean distance between lat and lon coordinates is not a perfect proxy for distance in km (earth is not a rectangle or perfect sphere)
+    - Calculating distance between GPS coordinates in r:
+      - [Geosphere package](ftp://cran.r-project.org/pub/R/web/packages/geosphere/geosphere.pdf)
+      - distGeo() is more accurate than Haversine, accounts for ellipsoid effects
+  - Calculating pairwise difference in prevalence
+    - Using the dist() function
+  - A list of approximate village mid-points was made using household GPS coordinates and picking a central spot on google earth
+
+***
+
+#### (5.01) Calculating the pairwise difference in prevalence between sites and the pairwise geographic distance between sites
+
+(5.01.1) Importing a file that contains the spatial midpoint (latitude and longitude) for each site
+```{r 5.01.1, eval = FALSE}
+filename_site_midpoint_data <- "Site midpoints for ease of reference Ben 20190225.csv"
+gps_midpoint_data <- read.csv(file.path(mainDir, filename_site_midpoint_data), stringsAsFactors = FALSE)
+```
+
+(5.01.2) Joining the gps data to prevalence data for the sites
+```{r 5.01.2, eval = FALSE}
+#Joining to the prev_by_site_table
+site_prev_gps_data <- full_join(gps_midpoint_data, prev_by_site_table, by = "site_id")
+
+#Selecting relevant data columns
+site_prev_gps_data <- site_prev_gps_data %>% select(
+  site_id, prev_site, latitude, longitude
+)
+```
+
+(5.01.3) Determining magnitude of all pairwise differences in prevalence between sites
+```{r 5.01.3, eval = FALSE}
+#Determining the number of pairwise comparisons possible for 24 sites
+# [n(n-1)]/2 = (24*(24-1))/2 = 276 = sum(n-1, n-2, n-3, ... n-(n-1)) = sum(23:1)
+
+#Calculating all possible pairwise differences in prevalence using dist(), store as a vector prev_pw_dist
+# Using as.numeric() to convert the output from a pairwise distance matrix to a vector
+#  Vector is Site1-Site2, Site1-Site3... etc and length = the number of pairwise comparisons possible for X sites
+v_prev_pw_dist <- as.numeric(dist(site_prev_gps_data$prev_site))
+```
+
+(5.01.4) Determining all geographic distances between sites
+```{r 5.01.4, eval = FALSE}
+#Defining a function to calculate the geographic distance between all sites' midpoints using the Haversine formula
+# Inputs are vectors for site_ids, longitude, and latitude
+#  Output is a data frame with site_ids of the compared sites, and all pairwise geographic distances in the form:
+#   Site1-Site2, Site1-Site3...Site1-Site24, Site2-Site3 etc and length = the number of unique pairwise comparisons possible for X sites
+#    Using the distGeo() function from the geosphere package
+function.calc_geodist_xy <- function(site_ids, longitude, latitude){
+  #Storing the site_ids, lon, and lat data in easier to reference vectors
+  site_ids   <- site_ids
+  v_x_lon    <- longitude
+  v_y_lat    <- latitude
+  n_sites    <- length(site_ids)
+  #Creating a vector to hold the calculated pairwise geographic distances
+  calc_geographic_pw_dist <- rep(NA, (n_sites * (n_sites - 1)) / 2)
+  #Creating empty lists to hold the indices (used to specify which sites to compare pairwise)
+  v_pairing_indices_i <- list()
+  v_pairing_indices_j <- list()
+  #Filling the indices lists with the same pattern as in the pairwise difference in prevalence vector
+  # Comparisons: 1-2, 1-3...1-24, 2-3, 2-4...2-24, 3-4, 3-5...2-34...23-24 (i holds the index of the left hand site in the comparison)
+  for(i in 1:n_sites){
+    v_pairing_indices_i[[i]] <- rep(i, each = n_sites - i)
+  }
+  # (j holds the index of the right hand site in the comparison)
+  for(j in 1:(n_sites-1)){
+    v_pairing_indices_j[[j]] <- (1+j):n_sites
+  }
+  # Combining i and j indices into a data frame
+  df_pairing_indices <- data.frame(i_c = unlist(v_pairing_indices_i), j_c = unlist(v_pairing_indices_j))
+  #Looping through the list of comparisons to be made (specificed by compare site i to site j)
+  # Using distGeo() to find the scale in m (dividing by 1000 to convert to km)
+  for(k in 1:length(df_pairing_indices$i_c)){
+    calc_geographic_pw_dist[k] <- distGeo(
+      c(v_x_lon[df_pairing_indices[k, 1]], v_y_lat[df_pairing_indices[k, 1]]), 
+      c(v_x_lon[df_pairing_indices[k, 2]], v_y_lat[df_pairing_indices[k, 2]])) / 1000
+  }
+  #Adding the site comparisons specified by the i and j indices to the calc_geographic_pw_dist results
+  # Repeating the site_ids in the same pattern as the i and j indices
+  sites_i <- list()
+  for(a in 1:n_sites){
+    sites_i[[a]] <- rep(site_ids[a], each = n_sites - a)
+  }
+  sites_j <- list()
+  for(b in 1:(n_sites-1)){
+    sites_j[[b]] <- site_ids[(1+b):n_sites]
+  }
+  #Binding the site_ids and calc_geographic_pw_dist results
+  df_geographic_pw_dist <- data.frame(site_i = unlist(sites_i), site_j = unlist(sites_j), calc_geographic_pw_dist)
+  
+  return(df_geographic_pw_dist)
+}
+
+#Calling the function.calc_geodist_xy to calculate pairwise geographic distances between sites' GPS midpoints
+#Inputs are site_ids, longitude (x), and latitude (y) data
+df_geographic_pw_dist <- function.calc_geodist_xy(site_prev_gps_data$site_id, site_prev_gps_data$longitude, site_prev_gps_data$latitude)
+```
+
+(5.01.5) Creating the difference in prevalence vs geographic distance table
+```{r 5.01.5, eval = FALSE}
+#Binding prevs_pw_dist to the df_geographic_pw_dist)
+df_prev_by_distance_table <- data.frame(df_geographic_pw_dist, prev_pw_dist = v_prev_pw_dist)
+
+#Previewing the pw_distance_table
+df_prev_by_distance_table_fp <- df_prev_by_distance_table[1:100, ]
+kable(df_prev_by_distance_table_fp, caption = "Table 5.01.3 Preview of prevalence vs distance data") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"), font_size = 11, full_width = F, position = "left")%>% 
+  scroll_box(width = "100%", height = "300px")
+
+#Export the data as a csv and plot scatter using Excel
+# write.csv(pw_distance_table, "pw_distance_table.csv")
+```
+
+***
+
+#### (5.02) Visualing the variation in prevalence over geographic distance
+
+- Figure idea: Prevalence by distance
+  - X-axis: Distance between communities (in km) - may need a log scale or limit it to within region only and have some caption that describes average distance between regions
+  - Y-axis: Magnitude of difference in prevalence (abs(Prev X1 - Prev X2))
+
+(5.02.1) Plotting the difference in prevalence vs geographic distance table
+```{r 5.02.1, eval = FALSE}
+par(mar=c(4.25, 4.1, 0.7, 2.1))
+plot(df_prev_by_distance_table$calc_geographic_pw_dist, df_prev_by_distance_table$prev_pw_dist)
+```
+
+**FIX** Make plot into a ggplot with log scale x axis (x axis is in km), shade 10km, 25km, 100km
+
+
+***
+***
+#### END Section 5 (Prevalence by distance)
+***
+
+
+
+***
+
+# (6) Age structure analysis
+
+***
+
+#### (6.01) Formatting the data for age structure analysis
+
+***
+
+(6.01.1) Calculating an approximate age (year bins) by subtracting year of birth from 2017
+```{r 6.01.1, eval = FALSE}
+#Creating a new data frame for age structure analysis
+#Adding an approximate age in years variable by simply substracting the year of birth from 2017 (the year of sampling)
+rdt_age_structure_data <- rdt_data_cleaned %>% mutate(
+  calc_age = as.integer(2017 - dob_yr)
+)
+```
+
+(6.01.2) Setting age bin boundaries for bins of 2, 3, 4, 5, and 10 year increments
+```{r 6.01.2, eval = FALSE}
+#Using rep() to set various age bin boundaries. The max age observed is 97 so range will be 0-100.
+#2 year increments
+cutoffs_age_bins_2 <- c(seq(0, 100, by=2))
+
+#3 year increments
+cutoffs_age_bins_3 <- c(seq(0, 100, by=3))
+
+#4 year increments
+cutoffs_age_bins_4 <- c(seq(0, 100, by=4))
+  
+#5 year increments
+cutoffs_age_bins_5 <- c(seq(0, 100, by=5))
+  
+#10 year increments
+cutoffs_age_bins_10 <- c(seq(0, 100, by=10))
+```
+
+***
+
+#### (6.02) Determining the frequency of each age and sex bin
+
+***
+
+(6.02.1) Writing the necessary functions to determine the frequency (% of individuals) for age bins
+```{r 6.02.1, eval = FALSE}
+#Writing a function to determine the frequency (% of individuals) for each age bin
+function.age_frequency_binned <- function(calc_age_v, cutoffs_age_bins){
+  age_bin_freq_v <- rep(NA, length(cutoffs_age_bins)-1)
+  for(i in 1:(length(cutoffs_age_bins)-1)){
+    age_bin_freq_v[i] <- sum(calc_age_v >= cutoffs_age_bins[i] & calc_age_v < cutoffs_age_bins[i+1]) / length(calc_age_v)
+  }
+  return(age_bin_freq_v)
+}
+
+#Writing a function to auto-generate the column names (specifying the age bins)
+# and add the rdt_age_structure_data_grouped_list data as rows
+function.age_frequency_bin_colnames <- function(cutoffs_age_bins, rdt_age_structure_data_grouped_list){
+  cutoffs_age_bins_colnames_v <- rep(NA, length(cutoffs_age_bins)-1)
+  for(i in 1:(length(cutoffs_age_bins)-1)){
+    cutoffs_age_bins_colnames_v[i] <- paste(cutoffs_age_bins[i], "-", cutoffs_age_bins[i+1], " y", sep = "")
+  }
+  return(cutoffs_age_bins_colnames_v)
+}
+```
+
+(6.02.2) Comparing the age structure by region, sex and malaria status (age bins of 3 years)
+```{r 6.02.2, eval = FALSE}
+#Grouping by region, sex, and rdt_result then passing to function.age_frequency_binned()
+# Using group_map() to apply the function to each group in the groupped data
+#  Output is a list where the number of elements is equal to the number of groups
+#   and each element is a vector with length equal to the number of age bins
+rdt_age_structure_data_grouped_list1 <- rdt_age_structure_data %>% group_by(region_id, sex, rdt_result) %>%
+  group_map(~ function.age_frequency_binned(.x$calc_age, cutoffs_age_bins_3))
+
+#Calling function.age_frequency_bin_colnames() to specify the column names
+# Here use age bins of 3 years
+cutoffs_age_bins_colnames_v <- function.age_frequency_bin_colnames(cutoffs_age_bins_3)
+
+#Assembling the data frame
+#(1) Getting the relevant columns and sample size from the age_structure_data_grouped_df
+rdt_age_structure_data_grouped_df1 <- rdt_age_structure_data %>% group_by(region_id, sex, rdt_result) %>%
+  summarise(n = length(unique_ind_id))
+
+#(2) Converting the rdt_age_structure_data_grouped_list containing the age frequency data to a data frame
+rdt_age_structure_data1.bin3 <- data.frame(matrix(unlist(rdt_age_structure_data_grouped_list1), 
+                                                  nrow=length(rdt_age_structure_data_grouped_list1), byrow=T))
+
+#(3) Changing the column names of rdt_age_structure_data.bin3 to the age bins
+colnames(rdt_age_structure_data1.bin3) <- cutoffs_age_bins_colnames_v
+
+#(4) Combining the region, sex, rdt, and sample size columns with the age bin frequencies
+rdt_age_structure_data1.bin3 <- cbind(as.data.frame(rdt_age_structure_data_grouped_df1), rdt_age_structure_data1.bin3)
+
+#(5) Creating data rows for the age bin frequency of all males or females combined (RDT negative or positive)
+#(5.1) Grouping by region_id and sex only (disregarding RDT result)
+rdt_age_structure_data_grouped_list2 <- rdt_age_structure_data %>% group_by(region_id, sex) %>%
+  group_map(~ function.age_frequency_binned(.x$calc_age, cutoffs_age_bins_3))
+
+#(5.2) Getting the relevant columns and sample size from the age_structure_data_grouped_df (using a placeholder for the rdt_result column)
+rdt_age_structure_data_grouped_df2 <- rdt_age_structure_data %>% group_by(region_id, sex) %>%
+  summarise(
+    rdt_result = "all combined",
+    n          = length(unique_ind_id))
+
+#(5.3) Converting the rdt_age_structure_data_grouped_list containing the age frequency data to a data frame
+rdt_age_structure_data2.bin3 <- data.frame(matrix(unlist(rdt_age_structure_data_grouped_list2), 
+                                                  nrow=length(rdt_age_structure_data_grouped_list2), byrow=T))
+
+#(5.4) Changing the column names of rdt_age_structure_data.bin3 to the age bins
+colnames(rdt_age_structure_data2.bin3) <- cutoffs_age_bins_colnames_v
+
+#(5.5) Combining the region, sex, rdt, and sample size columns with the age bin frequencies
+rdt_age_structure_data2.bin3 <- cbind(as.data.frame(rdt_age_structure_data_grouped_df2), rdt_age_structure_data2.bin3)
+
+#(6) Combining the data grouped by region+sex+RDT with the data grouped by region+sex alone
+#    Allows comparing the age and sex structure of the RDT positive population to that of the population as a whole
+rdt_age_structure_data.bin3 <- rbind(rdt_age_structure_data2.bin3, rdt_age_structure_data1.bin3)
+
+#(7) Trimming out the RDT negative subgroup to only keep the RDT positive and population as a whole subgroups
+rdt_age_structure_data.bin3 <- rdt_age_structure_data.bin3[rdt_age_structure_data.bin3$rdt_result != 0, ]
+
+#(8) Adding a column to more easily specify the grouping
+rdt_age_structure_data.bin3 <- rdt_age_structure_data.bin3 %>% mutate(
+  rdt_result = case_when(
+    rdt_result == "1"            ~ "positive",
+    rdt_result == "all combined" ~ "all_combined"
+  ),
+  group = paste("Region", region_id, sex, rdt_result, sep = "_")
+)
+
+rdt_age_structure_data.bin3 <- rdt_age_structure_data.bin3 %>% select(
+  group, region_id:'96-99 y'
+)
+
+#(9) Re-ordering rows for clarity
+rdt_age_structure_data.bin3 <- rdt_age_structure_data.bin3[order(
+  rdt_age_structure_data.bin3$region_id,
+  rdt_age_structure_data.bin3$sex,
+  rdt_age_structure_data.bin3$rdt_result
+),]
+
+#Printing the age structure of infection data
+kable(rdt_age_structure_data.bin3, caption = "Table 6.02.2: Age and sex structure of RDT status by region (3 year age bins)") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"), font_size = 11) %>% scroll_box(width = "100%", height = "300px")
+```
+
+***
+
+#### (6.03) Visualizing the age and sex structure results
+
+***
+
+- Plotting as age structure diagrams (with females and males mirrored)
+  - Comparing the age distribution of infections to the age distribution of the population for each region
+- Based in part on:
+  - [Simpler population pyramid in ggplot2 tutorial](https://stackoverflow.com/questions/14680075/simpler-population-pyramid-in-ggplot2)
+
+***
+
+(6.03.1) Preparing a data table for plotting: `plot.rdt_age_structure_data.bin3`
+
+- Data columns:
+  - `age_bins`: Writing out the age bin for clarity
+    - E.g. 0-3 y, 3-6 y, 6-9 y, ... etc
+  - `age_bins_num`: For plotting, use the upper bound of the age bin to specify the bin
+    - E.g. 3, 6, 9, ... etc
+  - `sex`: Specifying sex
+    - E.g. male or female
+  - `group_for_plotting`: Specifying RDT negative and RDT positive groups for each region
+    - E.g. R2 (all individuals), R2 (RDT positive individuals only), ... etc
+    - Plotting without faceting, by creating separate subsets for each region to be plotted separately
+  - `freq`: Frequency of individuals in the age, sex, and RDT result group.
+    - E.g. `freq` for R2 (all individuals) is 0.21 for the frequency of 0-3 year olds among all individuals in R2
+    
+```{r 6.03.1, eval = FALSE}
+#Making subsets for R2-R5
+R2.rdt_age_structure_data.bin3 <- rdt_age_structure_data.bin3[rdt_age_structure_data.bin3$region_id == 2, ]
+R3.rdt_age_structure_data.bin3 <- rdt_age_structure_data.bin3[rdt_age_structure_data.bin3$region_id == 3, ]
+R4.rdt_age_structure_data.bin3 <- rdt_age_structure_data.bin3[rdt_age_structure_data.bin3$region_id == 4, ]
+R5.rdt_age_structure_data.bin3 <- rdt_age_structure_data.bin3[rdt_age_structure_data.bin3$region_id == 5, ]
+
+#Defining a function to take a region subset and make a data frame in the form of a plot usable for plotting
+function.plot.table.rdt_age_structure_data.bin3 <- function(subset.rdt_age_structure_data.bin3){
+  df.rdt_age_structure_data.bin3 <- data.frame(
+    age_bins           = rep(colnames(R2.rdt_age_structure_data.bin3[6:38]), 2),
+    age_bins_num       = rep(cutoffs_age_bins_3[2:length(cutoffs_age_bins_3)], 2),
+    sex                = c(
+      rep("female", 2*(length(cutoffs_age_bins_3)-1)), 
+      rep("male", 2*(length(cutoffs_age_bins_3)-1))),
+    rdt_result         = rep(c(
+      rep("All combined", length(cutoffs_age_bins_3)-1),
+      rep("RDT positive", length(cutoffs_age_bins_3)-1)
+      ), 2),
+    group              = c(
+      rep(subset.rdt_age_structure_data.bin3[1,1], length(cutoffs_age_bins_3)-1),
+      rep(subset.rdt_age_structure_data.bin3[2,1], length(cutoffs_age_bins_3)-1),
+      rep(subset.rdt_age_structure_data.bin3[3,1], length(cutoffs_age_bins_3)-1),
+      rep(subset.rdt_age_structure_data.bin3[4,1], length(cutoffs_age_bins_3)-1)),
+    freq               = c(
+      as.numeric(subset.rdt_age_structure_data.bin3[1, 6:38]),
+      as.numeric(subset.rdt_age_structure_data.bin3[2, 6:38]),
+      as.numeric(subset.rdt_age_structure_data.bin3[3, 6:38]),
+      as.numeric(subset.rdt_age_structure_data.bin3[4, 6:38])
+    )
+  )
+  return(df.rdt_age_structure_data.bin3)
+}
+
+#Making the tables for plotting R2-R5 by calling function.plot.table.rdt_age_structure_data.bin3
+plot.R2.rdt_age_structure_data.bin3 <- function.plot.table.rdt_age_structure_data.bin3(R2.rdt_age_structure_data.bin3)
+plot.R3.rdt_age_structure_data.bin3 <- function.plot.table.rdt_age_structure_data.bin3(R3.rdt_age_structure_data.bin3)
+plot.R4.rdt_age_structure_data.bin3 <- function.plot.table.rdt_age_structure_data.bin3(R4.rdt_age_structure_data.bin3)
+plot.R5.rdt_age_structure_data.bin3 <- function.plot.table.rdt_age_structure_data.bin3(R5.rdt_age_structure_data.bin3)
+```
+
+***
+
+(6.03.2) Plotting the age and sex structure data
+
+***
+
+- **Figure 6.03.2: Distribution of infections among age and sex classes**
+```{r 6.03.2, eval = FALSE, fig.width = 10}
+p.R2.rdt_age_structure_data.bin3 <- ggplot(data = plot.R2.rdt_age_structure_data.bin3,
+       aes(x     = age_bins_num, 
+           y     = ifelse(test = sex == "male", 
+                          yes = -freq, no = freq), 
+           fill  = rdt_result, 
+           color = rdt_result,
+           alpha = rdt_result)) +
+  geom_bar(stat="identity", position ="identity") +
+  coord_flip() +
+  scale_colour_manual(values=c("dimgray", "tomato")) +
+  scale_fill_manual(values=c("dimgray", "tomato")) +
+  scale_alpha_manual(values=c(1, 0.2)) +
+  labs(title = "Region 2", y = "Frequency", x = "Age") +
+  #rremove("legend") +
+  scale_y_continuous(labels = abs, limits = 0.23 * c(-1,1))
+
+p.R3.rdt_age_structure_data.bin3 <- ggplot(data = plot.R3.rdt_age_structure_data.bin3,
+       aes(x     = age_bins_num, 
+           y     = ifelse(test = sex == "male", 
+                          yes = -freq, no = freq), 
+           fill  = rdt_result, 
+           color = rdt_result,
+           alpha = rdt_result)) +
+  geom_bar(stat="identity", position ="identity") +
+  coord_flip() +
+  scale_colour_manual(values=c("dimgray", "tomato")) +
+  scale_fill_manual(values=c("dimgray", "tomato")) +
+  scale_alpha_manual(values=c(1, 0.2)) +
+  labs(title = "Region 3", y = "Frequency", x = "Age") +
+  #rremove("legend") +
+  scale_y_continuous(labels = abs, limits = 0.23 * c(-1,1))
+
+p.R4.rdt_age_structure_data.bin3 <- ggplot(data = plot.R4.rdt_age_structure_data.bin3,
+       aes(x     = age_bins_num, 
+           y     = ifelse(test = sex == "male", 
+                          yes = -freq, no = freq), 
+           fill  = rdt_result, 
+           color = rdt_result,
+           alpha = rdt_result)) +
+  geom_bar(stat="identity", position ="identity") +
+  coord_flip() +
+  scale_colour_manual(values=c("dimgray", "tomato")) +
+  scale_fill_manual(values=c("dimgray", "tomato")) +
+  scale_alpha_manual(values=c(1, 0.2)) +
+  labs(title = "Region 4", y = "Frequency", x = "Age") +
+  #rremove("legend") +
+  scale_y_continuous(labels = abs, limits = 0.23 * c(-1,1))
+
+p.R5.rdt_age_structure_data.bin3 <- ggplot(data = plot.R5.rdt_age_structure_data.bin3,
+       aes(x     = age_bins_num, 
+           y     = ifelse(test = sex == "male", 
+                          yes = -freq, no = freq), 
+           fill  = rdt_result, 
+           color = rdt_result,
+           alpha = rdt_result)) +
+  geom_bar(stat="identity", position ="identity") +
+  coord_flip() +
+  scale_colour_manual(values=c("dimgray", "tomato")) +
+  scale_fill_manual(values=c("dimgray", "tomato")) +
+  scale_alpha_manual(values=c(1, 0.2)) +
+  labs(title = "Region 5", y = "Frequency", x = "Age") +
+  #rremove("legend") +
+  scale_y_continuous(labels = abs, limits = 0.50 * c(-1,1))
+
+p.R2.rdt_age_structure_data.bin3
+p.R3.rdt_age_structure_data.bin3
+p.R4.rdt_age_structure_data.bin3
+p.R5.rdt_age_structure_data.bin3
+```
+
+- Notes on figure:
+  - Prepping final version **FIX**
+    - Show sample size for each sex for each region in in-panel legend
+    - Label panels as left half is males, right half is females
+    - Don't print legend so as to keep all panels the same size, only show legend once
+  - Noting the apparent excess of 3-6 year old males in Regions 3-5:
+    - Seems to be a result of the relative paucity of males in the 20-40 year age range that makes the bulge at 3-6 years more noticeable
+
+***
+***
+#### END Section 6 (Age structure)
+***
+
+
+
+***
+
+# (7) Analysing the distribution of infections among households
+
+***
+
+Comparing the distribution of infected individuals among households to that expected by chance:
+
+(1) Using a **parametric bootstrap approach**:
+    - Comparing the number of infected individuals observed in a household to the number expected if individuals were chosen from a binomial distribution at random, with the probability of being infected equal to the prevalence at the site
+(2) Using a **non-parametric bootstrap approach**:
+    - Comparing the number of households with a given number of infections to the number expected if infected individuals were randomly re-assigned to households (permutation test)
+
+Note: The `hh_infs_site_table` created above contains the observed numbers of hhs with a given number of infected individuals for a site
+
+***
+
+### (7.01) Parametric bootstrap approach
+
+***
+
+See Aimee Taylor notes; **FIX** add Aimee to the acknowledgements
+
+***
+
+### (7.02) Non-parametric bootstrap approach
+
+***
+
+#### (7.02.1) Writing a bootstrap resampling function to generate permutations of the RDT outcomes
+
+- Bootstrap resampling function `b.resample()`:
+  - Inputs:
+    - A vector containing a site's RDT results as a series of 1s and 0s
+    - An integer specifying the number of random resamples to perform (default is 10,000)
+  - Using `sapply()` instead of `lapply()` to return a matrix/vector instead of a list
+  - The`function(i)` parameter is just a place holder to allow calling a function with some input parameters
+  - `sample()` with `replace = F` simply reshuffles the inputted vector of 0s and 1s randomly
+  - Output: a matrix with the random resample results
+    - Number of rows = length of the site's RDT results vector
+    - Number of columns = the number of resamples performed
+
+```{r 7.02.1, eval = FALSE}
+b.resample <- function(rdt_results_v, num_of_resamples = 10000){
+  resamples.matrix <- sapply(1:num_of_resamples, function(i) sample(rdt_results_v, replace=F))
+  return(resamples.matrix) 
+}
+```
+
+***
+
+#### (7.02.2) Writing additional functions to generate and analyze simulated hh infection distributions:
+
+(1) `function.hh_inf_permutations`: Creates 10,000 randomly reshuffled vectors of rdt infection outcomes
+(2) `function.hh_0inf_counts`: Counts the number of households with 0 infections in the permutations
+(3) `function.hh_inf_sim_bounds`: Determines the 0.025, median, and 0.975 bounds for the number of households with 0 infections
+(4) `function.nonparam_hh_sim_data`: Calls the other functions and assembles a data frame with the results of the nonparametric bootstrapping
+
+```{r 7.02.2.1, eval = FALSE}
+#F1
+#Inputs:  A vector of unique_ind_ids and their corresponding rdt_result + the number of bootstrap resamples to perform
+#Outputs: A data frame with:
+#   columns: unique_ind_id, resample 1, 2, 3, ... 10,000
+#   rows: unique_ind_id of individual 1, 2, 3, ... number of individuals for that site
+function.hh_inf_permutations <- function(hh_id_v, rdt_result_v, num_resamples){
+  df_hh_inf_permutations <- data.frame(
+    hh_id = hh_id_v,
+    b.resample(rdt_result_v, num_resamples)
+  )
+  return(df_hh_inf_permutations)
+}
+
+rdt_data_cleaned.301 <- rdt_data_cleaned[rdt_data_cleaned$site_id == 301, ]
+df_hh_inf_permutations.301 <- function.hh_inf_permutations(rdt_data_cleaned.301$hh_id, rdt_data_cleaned.301$rdt_result, 15)
+
+```
+
+```{r 7.02.2.2, eval = FALSE}
+#F2
+#Inputs:  A data frame with the 10,000 reshuffled rdt_result vectors and their corresponding unique_ind_ids
+#Outputs: A vector with the number of households with 0 infections for permutation 1, 2, 3, ... 10,000
+function.hh_0inf_counts <- function(df_hh_inf_permutations){
+  v_hh_0inf_counts <- rep(NA, length(df_hh_inf_permutations)-1)
+  #Creating a for loop to take each column/permutation. Starting at i+1 because the first column is the hh_id
+  for(i in 1:(length(df_hh_inf_permutations)-1)){
+    df_hh_id_i <- data.frame(
+      hh_id  = as.numeric(df_hh_inf_permutations[ ,1]),
+      perm_i = as.numeric(df_hh_inf_permutations[ ,i+1])
+    )
+    #Grouping by hh_id and using summarise() to calculate the number of infections in each hh in each permutation
+    dfg_hh_id_i <- df_hh_id_i %>% 
+      group_by(hh_id) %>% 
+      summarise(n_inf_hh_col_i = sum(perm_i))
+    #Crating a vector with the number of hhs with 0 infections for each permutation
+    v_hh_0inf_counts[i] <- length(which(dfg_hh_id_i$n_inf_hh_col_i == 0))
+  }
+  return(v_hh_0inf_counts)
+}
+
+v_hh_0inf_counts.301 <- function.hh_0inf_counts(df_hh_inf_permutations.301)
+
+```
+
+```{r 7.02.2.3, eval = FALSE}
+#F3
+#Determining the 0.025, median, and 0.975 bounds for the number of households with 0 infections for that site
+# ie 95% of the permutations provide a number of households with 0 infections within these bounds
+
+#Inputs:  A vector of the counts of households with 0 infections for the X permutations done above
+#Outputs: A vector with the: (1) 0.025 bound (2) median (3) 0.975 bound
+function.hh_inf_sim_bounds <- function(v_household_inf_counts){
+  #Note that the quantile function will non-integers despite the data being discrete
+  # E.g. the upper bound could be 46.65 households expected to have zero infections. Proceeding with using the unrounded non-integer
+  #  such that in this example, an observation of 47 households would be above the 0.975 cut-off
+  hh_inf_sim_bounds_025    <- as.numeric(quantile(v_household_inf_counts, 0.025))
+  hh_inf_sim_bounds_median <- median(v_household_inf_counts)
+  hh_inf_sim_bounds_975    <- as.numeric(quantile(v_household_inf_counts, 0.975))
+  
+  v_hh_inf_sim_bounds      <- c(hh_inf_sim_bounds_025, hh_inf_sim_bounds_median, hh_inf_sim_bounds_975)
+
+  return(v_hh_inf_sim_bounds)
+}
+```
+
+```{r 7.02.2.4, eval = FALSE}
+#F4
+#Writing a function to assemble the final dataframe:
+# Columns: site_id, region_id, n_hh_site, n_rdt_pos_site, observed number of hhs with 0 infections +
+#  expectations from simulations: (1) 0.025 bound (2) median (3) 0.975 bound
+
+#For each site, passing the data to the three functions above
+function.nonparam_hh_sim_data <- function(rdt_data_cleaned, num_resamples = 10000){
+  #Copying the code used to make the hh_infs_site_table to extract the site_id and observed number of hhs with 0 infections
+  cg1_nonparam_hh_sim_data <- rdt_data_cleaned %>% group_by(hh_id) %>% summarise(
+      region_id        = unique(region_id),
+      site_id          = unique(site_id),
+      hh_rdt_pos_count = sum(rdt_result)) %>% 
+    group_by(site_id) %>% summarise(
+      region_id        = unique(region_id),
+      n_hh_site        = length(hh_id),
+      n_rdt_pos_site   = sum(hh_rdt_pos_count),
+      obs_n_hh_0_pos   = length(which(hh_rdt_pos_count == '0')))
+  #Creating a vector that is the site_ids
+  v_site_ids <- unique(rdt_data_cleaned$site_id)
+  
+  #Making the empty list_nonparam_hh_sim_data as a placeholder that will later hold the vectors with the hh_inf_sim_bounds data for each site
+  list_nonparam_hh_sim_data <- list()
+  #Passing each site to the 3 functions defined above
+  for(i in 1:length(v_site_ids)){
+    df_site_i <- rdt_data_cleaned[rdt_data_cleaned$site_id == v_site_ids[i], ]
+    list_nonparam_hh_sim_data[[i]] <- function.hh_inf_sim_bounds(
+                                      function.hh_0inf_counts(
+                                      function.hh_inf_permutations(df_site_i$hh_id, df_site_i$rdt_result, num_resamples)))
+  }
+  #Extracting the list_nonparam_hh_sim_data into a matrix then data frame
+  cg2_nonparam_hh_sim_data <- as.data.frame(matrix(unlist(list_nonparam_hh_sim_data), nrow=length(list_nonparam_hh_sim_data), byrow=T))
+  colnames(cg2_nonparam_hh_sim_data) <- c("bound_025", "median", "bound_975")
+  #Binding cg1_nonparam_hh_sim_data and cg2_nonparam_hh_sim_data
+  nonparam_hh_sim_data <- cbind(cg1_nonparam_hh_sim_data, cg2_nonparam_hh_sim_data)
+  return(nonparam_hh_sim_data)
+}
+```
+
+***
+
+#### (7.02.3) Performing the comparison of observed and expected household counts (non-parametric bootstrap)
+
+**Note:** 
+- To re-run simulations, need to change to eval = FALSE and not load from CSV file below
+- Othwerwise will load in a previously written results file
+```{r 7.02.3.1, eval = FALSE}
+#Calling the function.nonparam_hh_sim_data on the rdt_data_cleaned and storing as nonparam_hh_sim_data
+nonparam_hh_sim_data <- function.nonparam_hh_sim_data(rdt_data_cleaned, 10000)
+#Note: Takes approximately 4 minutes to run
+
+#Writing to file so as to avoid having to re-run the simulations every time
+# write.csv(nonparam_hh_sim_data, file = "nonparam_hh_sim_data_20190923.csv", row.names=FALSE)
+```
+
+```{r 7.02.3.2, eval = FALSE}
+#Reading from file as to avoid having to re-run the simulations every time
+filename_nonparam_hh_sim_data <- "nonparam_hh_sim_data_20190923.csv"
+nonparam_hh_sim_data <- read.csv(file.path(mainDir, filename_nonparam_hh_sim_data), stringsAsFactors = FALSE)
+
+#Printing the nonparam_hh_sim_data
+kable(nonparam_hh_sim_data, caption = "Table 7.02.3.2: Comparing the observed and expected household counts (non-parametric bootstrap)") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"), font_size = 11)
+```
+
+***
+
+#### (7.02.4) Visualizing the results of the non-parametric bootstrap resampling
+
+***
+
+(7.02.4.1) For reference, visualizing the distribution of household size (number of individuals per household) by region
+
+**Figure 7.02.4.1 Distribution of household size by region**
+
+```{r 7.02.4.1, eval = FALSE, fig.height = 5, fig.width = 10}
+plot.hh_rdt_pos_table <- hh_rdt_pos_table %>% mutate(
+  region_id = case_when(
+    region_id == 2 ~ "Region 2 (Mananjary)",
+    region_id == 3 ~ "Region 3 (Toliara)",
+    region_id == 4 ~ "Region 4 (Morombe)",
+    region_id == 5 ~ "Region 5 (Amoron'i Mania)"
+  )) %>% group_by(region_id) %>% mutate(
+    regional_mean = mean(hh_ind_count)
+    )
+
+ggplot(plot.hh_rdt_pos_table, aes(x=hh_ind_count)) + 
+  geom_histogram(aes(y=..density..), binwidth = 1) +
+  facet_wrap(~region_id, nrow = 1) +
+  scale_x_continuous(breaks = c(2:18)) +
+  xlab("Household size (number of individuals per household)") + ylab("Frequency") +
+  rremove("grid") + 
+  geom_vline(aes(xintercept = regional_mean), linetype="dotted", 
+                color = "#3498DB", size = 1.5) +
+  theme(axis.text.x = element_text(angle=90, hjust=1, size = 7)) 
+```
+*Regional mean household size shown in blue*
+
+**FIX** Some households with 1 individual ---> likely household ID errors
+
+***
+
+(7.02.4.1) Comparing expected and observed levels of household clustering
+
+- Plotting a dumbbell plot:
+  - [Tutorial 1](https://gist.github.com/hrbrmstr/0d206070cea01bcb0118)
+  - [Tutorial 2](https://data-se.netlify.com/2018/05/23/playing-around-with-dumbbell-plots/)
+  - [Tutorial 3](https://cran.r-project.org/web/packages/ggalt/vignettes/ggalt_examples.html)
+  - Can add dots for the median etc by simply adding a geom_point call
+
+- To plot, need a data frame that is columns: 
+  - sites 2.1, 2.2, etc (site_id_name)
+  - left  bound of dumbbell (2.5)
+  - right bound of dumbbell (97.5)
+  - Add points: 
+    - Expected median point: Median number of households with 0 infections from permutations
+    - Observed point: Observed number of households with 0 infections
+
+**Figure 7.02.4.2: The distribution of infections among households (non-parametric bootstrap)**
+```{r 7.02.4.2, eval = FALSE, fig.height = 7, fig.width = 10}
+#Panel by region?
+#Sort within regions by prevalence?
+#Drop sites with 0, or 1 infection? YES
+#Ifelse to not show median for sites with 1 or 2 infections
+
+plot.nonparam_hh_sim_data <- nonparam_hh_sim_data %>% mutate(
+  region_id = case_when(
+    region_id == 2 ~ "Region 2 (Mananjary)",
+    region_id == 3 ~ "Region 3 (Toliara)",
+    region_id == 4 ~ "Region 4 (Morombe)",
+    region_id == 5 ~ "Region 5 (Amoron'i Mania)"
+  ))
+
+ggplot(plot.nonparam_hh_sim_data, aes(
+  #Converting site_id to a factor and manually specifying order so as to sort from high -> low prevalence by region
+  y = factor(plot.nonparam_hh_sim_data$site_id, levels=c(
+  206, 205, 204, 202, 203, 201,
+  303, 306, 305, 301, 302, 304,
+  402, 403, 405, 404, 401, 406,
+  502, 501, 506, 503, 504, 505
+  )), 
+  x = bound_025, 
+  xend = bound_975
+  )) + 
+  #Adding the dumbbell
+  geom_dumbbell(size=1.75, color="#2874A6", 
+                colour_x = "#2874A6", colour_xend = "#2874A6") +
+  #Removing title and axis labels
+  labs(x="Number of households with zero infections", y=NULL, title=NULL) +
+  #Changing the grid lines
+  theme(panel.grid.major.x=element_line(size=0.05)) +
+  theme(panel.grid.major.y=element_line(size=0.15)) +
+  #Flipping the x and y axes so that the dumbbells are vertical rather than horizontal
+  coord_flip() +
+  #Adding a red dot for the observed hh count
+  geom_point(aes(y=factor(site_id), x=obs_n_hh_0_pos), color = "#E74C3C", size = 1.4) +
+  #Adding a lighter blue dot for the median of the permutation simulations
+  geom_point(aes(y=as.factor(site_id), x=median, color = ifelse(obs_n_hh_0_pos == median, "#2874A6", "#2E86C1")), size = 1.4) +
+  #Faceting by region
+  facet_wrap(~ region_id, nrow = 1, scales = "free_x") +
+  #Remove the legend
+  rremove("legend")
+```
+*Note:* Blue bars show the 95% confidence interval of the expected number of households with zero infections as per 10,000 bootstrap replicates. The median of the 10,000 permutations is shown as a blue dot. The observed number of households with zero infections is shown as a red dot. For sites with 0 or 1 total infections, there is no range in the expected number of households with zero infections. Sites ranked by prevalence within regions
+
+**FIX** Add legend: Expected (blue), Observed (red), Maybe swap dark blue for median dot
+
+***
+
+***
+#### END Section 7 (Distribution of infections among households)
+***
+
+***
+
+# (8) Household mapping
+
+***
+
+- Initial notes:
+  - Joining GPS data to HH list with RDT results
+    - Check how many HHs still have missing GPS data
+  - Center on approximate site mid-point and have lat and lon be X and Y as distance from the southernmost point and the eastern most point
+  - Point markers: ○ ○ ○ ● ●
+
+***
+
+##### (8.01) Cleaning household GPS data and checking completeness
+
+***
+
+(8.01.1) Reading in household GPS data
+
+- Use copy of file: `Household GPS Data Ben 20170919.csv`
+
+```{r 8.01.1, eval = FALSE}
+filename_hh_gps_data <- "Household GPS Data Ben 20170919.csv"
+raw.hh_gps_data <- read.csv(file.path(mainDir, filename_hh_gps_data), stringsAsFactors = FALSE)
+```
+
+***
+
+(8.01.2) Checking `raw.hh_gps_data` for potential GPS data entry errors
+```{r 8.01.2, eval = FALSE, fig.height = 7, fig.width = 10}
+ggplot(raw.hh_gps_data, aes(x = Longitude, y = Latitude)) + 
+  geom_point() +
+  facet_wrap(~ Site.ID, nrow = 4, scales = "free")
+```
+
+- Noting sites with gps points that appear distant from other households:
+  - R2: 
+    - Site 203 (1 HH in NE corner)
+      - The HH at -21.12000, 48.31532 confirmed via sat imagery to be a HH in a satellite village to the NE
+  - R3: 
+    - Site 301 (2 HH in NW corner)
+      - The 2 HH near -22.90308, 43.58390 confirmed via sat imagery to be HHs at the eastern edge of the contiguous village
+    - Site 302 (1 HH in NE corner)
+      - The HH at -23.25965, 43.73453 confirmed via sat imagery to be HHs at the northeastern edge of the contiguous village
+    - Site 306 (1 HH in NE corner)
+      - The HH at -23.29887, 43.62302 confirmed via sat imagery to be HHs at the northeastern edge of the contiguous village
+  - R4: 
+    - Site 401 (1 HH in E edge)
+      - The HH at -21.68275, 43.54760 appears to be distant from any households - likely a data entry error
+        - Fixing the error: HH 4010067: -21.68275, 43.5476 ---> -21.68275, 43.51760
+    - Site 403 (1 HH in NE corner, 1 in NW corner)
+      - The HH at -21.72204	43.49686 (NE corner) appearsto be distant from any households - likely a data entry error
+        - Fixing the error: HH 4030028: -21.72204, 43.49686 ---> -21.73204, 43.49686
+      - The HH at -21.72458, 43.49084 (NW corner) confirmed via sat imagery to be a HH in a satellite village to the W
+    - Site 404 (2 HH in SW corner)
+      - The 2 HH near -22.19291, 43.61024 confirmed via sat imagery to be in a satellite village to the SW
+    - Site 406 (4 HH in the SW)
+      - The 4-6 HHs in the SW are confirmed via sat imagery to be distant HHs or small satellite villages
+  - R5: 
+    - Site 505 (i HH in NE corner)
+      - The HH at -20.34326, 47.15646 confirmed via sat imagery to be a semi-distant HH to the W
+
+(8.01.3) Correcting GPS coordinate data entry errors
+```{r 8.01.3, eval = FALSE}
+#HH 4010067: -21.68275, 43.5476 ---> -21.68275, 43.51760
+raw.hh_gps_data[raw.hh_gps_data$Household.ID == 4010067, "Longitude"] <-  43.51760
+#HH 4030028: -21.72204, 43.49686 ---> -21.73204, 43.49686
+raw.hh_gps_data[raw.hh_gps_data$Household.ID == 4030028, "Latitude"]  <- -21.73204
+```
+
+(8.01.4) Formatting the `raw.hh_gps_data` and storing it as `hh_gps_data`
+```{r 8.01.4, eval = FALSE}
+hh_gps_data <- raw.hh_gps_data %>% transmute(
+  hh_id     = Household.ID,
+  region_id = Region.Code,
+  site_id   = Site.ID,
+  y_lat     = Latitude,
+  x_lon     = Longitude
+)
+```
+**FIX** Add the new transcribed data for R3 from Busta's scans and look for outlier dots; Copy these data cleaning steps for the eventual unified CRS data cleaning pipeline
+
+***
+
+Random ideas:
+**FIX** Worth computing average distance between sampled households for some sites?
+**FIX** Worth computing household size from census data not from blood sampled individual data?
+
+***
+
+(8.01.5) Merging GPS data with rdt data
+
+- Joining GPS data with data on household size (number of individuals per household) and the number of RDT positive individuals in the household
+
+```{r 8.01.5, eval = FALSE}
+#Merge data frames using the full_join() function and store as hh_rdt_gps_data_joined
+hh_rdt_gps_data_joined <- full_join(hh_rdt_pos_table, hh_gps_data %>% select(hh_id, y_lat, x_lon), by = "hh_id")
+
+#Checking merged sheet
+glimpse(hh_rdt_gps_data_joined)
+```
+
+***
+
+(8.01.6) Checking data completeness and cleaning the hh_rdt_gps_data_joined data frame
+```{r 8.01.6, eval = FALSE}
+hh_rdt_gps_data_completeness_table <- data.frame(
+  Category = c(
+    "Number of HHs with RDT data (overall)",                          #1
+    "Number of HHs with RDT, latitude, and longitude data (overall)", #2
+    "% of HHs with RDT, latitude, and longitude data (overall)",      #3
+    "Number of HHs with GPS but no RDT data (overall)",               #4
+    "% of HHs with latitude and longitude data (R2)",                 #5
+    "% of HHs with latitude and longitude data (R3)",                 #6
+    "% of HHs with latitude and longitude data (R4)",                 #7
+    "% of HHs with latitude and longitude data (R5)"                  #8
+  ),
+  Value = c(
+    length(unique(rdt_data_cleaned$hh_id)),                                                       #1
+    
+    sum(!is.na(hh_rdt_gps_data_joined$y_lat) & !is.na(hh_rdt_gps_data_joined$region_id)),         #2
+    
+    round((sum(!is.na(hh_rdt_gps_data_joined$y_lat) & !is.na(hh_rdt_gps_data_joined$region_id)) /
+      length(unique(rdt_data_cleaned$hh_id)) * 100), 2),                                          #3
+    
+    sum(is.na(hh_rdt_gps_data_joined$region_id)),                                                 #4
+    
+    round((length(which(hh_rdt_gps_data_joined$region_id == 2 & 
+                   !is.na(hh_rdt_gps_data_joined$hh_id) &
+                   !is.na(hh_rdt_gps_data_joined$y_lat))) / 
+      length(which(hh_rdt_gps_data_joined$region_id == 2)) * 100), 2),                            #5
+    
+    round((length(which(hh_rdt_gps_data_joined$region_id == 3 & 
+                   !is.na(hh_rdt_gps_data_joined$hh_id) &
+                   !is.na(hh_rdt_gps_data_joined$y_lat))) / 
+      length(which(hh_rdt_gps_data_joined$region_id == 3)) * 100), 2),                            #6
+    
+    round((length(which(hh_rdt_gps_data_joined$region_id == 4 & 
+                   !is.na(hh_rdt_gps_data_joined$hh_id) &
+                   !is.na(hh_rdt_gps_data_joined$y_lat))) / 
+      length(which(hh_rdt_gps_data_joined$region_id == 4)) * 100), 2),                            #7
+    
+    round((length(which(hh_rdt_gps_data_joined$region_id == 5 & 
+                   !is.na(hh_rdt_gps_data_joined$hh_id) &
+                   !is.na(hh_rdt_gps_data_joined$y_lat))) / 
+      length(which(hh_rdt_gps_data_joined$region_id == 5)) * 100), 2)                             #8
+  )
+)
+
+#Printing the hh_rdt_gps_data_completeness_table
+kable(hh_rdt_gps_data_completeness_table, caption = "Table 8.01.5: Notes on data completeness for HH GPS data") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"), font_size = 11, full_width = F, position = "left")
+```
+
+***
+
+(8.01.7) Trimming out rows with missing data and storing as hh_rdt_gps_data
+```{r 8.01.7, eval = FALSE}
+hh_rdt_gps_data <- hh_rdt_gps_data_joined[!is.na(hh_rdt_gps_data_joined$region_id), ] #1131 ---> 1123 rows
+hh_rdt_gps_data <- hh_rdt_gps_data[!is.na(hh_rdt_gps_data$y_lat), ]                   #1123 --->  972 rows
+```
+
+***
+
+##### (8.02) Visualizing the spatial distribution of households
+
+***
+
+(8.02.1) To test plotting, creating subsets for the 6 sites with a non-random distribution of infections 
+
+(per the analysis shown in Figure 7.02.4.1)
+
+```{r 8.02.1, eval = FALSE}
+#R2V2, R2V3, R4V1, R4V3, R4V5, R4V6
+hh_gps_data.R2V2 <- hh_rdt_gps_data[hh_rdt_gps_data$site_id == 202, ]
+hh_gps_data.R2V3 <- hh_rdt_gps_data[hh_rdt_gps_data$site_id == 203, ]
+
+hh_gps_data.R4V1 <- hh_rdt_gps_data[hh_rdt_gps_data$site_id == 401, ]
+hh_gps_data.R4V3 <- hh_rdt_gps_data[hh_rdt_gps_data$site_id == 403, ]
+hh_gps_data.R4V5 <- hh_rdt_gps_data[hh_rdt_gps_data$site_id == 405, ]
+hh_gps_data.R4V6 <- hh_rdt_gps_data[hh_rdt_gps_data$site_id == 406, ]
+```
+
+***
+
+(8.02.2) Writing functions to create filled or unfilled dot annotations for plotted HH coordinates
+
+- `function.make_dot_label`: Making labels to display HH infection outcomes
+  - Inputs: 
+    - A vector (or data column) that is the number of individuals per household
+    - A vector (or data column) that is the number of RDT positive individuals in the household
+  - Outputs:
+    - Returns a vector of character strings, e.g. `○○○●●●`
+
+**FIX** Add line breaks to the text labels? See email with Nick
+```{r 8.02.2.1, eval = FALSE}
+function.make_dot_label <- function(hh_ind_count_v, hh_rdt_pos_count_v){
+  label_text_v = rep(NA, length(hh_ind_count_v))
+  
+  for(i in 1:length(hh_ind_count_v)){
+    #Add a unfilled dot for negative individuals and a filled dot for infected individuals
+    text_neg_i      <- paste(rep("○", hh_ind_count_v[i] - hh_rdt_pos_count_v[i]), collapse = "")
+    text_pos_i      <- paste(rep("●", hh_rdt_pos_count_v[i]), collapse =  "")
+    #Paste the unfilled and filled dots together
+    label_text_v[i] <- paste(text_neg_i, text_pos_i, collapse = "", sep = "")
+  }
+  
+  return(label_text_v)
+}
+```
+
+- `function.rescale_dds`: Converting lat and lon to de-identified coordinates centered on zero (axes are decimal degrees from start point)
+  - Inputs: 
+    - A vector (or data column) that is the latitude OR longitude of HHs
+      - Coordinates are rescaled as decimal degrees from the:
+        - southernmost latitude (largest negative latitude) OR the westernmost longitude (lowest longitude)
+  - Outputs:
+    - Returns a vector of scaled latitude or longitude values (in decimal degrees)
+
+```{r 8.02.2.2, eval = FALSE}
+function.rescale_dds <- function(latitude_or_longitude){
+  scaled.latitude_or_longitude <- rep(NA, length(latitude_or_longitude))
+  #Find the southernmost latitude (largest negative latitude) OR the westernmost longitude (lowest longitude)
+  min_dd <- min(latitude_or_longitude)
+  #Subtract the min from each point
+  for(i in 1:length(latitude_or_longitude)){
+    scaled.latitude_or_longitude[i] <- latitude_or_longitude[i] - min_dd
+  }
+  #Return the re-scaled lat or lon values
+  return(scaled.latitude_or_longitude)
+}
+```
+
+(8.02.3) Making data tables that have the dot annotations and infection status of households specified
+```{r 8.02.3, eval = FALSE}
+#Calling the functions defined above to rescale lat and lon data and to create the filled and unfilled dot point labels
+# Creating a new column "infs_label" to mark houses with 1+ infections to color them differently in the plot
+
+#R2V2, R2V3, R4V1, R4V3, R4V5, R4V6
+#R2V2
+plot.hh_gps_data.R2V2 <- hh_gps_data.R2V2 %>% mutate(
+  x_lon      = function.rescale_dds(hh_gps_data.R2V2$x_lon),
+  y_lat      = function.rescale_dds(hh_gps_data.R2V2$y_lat),
+  label      = function.make_dot_label(hh_gps_data.R2V2$hh_ind_count, hh_gps_data.R2V2$hh_rdt_pos_count),
+  infs_label = ifelse(hh_rdt_pos_count > 0, 1, 0)
+)
+#R2V3
+plot.hh_gps_data.R2V3 <- hh_gps_data.R2V3 %>% mutate(
+  x_lon      = function.rescale_dds(hh_gps_data.R2V3$x_lon),
+  y_lat      = function.rescale_dds(hh_gps_data.R2V3$y_lat),
+  label      = function.make_dot_label(hh_gps_data.R2V3$hh_ind_count, hh_gps_data.R2V3$hh_rdt_pos_count),
+  infs_label = ifelse(hh_rdt_pos_count > 0, 1, 0)
+)
+#R4V1
+plot.hh_gps_data.R4V1 <- hh_gps_data.R4V1 %>% mutate(
+  x_lon      = function.rescale_dds(hh_gps_data.R4V1$x_lon),
+  y_lat      = function.rescale_dds(hh_gps_data.R4V1$y_lat),
+  label      = function.make_dot_label(hh_gps_data.R4V1$hh_ind_count, hh_gps_data.R4V1$hh_rdt_pos_count),
+  infs_label = ifelse(hh_rdt_pos_count > 0, 1, 0)
+)
+#R4V3
+plot.hh_gps_data.R4V3 <- hh_gps_data.R4V3 %>% mutate(
+  x_lon      = function.rescale_dds(hh_gps_data.R4V3$x_lon),
+  y_lat      = function.rescale_dds(hh_gps_data.R4V3$y_lat),
+  label      = function.make_dot_label(hh_gps_data.R4V3$hh_ind_count, hh_gps_data.R4V3$hh_rdt_pos_count),
+  infs_label = ifelse(hh_rdt_pos_count > 0, 1, 0)
+)
+#R4V5
+plot.hh_gps_data.R4V5 <- hh_gps_data.R4V5 %>% mutate(
+  x_lon      = function.rescale_dds(hh_gps_data.R4V5$x_lon),
+  y_lat      = function.rescale_dds(hh_gps_data.R4V5$y_lat),
+  label      = function.make_dot_label(hh_gps_data.R4V5$hh_ind_count, hh_gps_data.R4V5$hh_rdt_pos_count),
+  infs_label = ifelse(hh_rdt_pos_count > 0, 1, 0)
+)
+#R4V6
+plot.hh_gps_data.R4V6 <- hh_gps_data.R4V6 %>% mutate(
+  x_lon      = function.rescale_dds(hh_gps_data.R4V6$x_lon),
+  y_lat      = function.rescale_dds(hh_gps_data.R4V6$y_lat),
+  label      = function.make_dot_label(hh_gps_data.R4V6$hh_ind_count, hh_gps_data.R4V6$hh_rdt_pos_count),
+  infs_label = ifelse(hh_rdt_pos_count > 0, 1, 0)
+)
+```
+
+(8.02.4) Creating the household map figures
+
+**Figure 8.02.4: Spatial distribution of malaria infections within communities**
+```{r 8.02.4, eval = FALSE, fig.height = 7, fig.width = 10}
+#R2V2, R2V3, R4V1, R4V3, R4V5, R4V6
+
+#R2V2
+p.plot.hh_gps_data.R2V2 <- ggplot(plot.hh_gps_data.R2V2, aes(x_lon, y_lat)) + 
+  #Adding the points for the coordinates of the houses, coloring infected houses red
+  geom_point(shape = 15, size = 2.5,
+             color = ifelse(plot.hh_gps_data.R2V2$infs_label == 0, "gray42", "firebrick")) + 
+  #Setting the x and y scale limits manually
+  xlim(0.00, 0.0015) + ylim(-.0005, 0.0025) +
+  #Adding the HH labels, requiring a line between label and point, rotating the labels vertically, and adding padding to avoid over-crowding
+  geom_text_repel(
+    aes(x_lon, y_lat, label = label),
+    size          = 3,
+    angle         = 270,
+    segment.size  = 0.15,
+    point.padding = 0.5,
+    box.padding   = 0.5,
+    min.segment.length = unit(0, 'lines')) +
+  theme_classic() +
+  labs(title = "Site 202", x = "Longitude (decimal degrees, re-scaled)", y = "Latitude (decimal degrees, re-scaled)")
+
+## Reducing padding, adding size = 3 for labels, and manually adjusting the x and y scales helps
+## May want to replot awkward sites without the awkward distant HHs
+## Plot with distance scale and legend
+## In the end, don't print the axis ticks and labels
+
+#R2V3
+p.plot.hh_gps_data.R2V3 <- ggplot(plot.hh_gps_data.R2V3, aes(x_lon, y_lat)) + 
+  #Adding the points for the coordinates of the houses, coloring infected houses red
+  geom_point(shape = 15, size = 4,
+             color = ifelse(plot.hh_gps_data.R2V3$infs_label == 0, "gray42", "firebrick")) + 
+  #Setting the x and y scale limits manually
+  xlim(-.0015, 0.004) + ylim(-.003, 0.007) +
+  #Adding the HH labels, requiring a line between label and point, rotating the labels vertically, and adding padding to avoid over-crowding
+  geom_text_repel(
+    aes(x_lon, y_lat, label = label),
+    angle        = 270,
+    segment.size = 0.2,
+    point.padding = 1.1,
+    box.padding = 1.1,
+    min.segment.length = unit(0, 'lines')) +
+  theme_classic() +
+  labs(title = "Site 203", x = "Longitude (decimal degrees, re-scaled)", y = "Latitude (decimal degrees, re-scaled)")
+
+#R4V1
+p.plot.hh_gps_data.R4V1 <- ggplot(plot.hh_gps_data.R4V1, aes(x_lon, y_lat)) + 
+  #Adding the points for the coordinates of the houses, coloring infected houses red
+  geom_point(shape = 15, size = 4,
+             color = ifelse(plot.hh_gps_data.R4V1$infs_label == 0, "gray42", "firebrick")) + 
+  #Setting the x and y scale limits manually
+  xlim(-.0005, 0.004) + ylim(-.0005, 0.005) +
+  #Adding the HH labels, requiring a line between label and point, rotating the labels vertically, and adding padding to avoid over-crowding
+  geom_text_repel(
+    aes(x_lon, y_lat, label = label),
+    angle        = 270,
+    segment.size = 0.2,
+    point.padding = 1.1,
+    box.padding = 1.1,
+    min.segment.length = unit(0, 'lines')) +
+  theme_classic() +
+  labs(title = "Site 401", x = "Longitude (decimal degrees, re-scaled)", y = "Latitude (decimal degrees, re-scaled)")
+
+#R4V3
+p.plot.hh_gps_data.R4V3 <- ggplot(plot.hh_gps_data.R4V3, aes(x_lon, y_lat)) + 
+  #Adding the points for the coordinates of the houses, coloring infected houses red
+  geom_point(shape = 15, size = 4,
+             color = ifelse(plot.hh_gps_data.R4V3$infs_label == 0, "gray42", "firebrick")) + 
+  #Setting the x and y scale limits manually
+  xlim(0.0, 0.007) + ylim(-0.001, 0.011) +
+  #Adding the HH labels, requiring a line between label and point, rotating the labels vertically, and adding padding to avoid over-crowding
+  geom_text_repel(
+    aes(x_lon, y_lat, label = label),
+    angle        = 270,
+    segment.size = 0.2,
+    point.padding = 1.1,
+    box.padding = 1.1,
+    min.segment.length = unit(0, 'lines')) +
+  theme_classic() +
+  labs(title = "Site 403", x = "Longitude (decimal degrees, re-scaled)", y = "Latitude (decimal degrees, re-scaled)")
+
+#R4V5
+p.plot.hh_gps_data.R4V5 <- ggplot(plot.hh_gps_data.R4V5, aes(x_lon, y_lat)) + 
+  #Adding the points for the coordinates of the houses, coloring infected houses red
+  geom_point(shape = 15, size = 4,
+             color = ifelse(plot.hh_gps_data.R4V5$infs_label == 0, "gray42", "firebrick")) + 
+  #Setting the x and y scale limits manually
+  xlim(0.000, 0.003) + ylim(0.000, 0.0022) +
+  #Adding the HH labels, requiring a line between label and point, rotating the labels vertically, and adding padding to avoid over-crowding
+  geom_text_repel(
+    aes(x_lon, y_lat, label = label),
+    angle        = 270,
+    segment.size = 0.2,
+    point.padding = 1.1,
+    box.padding = 1.1,
+    min.segment.length = unit(0, 'lines')) +
+  theme_classic() +
+  labs(title = "Site 405", x = "Longitude (decimal degrees, re-scaled)", y = "Latitude (decimal degrees, re-scaled)")
+
+#R4V6
+p.plot.hh_gps_data.R4V6 <- ggplot(plot.hh_gps_data.R4V6, aes(x_lon, y_lat)) + 
+  #Adding the points for the coordinates of the houses, coloring infected houses red
+  geom_point(shape = 15, size = 4,
+             color = ifelse(plot.hh_gps_data.R4V6$infs_label == 0, "gray42", "firebrick")) + 
+  #Setting the x and y scale limits manually
+  xlim(0.000, 0.035) + ylim(0.000, 0.025) +
+  #Adding the HH labels, requiring a line between label and point, rotating the labels vertically, and adding padding to avoid over-crowding
+  geom_text_repel(
+    aes(x_lon, y_lat, label = label),
+    angle        = 270,
+    segment.size = 0.2,
+    point.padding = 1.1,
+    box.padding = 1.1,
+    min.segment.length = unit(0, 'lines')) +
+  theme_classic() +
+  labs(title = "Site 406", x = "Longitude (decimal degrees, re-scaled)", y = "Latitude (decimal degrees, re-scaled)")
+
+
+
+#Printing the plots
+#R2V2, R2V3, R4V1, R4V3, R4V5, R4V6
+p.plot.hh_gps_data.R2V2
+p.plot.hh_gps_data.R2V3
+p.plot.hh_gps_data.R4V1
+p.plot.hh_gps_data.R4V3
+p.plot.hh_gps_data.R4V5
+p.plot.hh_gps_data.R4V6
+```
+
+- Notes for now:
+  - Have to have different scales for different villages, R4V6 is very spread out for example
+  - Setting wider axis limits for x and y can alleviate crowding of the labels
+  - R4V1 has that one house way out in the distance **FIX**?
+
+***
+
+##### (8.03) Computing the average distance between households
+
+- Objective: Determine the average distance in meters between households
+
+***
+
+(8.03.1) Using the `function.calc_geodist_xy` from section 5.01.4 above
+```{r 8.03.1, eval = FALSE}
+#Using the function.calc_geodist_xy but passing a vectors of households and their lat and lon coordinates rather than a list of site midpoints
+# Writing a function that pass each site's HH gps data to the function.calc_geodist_xy to calculate all pairwise hh distances in km
+
+# Output as 24 different dataframes? Or a list where each element is a vector containing a site's 1200ish pairwise distances???
+
+hh_gps_data
+
+hh_gps_data.R4V5
+
+hh_gps_data.R4V6
+x1 <- function.calc_geodist_xy(hh_gps_data.R4V1$hh_id, hh_gps_data.R4V1$x_lon, hh_gps_data.R4V1$y_lat)
+x5 <- function.calc_geodist_xy(hh_gps_data.R4V5$hh_id, hh_gps_data.R4V5$x_lon, hh_gps_data.R4V5$y_lat)
+x6 <- function.calc_geodist_xy(hh_gps_data.R4V6$hh_id, hh_gps_data.R4V6$x_lon, hh_gps_data.R4V6$y_lat)
+
+mean(x1$calc_geographic_pw_dist) * 1000
+mean(x5$calc_geographic_pw_dist) * 1000
+mean(x6$calc_geographic_pw_dist) * 1000
+
+hist(x1$calc_geographic_pw_dist * 1000)
+hist(x5$calc_geographic_pw_dist * 1000)
+hist(x6$calc_geographic_pw_dist * 1000)
+
+
+
+function.calc_geodist_xy()
+
+```
+
+***
+***
+#### END Section 8 (Household mapping)
+***
+***
+END DOCUMENT
+***
+***
+
+
+
+
+
+
+
