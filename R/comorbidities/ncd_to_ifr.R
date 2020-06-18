@@ -40,26 +40,24 @@ hosp_ests %>%
 # IFR equal to hospitalization rate
 hosp_fit_age <- gam(hosp_rate ~ s(predictor, k = 8), family = betar(link="logit"), 
                     data = hosp_ests, method = "REML")
-hosp_preds_age <- predict(hosp_fit_age,  data.frame(predictor = ages), 
-                         type = "response", se.fit = TRUE)
-hosps_to_plot_age <- data.frame(ages = ages, 
-                               est = hosp_preds_age$fit, upper = hosp_preds_age$fit + 2*hosp_preds_age$se.fit, 
-                               lower = hosp_preds_age$fit - 2*hosp_preds_age$se.fit)
 
 # IFR equal to icu rate
 icu_fit_age <- gam(icu_rate ~ s(predictor, k = 8), family = betar(link="logit"), 
                    data = hosp_ests, method = "REML")
-icu_preds_age <- predict(icu_fit_age,  data.frame(predictor = ages), 
-                         type = "response", se.fit = TRUE)
-icus_to_plot_age <- data.frame(ages = ages, 
-                               est = icu_preds_age$fit, upper = icu_preds_age$fit + 2*icu_preds_age$se.fit, 
-                               lower = icu_preds_age$fit - 2*icu_preds_age$se.fit)
 
-# Make middle panel plot
-
+# Make middle panel plot ------------------------------------------------
 predict_ifr <- function(predictor, gam = ifr_fit_age) {
   predict(gam, newdata = data.frame(predictor = predictor), type = "response")
 }
+
+age_ifrs <- data.frame(age = seq(1, 100, by = 1))
+age_ifrs %>%
+  mutate(ifr_by_age = predict_ifr(predictor = age, gam = ifr_fit_age), 
+         ifr_by_ageplus5 = predict_ifr(predictor = age + 5, gam = ifr_fit_age),
+         ifr_by_ageplus10 = predict_ifr(predictor = age + 10, gam = ifr_fit_age), 
+         ifr_by_hosp = predict_ifr(predictor = age, gam = hosp_fit_age),
+         ifr_by_icu = predict_ifr(predictor = age, gam = icu_fit_age)) %>%
+  pivot_longer(starts_with("ifr"), names_to = "ifr_type", values_to = "ifr_est") -> ages_to_plot
 
 un_ages %>%
   filter(iso %in% iso_codes$iso) %>%
@@ -82,13 +80,22 @@ ifr_labs <- c("Age (baseline)", "Age, shifted + 5", "Age, shifted + 10", "IFR = 
               "IFR = Hospitalization rate by age")
 names(ifr_labs) <- names(ifr_cols)
 
+ggplot(data = ages_to_plot, aes(x = age, y = ifr_est, color = ifr_type)) +
+  geom_line(size = 1.2) + 
+  scale_color_manual(values = ifr_cols, labels = ifr_labs, guide = "none") +
+  theme_minimal_hgrid() +
+  labs(x = "Age", y = "IFR") +
+  theme(text = element_text(size = 12)) -> ifr_leg
+
+ggsave("figs/fig4_middle_inset.jpeg", height = 5, width = 5)
+
 ggplot(data = burden_by_age, aes(x = reorder(country, prop_over_60))) +
   geom_point(aes(y = burden_age/pop*1e5, color = ifr_type)) +
   coord_flip() +
   scale_color_manual(values = ifr_cols, labels = ifr_labs,
-                     name = "Predictor of burden") +
+                     name = "Predictor of IFR") +
   theme_minimal_hgrid() +
-  labs(x = "Countries (ordered by age)", y = "Incidence of deaths \n per 100,000 persons", tag = "D") +
+  labs(x = "Countries (ordered by age)", y = "Incidence of deaths \n per 100,000 persons", tag = "?") +
   theme(axis.text = element_text(size = 8), 
         axis.text.x = element_text(angle = 45, hjust = 1), text = element_text(size = 12)) -> middle_panel
 
