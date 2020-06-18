@@ -9,6 +9,8 @@ library(tidyverse)
 library(here)
 library(raster)
 library(data.table)
+library(fasterize)
+library(sf)
 
 # metadata
 metadata <- read_csv(here("data/raw/Africa_1km_Age_structures_2020/Demographic_data_organisation_per country_AFRICA.csv"))
@@ -77,9 +79,19 @@ admin3@data %>%
 writeOGR(admin3, dsn = here("data/processed/shapefiles"), layer = "master", 
          driver = "ESRI Shapefile", overwrite_layer = TRUE)
 
-# GADM Admin shapefiles 
+# GADM Admin shapefiles --------------------------------------------------------------
 gadm_admin2 <- readOGR(here("data/raw/gadm_adm2/gadm36_2.shp"))
 gadm_admin2 <- gadm_admin2[gadm_admin2$GID_0 %in% iso_codes$iso, ]
+
+# missing admin 2s need to use admin 1 shapefiles
+missing_isos <- iso_codes$iso[!(iso_codes$iso %in% gadm_admin2$GID_0)]
+gadm_admin1 <- readOGR(here("data/raw/gadm_adm1/gadm36_1.shp"))
+gadm_admin1 <- gadm_admin1[gadm_admin1$GID_0 %in% missing_isos, ]
+
+# Bind & coalesce ids
+gadm_admin <- bind(gadm_admin1, gadm_admin2)
+gadm_admin <- st_as_sf(gadm_admin)
+gadm_admin$feature_id <- coalesce(gadm_admin$GID_2, gadm_admin$GID_1)
 
 # pops for Jess (rasterize) + data.table (do it @ finer scale other wise some admin end up NA)
 files <- list.files(here('data/raw/Africa_1km_Age_structures_2020'), full.names = TRUE)
@@ -89,13 +101,15 @@ age_rasts <- stack(age_rasts)
 pop <- sum(age_rasts, na.rm = TRUE) # Takes a bit like 7 minutes
 
 # rasterize
-id_match <- rasterize(gadm_admin2, pop) # Takes too long...1 hr ish try pkg fasterize if repeated
-out <- data.table(feature_id = values(id_match), pop = values(pop))
-out <- out[, .(pop = sum(pop, na.rm = TRUE)), by = c("feature_id")]
-gadm_admin2$feature_id <- 1:nrow(gadm_admin2@data)
-gadm_admin2@data <- left_join(gadm_admin2@data, out)
+gadm_admin$row_id <- 1:nrow(gadm_admin)
+id_match <- fasterize(gadm_admin, pop, field = "row_id", fun = "first") # now fast with fasterize
+out <- data.table(row_id = values(id_match), pop = values(pop))
+out <- out[, .(pop = sum(pop, na.rm = TRUE)), by = c("row_id")]
+gadm_admin <- left_join(gadm_admin, out)
 
-# match to travel times 
+# match to travel times
 ttimes <- read.csv("data/raw/SSA_BigData_v1.2.csv")
-ttimes$pop <- gadm_admin2$pop[match(ttimes$Administrative.level.2.unit.code, gadm_admin2$GID_2)]
+ttimes$Administrative.level.2.unit.code[ttimes$Administrative.level.2.unit.code == ""] <- NA
+ttimes$feature_id <- coalesce(ttimes$Administrative.level.2.unit.code, ttimes$Administrative.level.1.unit.code)
+ttimes$pop <- gadm_admin$pop[match(ttimes$feature_id, gadm_admin$feature_id)]
 write_csv(ttimes, "data/processed/ttimes_SSA.csv")
