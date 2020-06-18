@@ -29,6 +29,71 @@ ifrs_to_plot_age <- data.frame(ages = ages,
                            est = ifr_preds_age$fit, upper = ifr_preds_age$fit + 2*ifr_preds_age$se.fit, 
                            lower = ifr_preds_age$fit - 2*ifr_preds_age$se.fit)
 
+# Fit age to hosp estimates ------------------------------------------------
+# Have to choose k in smoothing term because not many data points
+# Look into other papers to see if they have age-stratified ests
+hosp_ests <- read_csv(here("data/raw/hosp_from_salje.csv"))
+hosp_ests %>%
+  mutate(predictor = (age_lower + age_upper)/2, hosp_rate = inf_to_hosp_mean/100, 
+         icu_rate = (inf_to_hosp_mean/100)*(hosp_to_icu_mean/100)) -> hosp_ests
+
+# IFR equal to hospitalization rate
+hosp_fit_age <- gam(hosp_rate ~ s(predictor, k = 8), family = betar(link="logit"), 
+                    data = hosp_ests, method = "REML")
+hosp_preds_age <- predict(hosp_fit_age,  data.frame(predictor = ages), 
+                         type = "response", se.fit = TRUE)
+hosps_to_plot_age <- data.frame(ages = ages, 
+                               est = hosp_preds_age$fit, upper = hosp_preds_age$fit + 2*hosp_preds_age$se.fit, 
+                               lower = hosp_preds_age$fit - 2*hosp_preds_age$se.fit)
+
+# IFR equal to icu rate
+icu_fit_age <- gam(icu_rate ~ s(predictor, k = 8), family = betar(link="logit"), 
+                   data = hosp_ests, method = "REML")
+icu_preds_age <- predict(icu_fit_age,  data.frame(predictor = ages), 
+                         type = "response", se.fit = TRUE)
+icus_to_plot_age <- data.frame(ages = ages, 
+                               est = icu_preds_age$fit, upper = icu_preds_age$fit + 2*icu_preds_age$se.fit, 
+                               lower = icu_preds_age$fit - 2*icu_preds_age$se.fit)
+
+# Make middle panel plot
+
+predict_ifr <- function(predictor, gam = ifr_fit_age) {
+  predict(gam, newdata = data.frame(predictor = predictor), type = "response")
+}
+
+un_ages %>%
+  filter(iso %in% iso_codes$iso) %>%
+  mutate(ifr_by_age = predict_ifr(predictor = age, gam = ifr_fit_age), 
+         ifr_by_ageplus5 = predict_ifr(predictor = age + 5, gam = ifr_fit_age),
+         ifr_by_ageplus10 = predict_ifr(predictor = age + 10, gam = ifr_fit_age), 
+         ifr_by_hosp = predict_ifr(predictor = age + 10, gam = hosp_fit_age),
+         ifr_by_icu = predict_ifr(predictor = age + 10, gam = icu_fit_age), 
+         pop_over_60 = ifelse(age > 60, pop, 0)) %>%
+  pivot_longer(starts_with("ifr"), names_to = "ifr_type", values_to = "ifr_est") %>%
+  mutate(burden = ifr_est*pop*0.2) %>%
+  group_by(country, iso, ifr_type) %>%
+  summarize(burden_age = sum(burden), 
+            pop = sum(pop), pop_over_60 = sum(pop_over_60)) %>%
+  mutate(prop_over_60 = pop_over_60/pop) -> burden_by_age
+
+ifr_cols <- c("ifr_by_age" = "#1b9e77", "ifr_by_ageplus10" = "#d95f02", "ifr_by_ageplus5" = "#7570b3", 
+              "ifr_by_icu" = "#e7298a", "ifr_by_hosp" = "#66a61e")
+ifr_labs <- c("Age (baseline)", "Age, shifted + 5", "Age, shifted + 10", "IFR = ICU rate by age", 
+              "IFR = Hospitalization rate by age")
+names(ifr_labs) <- names(ifr_cols)
+
+ggplot(data = burden_by_age, aes(x = reorder(country, prop_over_60))) +
+  geom_point(aes(y = burden_age/pop*1e5, color = ifr_type)) +
+  coord_flip() +
+  scale_color_manual(values = ifr_cols, labels = ifr_labs,
+                     name = "Predictor of burden") +
+  theme_minimal_hgrid() +
+  labs(x = "Countries (ordered by age)", y = "Incidence of deaths \n per 100,000 persons", tag = "D") +
+  theme(axis.text = element_text(size = 8), 
+        axis.text.x = element_text(angle = 45, hjust = 1), text = element_text(size = 12)) -> middle_panel
+
+ggsave("figs/fig4_middle_exe.jpeg", height = 7, width = 7)
+
 # Fit ncd mortality/prevalence to ifr ests --------------------------------
 ncds %>%
   mutate(age_lower = sapply(strsplit(age_name, " "), 
@@ -81,6 +146,7 @@ un_ages %>%
   group_by(country, iso) %>%
   summarize(burden_age = sum(burden), 
             pop = sum(pop)) -> burden_by_age
+
 ncds %>%
   select(age_name, age_lower, age_upper) %>%
   group_by(age_name) %>%
