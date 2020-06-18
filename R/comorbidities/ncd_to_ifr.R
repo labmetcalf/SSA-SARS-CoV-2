@@ -66,8 +66,8 @@ un_ages %>%
   mutate(ifr_by_age = predict_ifr(predictor = age, gam = ifr_fit_age), 
          ifr_by_ageplus5 = predict_ifr(predictor = age + 5, gam = ifr_fit_age),
          ifr_by_ageplus10 = predict_ifr(predictor = age + 10, gam = ifr_fit_age), 
-         ifr_by_hosp = predict_ifr(predictor = age + 10, gam = hosp_fit_age),
-         ifr_by_icu = predict_ifr(predictor = age + 10, gam = icu_fit_age), 
+         ifr_by_hosp = predict_ifr(predictor = age, gam = hosp_fit_age),
+         ifr_by_icu = predict_ifr(predictor = age, gam = icu_fit_age), 
          pop_over_60 = ifelse(age > 60, pop, 0)) %>%
   pivot_longer(starts_with("ifr"), names_to = "ifr_type", values_to = "ifr_est") %>%
   mutate(burden = ifr_est*pop*0.2) %>%
@@ -76,7 +76,7 @@ un_ages %>%
             pop = sum(pop), pop_over_60 = sum(pop_over_60)) %>%
   mutate(prop_over_60 = pop_over_60/pop) -> burden_by_age
 
-ifr_cols <- c("ifr_by_age" = "#1b9e77", "ifr_by_ageplus10" = "#d95f02", "ifr_by_ageplus5" = "#7570b3", 
+ifr_cols <- c("ifr_by_age" = "#1b9e77", "ifr_by_ageplus5" = "#d95f02", "ifr_by_ageplus10" = "#7570b3", 
               "ifr_by_icu" = "#e7298a", "ifr_by_hosp" = "#66a61e")
 ifr_labs <- c("Age (baseline)", "Age, shifted + 5", "Age, shifted + 10", "IFR = ICU rate by age", 
               "IFR = Hospitalization rate by age")
@@ -299,3 +299,4 @@ ggplot(data = filter(ncds_long, measure_name == "Deaths"),
 sfig_ncds_age <- sfig_ncds_age_A | sfig_ncds_age_B
 
 ggsave(here("figs/supplement/SX_ncds_age.jpeg"), sfig_ncds_age, device = "jpeg", height = 8, width = 8)
+
