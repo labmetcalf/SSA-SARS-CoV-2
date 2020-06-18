@@ -7,6 +7,8 @@ library(malariaAtlas)
 library(rmapshaper)
 library(tidyverse)
 library(here)
+library(raster)
+library(data.table)
 
 # metadata
 metadata <- read_csv(here("data/raw/Africa_1km_Age_structures_2020/Demographic_data_organisation_per country_AFRICA.csv"))
@@ -74,3 +76,26 @@ admin3@data %>%
 
 writeOGR(admin3, dsn = here("data/processed/shapefiles"), layer = "master", 
          driver = "ESRI Shapefile", overwrite_layer = TRUE)
+
+# GADM Admin shapefiles 
+gadm_admin2 <- readOGR(here("data/raw/gadm_adm2/gadm36_2.shp"))
+gadm_admin2 <- gadm_admin2[gadm_admin2$GID_0 %in% iso_codes$iso, ]
+
+# pops for Jess (rasterize) + data.table (do it @ finer scale other wise some admin end up NA)
+files <- list.files(here('data/raw/Africa_1km_Age_structures_2020'), full.names = TRUE)
+files <- files[grepl(".tif$", files)] # only tifs
+age_rasts <- lapply(files, raster)
+age_rasts <- stack(age_rasts)
+pop <- sum(age_rasts, na.rm = TRUE) # Takes a bit like 7 minutes
+
+# rasterize
+id_match <- rasterize(gadm_admin2, pop) # Takes too long...1 hr ish try pkg fasterize if repeated
+out <- data.table(feature_id = values(id_match), pop = values(pop))
+out <- out[, .(pop = sum(pop, na.rm = TRUE)), by = c("feature_id")]
+gadm_admin2$feature_id <- 1:nrow(gadm_admin2@data)
+gadm_admin2@data <- left_join(gadm_admin2@data, out)
+
+# match to travel times 
+ttimes <- read.csv("data/raw/SSA_BigData_v1.2.csv")
+ttimes$pop <- gadm_admin2$pop[match(ttimes$Administrative.level.2.unit.code, gadm_admin2$GID_2)]
+write_csv(ttimes, "data/processed/ttimes_SSA.csv")

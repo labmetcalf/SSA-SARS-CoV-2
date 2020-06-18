@@ -177,16 +177,15 @@ ggplot(data = ifrs_to_plot_ncd, aes(x = ncd_prev)) +
        y = "Infection fatality ratio (%)", tag = "C") +
   theme(text = element_text(size = 12)) -> ncd_fig_C
 
-ggplot(data = burden_all, aes(x = reorder(country, burden_age))) +
-  geom_linerange(aes(ymax = burden_ncd, ymin = burden_age)) +
-  geom_point(data = burden_long, aes(x = country, y = value, color = name)) +
+ggplot(data = burden_all, aes(x = reorder(country, burden_age/pop*1e5))) +
+  geom_linerange(aes(ymax = burden_ncd/pop*1e5, ymin = burden_age/pop*1e5)) +
+  geom_point(data = burden_long, aes(x = country, y = value/pop*1e5, color = name)) +
   coord_flip() +
   scale_color_manual(values = c("#e7298a", "#66a61e"), 
                      labels = c("IFR by age", "IFR by NCD prevalence"), 
                      name = "Predictor of burden") +
-  scale_y_continuous(trans = "log", breaks = c(100, 1000, 10000, 1e5)) +
   theme_minimal_hgrid() +
-  labs(x = "", y = "Burden of deaths", tag = "D") +
+  labs(x = "Countries (ordered by age)", y = "Incidence of deaths \n per 100,000 persons", tag = "D") +
   theme(axis.text = element_text(size = 8), 
         axis.text.x = element_text(angle = 45, hjust = 1), text = element_text(size = 12)) -> ncd_fig_D
 
@@ -195,7 +194,7 @@ ncd_fig <-
      cowplot::as_grob(ncd_fig_D)) + 
   plot_layout(heights = c(1, 2))
 
-ggsave(here("figs/main/ncds_age.jpeg"), ncd_fig, width = 8, height = 8)
+ggsave(here("figs/main/ncds_age.jpeg"), ncd_fig, width = 8, height = 10)
 
 # Supplementary Figure: look at deaths & prev for the 4 main ones  ----------------------------
 ncds %>%
