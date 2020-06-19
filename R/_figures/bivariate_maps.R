@@ -15,6 +15,7 @@ library("TeachingDemos")
 
 # load and clean data
 health.indicators<-read.csv(here("data","processed","SSA.health.indicators.csv"),stringsAsFactors = F) #from Ben's github
+metadata<-read.csv(here("data","METADATA_2020_06_05_SSA_select_indicators.csv"),stringsAsFactors = F) 
 demog<-read.csv(here("data","processed","world.pop.data.csv"),stringsAsFactors = F) 
 
 ## clean demog data
@@ -101,8 +102,8 @@ color.func<-function(x,y,alpha=.5*max(x,y)+.5*x*y)
   rgb(col.val[1],col.val[2],col.val[3],alpha=alpha*255,maxColorValue = 255)
 } 
 
-# plot bivariate function
-plot.bivariate<-function(x.data.name,x.data.obj,x.rev=F,y.data.name,y.data.obj,y.rev=F,xlab,ylab,main)
+# plot bivariate map function
+plot.bivariate.map<-function(x.data.name,x.data.obj,x.rev=F,y.data.name,y.data.obj,y.rev,xlab,ylab,main)
 {
   x.data<-eval(parse(text=x.data.obj))
   y.data<-eval(parse(text=y.data.obj))
@@ -137,6 +138,13 @@ plot.bivariate<-function(x.data.name,x.data.obj,x.rev=F,y.data.name,y.data.obj,y
         if(length(new.y.val)==0) {new.y.val<-NA}
         y.vals<-c(y.vals,new.y.val)
     }   
+    if(y.data.obj=="health.indicators")
+    {
+      direction<-metadata[which(metadata$indicator_label_standard==y.data.name),"risk_direction_code"]
+      if(direction==-1) {y.rev=T}
+      if(direction==1) {y.rev=F}
+    }
+    else {y.rev=F}
   }
   
   x.percentile<-ecdf(x.vals)
@@ -175,17 +183,100 @@ plot.bivariate<-function(x.data.name,x.data.obj,x.rev=F,y.data.name,y.data.obj,y
   text(.15,1.15,labels="no data",pos=4)
 }
 
-plot.bivariate(x.data.name="severe.cases",x.data.obj="demog",x.rev=F,
-               y.data.name="% Urban popn with handwashing facilities at home",y.data.obj="health.indicators",y.rev=T,
+# plot bivariate + pop size + demog function
+plot.bivariate<-function(x.data.name,x.data.obj,x.rev=F,y.data.name,y.data.obj,y.rev,xlab,ylab,main)
+{
+  x.data<-eval(parse(text=x.data.obj))
+  y.data<-eval(parse(text=y.data.obj))
+  if(!x.data.obj=="demog") {get.indicator.dat("indicator.data1",x.data.name,data=x.data)}
+  if(!y.data.obj=="demog") {get.indicator.dat("indicator.data2",y.data.name,data=y.data)}
+  
+  x.vals<-c()
+  y.vals<-c()
+  for(i in (1:length(sub.sahara.index)))
+  {
+    if(x.data.obj=="demog") 
+    {
+      new.x.val<-get.value(i,sub.sahara.data.names,x.data,x.data.name)
+      if(length(new.x.val)==0) {new.x.val<-NA}
+      x.vals<-c(x.vals,new.x.val)
+    }
+    if(!x.data.obj=="demog") 
+    {
+      new.x.val<-get.value(i,sub.sahara.data.names,indicator.data1,"value","COUNTRY_NAME")
+      if(length(new.x.val)==0) {new.x.val<-NA}
+      x.vals<-c(x.vals,new.x.val)
+    }
+    if(y.data.obj=="demog") 
+    {
+      new.y.val<-get.value(i,sub.sahara.data.names,y.data,y.data.name)
+      if(length(new.y.val)==0) {new.y.val<-NA}
+      y.vals<-c(y.vals,new.y.val)
+    }    
+    if(!y.data.obj=="demog") 
+    {
+      new.y.val<-get.value(i,sub.sahara.data.names,indicator.data2,"value","COUNTRY_NAME")
+      if(length(new.y.val)==0) {new.y.val<-NA}
+      y.vals<-c(y.vals,new.y.val)
+    }   
+    if(y.data.obj=="health.indicators")
+    {
+      direction<-metadata[which(metadata$indicator_label_standard==y.data.name),"risk_direction_code"]
+      if(direction==-1) {y.rev=T}
+      if(direction==1) {y.rev=F}
+    }
+    else {y.rev=F}
+  }
+  
+  x.percentile<-ecdf(x.vals)
+  y.percentile<-ecdf(y.vals)
+  
+  par(fig=c(.1,1,0,1),mar=c(0,0,0,0))
+  sp::plot(0,0,type="n",xlim=c(-18,54),ylim=c(-36,30),asp=1,axes=F,xlab="",ylab="")
+  mtext(main,side=3,line=-2,cex=2)
+  
+  for(i in (1:length(sub.sahara.index))[-2])
+  {
+    if(x.rev==F) {x.val<-x.percentile(x.vals[i])}
+    if(x.rev==T) {x.val<-1-x.percentile(x.vals[i])}
+    if(y.rev==F) {y.val<-y.percentile(y.vals[i])}
+    if(y.rev==T) {y.val<-1-y.percentile(y.vals[i])}
+    if(isTRUE(!is.na(x.val) && !is.na(y.val))) {col<-color.func(x.val,y.val)} else {col<-"grey60"}
+    sp::plot(ne_countries(country=sub.sahara.names[i]),add=T,col=col)
+  }
+  
+  par(fig=c(.1,.4,.2,.5),mar=c(0,0,0,0),new=T)
+  plot(0,0,xlim=c(-.05,1.05),ylim=c(-.05,1.05),axes=F,xlab="",ylab="",type="n")
+  for(i in seq(0,1,.1))
+  {
+    for(j in seq(0,1,.1))
+    {
+      rect(i-.05,j-.05,i+.05,j+.05,col=color.func(i,j),border=NA)
+    }
+  }
+  rect(-.05,-.05,1.05,1.05,border="grey")
+  axis(1)
+  axis(2)
+  mtext(side=1,xlab,line=2)
+  mtext(side=2,ylab,line=2)
+  par(xpd=T)
+  rect(.05,1.1,.15,1.2,col="grey60")
+  text(.15,1.15,labels="no data",pos=4)
+}
+
+plot.bivariate.map(x.data.name="p.60.plus",x.data.obj="demog",x.rev=F,
+               y.data.name="% Urban popn with handwashing facilities at home",y.data.obj="health.indicators",
                xlab="demog",ylab="no hand washing",main="")
 
-plot.bivariate(x.data.name="severe.cases",x.data.obj="demog",x.rev=F,
-               y.data.name="% of Popn below poverty line" ,y.data.obj="health.indicators",y.rev=F,
+plot.bivariate.map(x.data.name="p.60.plus",x.data.obj="demog",x.rev=F,
+               y.data.name="% of Popn below poverty line" ,y.data.obj="health.indicators",
                xlab="demog",ylab="poverty",main="")
 
-plot.bivariate(x.data.name="% Urban popn with handwashing facilities at home",x.data.obj="health.indicators",x.rev=T,
-               y.data.name="% of Popn below poverty line" ,y.data.obj="health.indicators",y.rev=F,
+plot.bivariate.map(x.data.name="% Urban popn with handwashing facilities at home",x.data.obj="health.indicators",x.rev=T,
+               y.data.name="% of Popn below poverty line" ,y.data.obj="health.indicators",
                xlab="no hand wash",ylab="poverty",main="")
+
+
 
 
 
