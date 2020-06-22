@@ -87,7 +87,7 @@ ggplot(data = ages_to_plot, aes(x = age, y = ifr_est, color = ifr_type)) +
   labs(x = "Age", y = "IFR") +
   theme(text = element_text(size = 12)) -> ifr_leg
 
-ggsave("figs/fig4_middle_inset.jpeg", height = 5, width = 5)
+ggsave(here("figs/fig4_middle_inset.jpeg"), ifr_leg, height = 5, width = 5)
 
 ggplot(data = burden_by_age, aes(x = reorder(country, prop_over_60))) +
   geom_point(aes(y = burden_age/pop*1e5, color = ifr_type)) +
@@ -99,7 +99,7 @@ ggplot(data = burden_by_age, aes(x = reorder(country, prop_over_60))) +
   theme(axis.text = element_text(size = 8), 
         axis.text.x = element_text(angle = 45, hjust = 1), text = element_text(size = 12)) -> middle_panel
 
-ggsave("figs/fig4_middle_exe.jpeg", height = 7, width = 7)
+ggsave(here("figs/fig4_middle_exe.jpeg"), middle_panel, height = 7, width = 7)
 
 # Fit ncd mortality/prevalence to ifr ests --------------------------------
 ncds %>%
