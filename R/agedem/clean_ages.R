@@ -27,9 +27,11 @@ iso_codes$un_countries <- un_countries[apply(adist(iso_codes$country,
 iso_codes %>%
   mutate(un_countries = 
            case_when(country == "Republic of Congo" ~ "Congo", 
-                     country %in% c("Saint Helena", "Swaziland") ~ "NA", 
-                     !(country %in% c("Republic of Congo", "Saint Helena", 
-                                      "Swaziland")) ~ un_countries)) -> iso_codes
+                     country == "Swaziland" ~ "Eswatini", 
+                     country == "Tanzania" ~ "United Republic of Tanzania",
+                     country == "Saint Helena" ~ "NA", 
+                     !(country %in% c("Republic of Congo", "Saint Helena", "Swaziland",
+                                      "United Republic of Tanzania")) ~ un_countries)) -> iso_codes
 un_ages %>%
   rename(un_country = `Region, subregion, country or area *`) %>%
   filter(un_country %in% iso_codes$un_countries | un_country %in% c("Italy", "China", "France")) %>%
