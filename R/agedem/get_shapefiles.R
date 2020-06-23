@@ -113,3 +113,25 @@ ttimes$Administrative.level.2.unit.code[ttimes$Administrative.level.2.unit.code 
 ttimes$feature_id <- coalesce(ttimes$Administrative.level.2.unit.code, ttimes$Administrative.level.1.unit.code)
 ttimes$pop <- gadm_admin$pop[match(ttimes$feature_id, gadm_admin$feature_id)]
 write_csv(ttimes, "data/processed/ttimes_SSA.csv")
+
+# also get distance 
+library(geosphere)
+library(rgeos)
+
+# annoyingly convert back to sp
+gadm_admin <- as(gadm_admin, Class = "Spatial")
+centroids <- rgeos::gCentroid(gadm_admin, byid = TRUE) 
+dist_mat <- distm(centroids)/1000 # in km get a distance matrix
+colnames(dist_mat) <- gadm_admin$feature_id
+dist_mat <- data.frame(feature_id = gadm_admin$feature_id, GID_0 = gadm_admin$GID_0, centroids, dist_mat)
+
+dist_mat %>%
+  pivot_longer(COM.1_1:ZWE.10.8_1, names_to = "gid_to", values_to = "dist_km") %>% 
+  mutate(country_to = GID_0[match(gid_to, feature_id)]) %>%
+  filter(GID_0 == country_to & feature_id != gid_to) -> gadm_distances # select only within countries
+
+write_csv(gadm_distances, "data/processed/distances_SSA.csv")
+
+# If you want this as for each admin unit, distance to closest city, then you just need the city 
+# points for each country used in the travel time estimates (use geosphere::distGeo instead)
+
