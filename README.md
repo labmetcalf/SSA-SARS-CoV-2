@@ -39,7 +39,7 @@ Benjamin L. Rice 1,2, Akshaya Annapragada 3, Rachel E. Baker 1,4, Marjolein Brui
 
 ### Questions and suggestions welcome!
 
-Please contact Benny Rice (b.rice@princeton.edu) (twitter: @bennyvary) or any of the co-authors
+Please contact Benny Rice (b.rice@princeton.edu) (twitter: **@bennyvary**) or any of the co-authors
           
 
 
