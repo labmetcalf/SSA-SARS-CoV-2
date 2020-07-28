@@ -1,100 +1,45 @@
-# Burden of Covid19 in African countries
+# Variation expected in the pace and burden of SARS-CoV-2 outbreaks across sub-Saharan Africa
 
-## How to set this up repository on your computer
+## This repository contains data and code associated with a manuscript and Shiny-based online tool
 
-### With Rstudio & projects (recommended for ease of GUI:)
+### A pre-print of the manuscript is available on medRxiv
 
-Adapted from [Happy Git and GitHub for the useR](https://happygitwithr.com/rstudio-git-github.html):
-1. Open Rstudio and go to *File > New Project > Version Control > Git*. In *Repository URL*, paste  *https://github.com/labmetcalf/covid19-africa.git*.
-2. Accept the default project directory name, which coincides with the GitHub repo name.
-3. Choose the top directory you want the project directory to go (don't put it in dropbox!).
-3. I suggest you check “Open in new session”, as that’s what you’ll usually do in real life.
-4. Click “Create Project”.
+**[Link to manuscript](https://www.medrxiv.org/content/10.1101/2020.07.23.20161208v1)**
 
-You should find yourself in a new local RStudio Project with the cloned repo and a remote set up to push to this github repository. 
+### The SSA-SARS-CoV-2 online companion tool is now live
 
-**If you want to fork this, then click fork by the name of the repository & then do the same but with your url**
+**[Link to Shiny Tool](https://labmetcalf.shinyapps.io/covid19-burden-africa/)**
 
-The Happy Git and Github with R is a great resource, in particular if you're having issues check out [this section](https://happygitwithr.com/connect-intro.htm)].
+- Shiny led by Marjolein Bruijning, Malavika Rajeev and others
 
-### On the command line
+#### Authors
 
-```git clone https://github.com/labmetcalf/covid19-africa.git```
+Benjamin L. Rice 1,2, Akshaya Annapragada 3, Rachel E. Baker 1,4, Marjolein Bruijning 1, Winfred Dotse-Gborgbortsi 5, Keitly Mensah 6, Ian F. Miller 1, Nkengafac Villyen Motaze 7,8, Antso Raherinandrasana 9,10, Malavika Rajeev 1, Julio Rakotonirina 9,10, Tanjona Ramiadantsoa 11,12,13, Fidisoa Rasambainarivo 1,14, Weiyu Yu 15, Bryan T. Grenfell 1,16, Andrew J. Tatem 5, C. Jessica E. Metcalf 1,16
 
-From within the cloned directory:
+1. Department of Ecology and Evolutionary Biology, Princeton University, Princeton, NJ, USA
+2. Madagascar Health and Environmental Research (MAHERY), Maroantsetra, Madagascar
+3. Johns Hopkins University School of Medicine, Baltimore, MD, USA
+4. Princeton Environmental Institute, Princeton University, Princeton, NJ, USA.
+5. WorldPop, School of Geography and Environmental Science, University of Southampton, Southampton, UK
+6. Centre population et Développement CEPED (Université de Paris), Institut Recherche et Développement, Paris, France
+7. Centre for Vaccines and Immunology (CVI), National Institute for Communicable Diseases (NICD) a division of the National Health Laboratory Service (NHLS), South Africa
+8. Department of Global Health, Faculty of Medicine and Health Sciences, Stellenbosch University, Cape Town, South Africa
+9. Faculty of Medicine, University of Antananarivo, Madagascar
+10. Institute of Public Health Analakely, Antananarivo, Madagascar
+11. Department of Life Science, University of Fianarantsoa, Madagascar
+12. Department of Mathematics, University of Fianarantsoa, Madagascar
+13. Department of Integrative Biology, University of Wisconsin-Madison, WI, USA
+14. Mahaliana Labs SARL, Antananarivo, Madagascar
+15. School of Geography and Environmental Science, University of Southampton, Southampton, UK
+16. Princeton School of Public and International Affairs, Princeton University, NJ, USA
 
-```git remote add origin https://github.com/labmetcalf/covid19-afr```
+### For a related project focusing on Madagascar, see the dashboard led by Fidisoa Rasambainarivo
 
-## The git commands you need to know
+**[Link to Madagascar dashboard](https://www.covid19mg.org/)**
 
-The three below commands are all available in the Git pane of Rstudio. 
-   - ```commit``` (your own work)
-   - ```pull``` (changes anyone else or if you're working on a separate branch, you yourself,  have made on the remote)
-   - ```push``` (to your remote)
+### Questions and suggestions welcome!
 
-This one you need to do on the command line I'm pretty sure. 
-   - ```merge``` (two branches)
-    
-What if I pull & there are merge conflicts?
-   - You can go back to your previous state:
-      ```git reset --hard HEAD```
-   - You'll eventually need to fix the merge conflicts though if you want to push up!
-    
- Resources: 
-   - [happy git with r](https://happygitwithr.com)
-   - [https://git-scm.com](https://git-scm.com)
-   
-## Options for contributing
-
-1. Push directly to this repository: remember to always go in the order of commit | pull | push. This is probably the easiest way. And if we're not directly messing with each others scripts then this would make the most sense!
-
-2. Create a branch. Then the order will be commit to your branch | merge with master branch | pull | push. You may also want to pull to your master branch before merging in case it's been a while since you've pushed up!
-
-3. Rather than clone this repository, you can fork it and submit a pull request when you want to merge changes. 
-   - First fork it on github & set up the same way as you did the remote except now with url  *https://github.com/{yourusername}/covid19-africa.git*
-   - You still follow this order: Commit | Pull (from labmetcalf remote) | Push 
-   - To keep your fork up to date with the lab repo you will need to pull from the upstream repo (labmetcalf/covid19-afr)
-      - To do this first add a remote for the upstream branch:
-       ```git remote add upstream https://github.com/labmetcalf/covid19-afr```
-        or with Rstudio in the Rproject in the git pane click on New branch (the two little purple boxes) >  add remote > add the url with name *upstream*.
-      - Then pull from that before pushing up to your own remote
-      ```git pull upstream master`` (the --ff-only tag )```
-      - Finally push to your own remote with the little green button
+Please contact Benny Rice (b.rice@princeton.edu) or any of the co-authors
           
-## Repository Structure
 
-```
-├── R
-│   ├── _figures
-│   ├── _functions
-│   ├── agedem
-│   ├── climate
-│   ├── comorbidities
-│   ├── health_access
-│   ├── health_capacity
-│   └── mobility
-├── bash
-├── data
-│   ├── processed
-│   │   ├── alegana_ttimes_reporting
-│   │   └── shapefiles
-│   └── raw
-│       ├── Africa_1km_Age_structures_2020
-│       ├── alegana_pseek.tif
-│       └── alegana_ttimes
-├── docs
-├── output
-└── shiny
-```
-Note the raw data files are not included in the repository due to file size!
 
-### Avoiding  setwd()
-If you open the .Rproj and work from there, you do not need to set the working directory! 
-- Make all paths relative to your project directory
-- Alternatively use the package [`here`](https://here.r-lib.org). It's pretty awesome for working with nested directory structures!
-
-## Tasks
-
-- Literature spreadsheet
-- Data spreadsheet
-- Google doc
