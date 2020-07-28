@@ -16,6 +16,7 @@
 
 Benjamin L. Rice <sup>1,2</sup>, Akshaya Annapragada <sup>3</sup>, Rachel E. Baker <sup>1,4</sup>, Marjolein Bruijning <sup>1</sup>, Winfred Dotse-Gborgbortsi <sup>5</sup>, Keitly Mensah <sup>6</sup>, Ian F. Miller <sup>1</sup>, Nkengafac Villyen Motaze <sup>7,8</sup>, Antso Raherinandrasana <sup>9,10</sup>, Malavika Rajeev <sup>1</sup>, Julio Rakotonirina <sup>9,10</sup>, Tanjona Ramiadantsoa <sup>11,12,13</sup>, Fidisoa Rasambainarivo <sup>1,14</sup>, Weiyu Yu <sup>15</sup>, Bryan T. Grenfell <sup>1,16</sup>, Andrew J. Tatem <sup>5</sup>, C. Jessica E. Metcalf <sup>1,16</sup>
 
+<sup>
 1. Department of Ecology and Evolutionary Biology, Princeton University, Princeton, NJ, USA
 2. Madagascar Health and Environmental Research (MAHERY), Maroantsetra, Madagascar
 3. Johns Hopkins University School of Medicine, Baltimore, MD, USA
@@ -32,6 +33,7 @@ Benjamin L. Rice <sup>1,2</sup>, Akshaya Annapragada <sup>3</sup>, Rachel E. Bak
 14. Mahaliana Labs SARL, Antananarivo, Madagascar
 15. School of Geography and Environmental Science, University of Southampton, Southampton, UK
 16. Princeton School of Public and International Affairs, Princeton University, NJ, USA
+</sup>
 
 ### For a related project focusing on Madagascar, see the dashboard led by Fidisoa Rasambainarivo
 
