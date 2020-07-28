@@ -37,9 +37,11 @@ Benjamin L. Rice 1,2, Akshaya Annapragada 3, Rachel E. Baker 1,4, Marjolein Brui
 
 **[Link to Madagascar dashboard](https://www.covid19mg.org/)**
 
+**[@fidydvm]**(https://twitter.com/fidydvm/)
+
 ### Questions and suggestions welcome!
 
-Please contact Benny Rice (b.rice@princeton.edu) (twitter: **@bennyvary**) or any of the co-authors
+Please contact Benny Rice (b.rice@princeton.edu) (twitter: **[@bennyvary]**(https://twitter.com/bennyvary/)) or any of the co-authors
           
 
 
