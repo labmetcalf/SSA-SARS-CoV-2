@@ -39,7 +39,7 @@ Benjamin L. Rice <sup>1,2</sup>, Akshaya Annapragada <sup>3</sup>, Rachel E. Bak
 
 **[Link to Madagascar dashboard](https://www.covid19mg.org/)**
 
-**[@fidydvm](https://twitter.com/fidydvm/)**
+(twitter: **[@fidydvm](https://twitter.com/fidydvm/)**)
 
 ### Questions and suggestions welcome!
 
