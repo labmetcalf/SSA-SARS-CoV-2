@@ -10,7 +10,7 @@
 
 **[Link to Shiny Tool](https://labmetcalf.shinyapps.io/covid19-burden-africa/)**
 
-- Shiny led by Marjolein Bruijning, Malavika Rajeev and others
+- Shiny led by Marjolein Bruijning and Malavika Rajeev
 
 #### Authors
 
