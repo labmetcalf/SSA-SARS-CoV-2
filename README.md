@@ -14,7 +14,7 @@
 
 #### Authors
 
-Benjamin L. Rice 1,2, Akshaya Annapragada 3, Rachel E. Baker 1,4, Marjolein Bruijning 1, Winfred Dotse-Gborgbortsi 5, Keitly Mensah 6, Ian F. Miller 1, Nkengafac Villyen Motaze 7,8, Antso Raherinandrasana 9,10, Malavika Rajeev 1, Julio Rakotonirina 9,10, Tanjona Ramiadantsoa 11,12,13, Fidisoa Rasambainarivo 1,14, Weiyu Yu 15, Bryan T. Grenfell 1,16, Andrew J. Tatem 5, C. Jessica E. Metcalf 1,16
+Benjamin L. Rice <sup>1,2</sup>, Akshaya Annapragada 3, Rachel E. Baker 1,4, Marjolein Bruijning 1, Winfred Dotse-Gborgbortsi 5, Keitly Mensah 6, Ian F. Miller 1, Nkengafac Villyen Motaze 7,8, Antso Raherinandrasana 9,10, Malavika Rajeev 1, Julio Rakotonirina 9,10, Tanjona Ramiadantsoa 11,12,13, Fidisoa Rasambainarivo 1,14, Weiyu Yu 15, Bryan T. Grenfell 1,16, Andrew J. Tatem 5, C. Jessica E. Metcalf 1,16
 
 1. Department of Ecology and Evolutionary Biology, Princeton University, Princeton, NJ, USA
 2. Madagascar Health and Environmental Research (MAHERY), Maroantsetra, Madagascar
