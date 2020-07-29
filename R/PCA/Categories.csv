@@ -1,0 +1,30 @@
+category,alias,indicator_label_standard,Code
+A_demography,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years),A5
+A_demography,3_2_p_popn_below_pov_line,% of Popn below poverty line,A6
+A_demography,3_2_p_urb_popn_in_slums,% of Urban popn living in slums,A7
+B_comorbidity,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized",B1
+B_comorbidity,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized",B12
+B_comorbidity,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized",B14
+B_comorbidity,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized",B15
+B_comorbidity,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn,B16
+B_comorbidity,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49,B17
+B_comorbidity,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79,B3
+B_comorbidity,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized",B5
+B_comorbidity,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized",B6
+B_comorbidity,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized",B7
+B_comorbidity,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized",B8
+B_comorbidity,2_3_prev_anaemia_npws,% Anemia prevalence among NPW,B9
+B_comorbidity,2_3_prev_undernourishment,% Undernourishment prevalence,B10
+B_comorbidity,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas,B11
+D_intervention_capacity,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home,D1
+E_access_to_care,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn,E4
+E_access_to_care,1_1_physicians_p100k,Physicians per 100 000 popn,E5
+E_access_to_care,1_2_hospitals_p100k,Hospitals per 100 000 popn,E6
+E_access_to_care,1_2_hospital_beds_p100k,Hospital beds 100 000 popn,E7
+E_access_to_care,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility,E1
+E_access_to_care,1_4_p_births_att_by_skill,% Births attended by skilled staff,E3
+D_intervention_capacity,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos,D3
+E_access_to_care,3_2_health_exp_che_per_cap,Health expenditure per capita in USD,E8
+E_access_to_care,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket,E9
+A_demography,prop_over_50,Human population size; Proportion of population over age 50 (%) ,A1
+A_demography,household_size,"UNPOP (2019 revision) estimates of population by single calendar year (2020), age, and country",A3

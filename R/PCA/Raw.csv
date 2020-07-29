@@ -1,0 +1,1393 @@
+COUNTRY_CODE,value,alias,indicator_label_standard
+AGO,21.49,1_1_physicians_p100k,Physicians per 100 000 popn
+BEN,15.72,1_1_physicians_p100k,Physicians per 100 000 popn
+BWA,36.88,1_1_physicians_p100k,Physicians per 100 000 popn
+BFA,6,1_1_physicians_p100k,Physicians per 100 000 popn
+BDI,5,1_1_physicians_p100k,Physicians per 100 000 popn
+CMR,8.98,1_1_physicians_p100k,Physicians per 100 000 popn
+CPV,76.94,1_1_physicians_p100k,Physicians per 100 000 popn
+CAF,6.29,1_1_physicians_p100k,Physicians per 100 000 popn
+TCD,4.75,1_1_physicians_p100k,Physicians per 100 000 popn
+COM,16.99,1_1_physicians_p100k,Physicians per 100 000 popn
+CIV,23.26,1_1_physicians_p100k,Physicians per 100 000 popn
+COD,9,1_1_physicians_p100k,Physicians per 100 000 popn
+DJI,22.03,1_1_physicians_p100k,Physicians per 100 000 popn
+GNQ,40,1_1_physicians_p100k,Physicians per 100 000 popn
+ERI,5.57,1_1_physicians_p100k,Physicians per 100 000 popn
+SWZ,7.96,1_1_physicians_p100k,Physicians per 100 000 popn
+ETH,10,1_1_physicians_p100k,Physicians per 100 000 popn
+GAB,36.11,1_1_physicians_p100k,Physicians per 100 000 popn
+GMB,10.77,1_1_physicians_p100k,Physicians per 100 000 popn
+GHA,18,1_1_physicians_p100k,Physicians per 100 000 popn
+GIN,7.88,1_1_physicians_p100k,Physicians per 100 000 popn
+GNB,20,1_1_physicians_p100k,Physicians per 100 000 popn
+KEN,19.88,1_1_physicians_p100k,Physicians per 100 000 popn
+LSO,6.76,1_1_physicians_p100k,Physicians per 100 000 popn
+LBR,3.73,1_1_physicians_p100k,Physicians per 100 000 popn
+MDG,18.12,1_1_physicians_p100k,Physicians per 100 000 popn
+MWI,1.57,1_1_physicians_p100k,Physicians per 100 000 popn
+MLI,13.93,1_1_physicians_p100k,Physicians per 100 000 popn
+MRT,17.9,1_1_physicians_p100k,Physicians per 100 000 popn
+MUS,202.46,1_1_physicians_p100k,Physicians per 100 000 popn
+MOZ,7.35,1_1_physicians_p100k,Physicians per 100 000 popn
+NAM,37.4,1_1_physicians_p100k,Physicians per 100 000 popn
+NER,5,1_1_physicians_p100k,Physicians per 100 000 popn
+NGA,38.27,1_1_physicians_p100k,Physicians per 100 000 popn
+COG,11.59,1_1_physicians_p100k,Physicians per 100 000 popn
+RWA,13.46,1_1_physicians_p100k,Physicians per 100 000 popn
+STP,32,1_1_physicians_p100k,Physicians per 100 000 popn
+SEN,6.92,1_1_physicians_p100k,Physicians per 100 000 popn
+SYC,94.58,1_1_physicians_p100k,Physicians per 100 000 popn
+SLE,2.5,1_1_physicians_p100k,Physicians per 100 000 popn
+SOM,2.29,1_1_physicians_p100k,Physicians per 100 000 popn
+ZAF,91.01,1_1_physicians_p100k,Physicians per 100 000 popn
+SSD,0,1_1_physicians_p100k,Physicians per 100 000 popn
+TZA,3.99,1_1_physicians_p100k,Physicians per 100 000 popn
+TGO,4.87,1_1_physicians_p100k,Physicians per 100 000 popn
+UGA,9.08,1_1_physicians_p100k,Physicians per 100 000 popn
+ZMB,9.13,1_1_physicians_p100k,Physicians per 100 000 popn
+ZWE,7.63,1_1_physicians_p100k,Physicians per 100 000 popn
+AGO,131.23,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+BEN,61.45,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+BWA,330.04,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+BFA,56.96,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+BDI,68,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+CMR,93.37,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+CPV,122.72,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+CAF,20.39,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+TCD,36.37,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+COM,92.14,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+CIV,85.17,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+COD,47,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+DJI,53.5,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+GNQ,50,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+ERI,64.92,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+SWZ,200,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+ETH,84,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+GAB,258.06,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+GMB,162.92,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+GHA,120,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+GIN,38.44,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+GNB,140,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+KEN,154.21,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+LSO,65.08,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+LBR,10.07,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+MDG,10.59,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+MWI,25.28,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+MLI,38.2,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+MRT,103.41,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+MUS,338.31,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+MOZ,44.36,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+NAM,277.5,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+NER,31.09,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+NGA,145.24,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+COG,174.31,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+RWA,83.07,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+STP,226,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+SEN,31.29,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+SYC,326.13,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+SLE,99.62,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+SOM,6.11,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+ZAF,351.71,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+SSD,0,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+TZA,41.26,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+TGO,29.8,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+UGA,63.03,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+ZMB,89.25,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+ZWE,115.46,1_1_nurses_midwives_p100k,Nurses and midwives per 100 000 popn
+AGO,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+BEN,0.40684,1_2_hospitals_p100k,Hospitals per 100 000 popn
+BWA,1.2864,1_2_hospitals_p100k,Hospitals per 100 000 popn
+BFA,0.30706,1_2_hospitals_p100k,Hospitals per 100 000 popn
+BDI,0.50184,1_2_hospitals_p100k,Hospitals per 100 000 popn
+CMR,0.79087,1_2_hospitals_p100k,Hospitals per 100 000 popn
+CPV,1.00221,1_2_hospitals_p100k,Hospitals per 100 000 popn
+CAF,0.47656,1_2_hospitals_p100k,Hospitals per 100 000 popn
+TCD,0.65495,1_2_hospitals_p100k,Hospitals per 100 000 popn
+COM,0.68035,1_2_hospitals_p100k,Hospitals per 100 000 popn
+CIV,1.70801,1_2_hospitals_p100k,Hospitals per 100 000 popn
+COD,0.44584,1_2_hospitals_p100k,Hospitals per 100 000 popn
+DJI,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+GNQ,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+ERI,0.36317,1_2_hospitals_p100k,Hospitals per 100 000 popn
+SWZ,0.80031,1_2_hospitals_p100k,Hospitals per 100 000 popn
+ETH,0.21891,1_2_hospitals_p100k,Hospitals per 100 000 popn
+GAB,3.52932,1_2_hospitals_p100k,Hospitals per 100 000 popn
+GMB,0.70297,1_2_hospitals_p100k,Hospitals per 100 000 popn
+GHA,1.36269,1_2_hospitals_p100k,Hospitals per 100 000 popn
+GIN,0.37462,1_2_hospitals_p100k,Hospitals per 100 000 popn
+GNB,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+KEN,1.46549,1_2_hospitals_p100k,Hospitals per 100 000 popn
+LSO,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+LBR,0.37261,1_2_hospitals_p100k,Hospitals per 100 000 popn
+MDG,0.46674,1_2_hospitals_p100k,Hospitals per 100 000 popn
+MWI,0.39725,1_2_hospitals_p100k,Hospitals per 100 000 popn
+MLI,0.45747,1_2_hospitals_p100k,Hospitals per 100 000 popn
+MRT,1.02831,1_2_hospitals_p100k,Hospitals per 100 000 popn
+MUS,0.96432,1_2_hospitals_p100k,Hospitals per 100 000 popn
+MOZ,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+NAM,1.91029,1_2_hospitals_p100k,Hospitals per 100 000 popn
+NER,0.5496,1_2_hospitals_p100k,Hospitals per 100 000 popn
+NGA,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+COG,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+RWA,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+STP,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+SEN,0.15566,1_2_hospitals_p100k,Hospitals per 100 000 popn
+SYC,1.07715,1_2_hospitals_p100k,Hospitals per 100 000 popn
+SLE,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+SOM,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+ZAF,0.67455,1_2_hospitals_p100k,Hospitals per 100 000 popn
+SSD,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+TZA,0,1_2_hospitals_p100k,Hospitals per 100 000 popn
+TGO,0.60144,1_2_hospitals_p100k,Hospitals per 100 000 popn
+UGA,0.40448,1_2_hospitals_p100k,Hospitals per 100 000 popn
+ZMB,0.45396,1_2_hospitals_p100k,Hospitals per 100 000 popn
+ZWE,0.52298,1_2_hospitals_p100k,Hospitals per 100 000 popn
+AGO,80,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+BEN,50,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+BWA,180,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+BFA,40,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+BDI,80,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+CMR,130,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+CPV,210,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+CAF,100,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+TCD,40,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+COM,220,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+CIV,40,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+COD,80,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+DJI,140,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+GNQ,210,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+ERI,70,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+SWZ,210,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+ETH,30,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+GAB,630,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+GMB,110,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+GHA,90,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+GIN,30,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+GNB,100,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+KEN,140,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+LSO,130,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+LBR,80,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+MDG,20,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+MWI,130,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+MLI,10,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+MRT,40,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+MUS,340,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+MOZ,70,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+NAM,270,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+NER,30,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+NGA,50,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+COG,160,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+RWA,160,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+STP,290,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+SEN,30,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+SYC,360,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+SLE,40,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+SOM,90,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+ZAF,280,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+SSD,0,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+TZA,70,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+TGO,70,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+UGA,50,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+ZMB,200,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+ZWE,170,1_2_hospital_beds_p100k,Hospital beds 100 000 popn
+AGO,58.604815,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+BEN,23.12492,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+BWA,0,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+BFA,56.013385,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+BDI,58.32055,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+CMR,26.692295,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+CPV,0,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+CAF,29.83522,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+TCD,25.780035,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+COM,37.831435,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+CIV,43.379775,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+COD,41.5809,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+DJI,62.155135,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+GNQ,0,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+ERI,0,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+SWZ,59.64741,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+ETH,29.40945,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+GAB,48.738315,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+GMB,67.249455,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+GHA,52.61657,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+GIN,29.611035,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+GNB,34.737795,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+KEN,65.6652,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+LSO,63.06989,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+LBR,50.29037,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+MDG,41.83903,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+MWI,74.44293,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+MLI,22.94743,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+MRT,33.73394,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+MUS,0,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+MOZ,59.51854,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+NAM,67.569015,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+NER,53.19491,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+NGA,23.660665,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+COG,28.258655,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+RWA,53.91985,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+STP,68.568085,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+SEN,52.003925,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+SYC,0,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+SLE,71.69294,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+SOM,12.906185,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+ZAF,0,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+SSD,47.289865,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+TZA,55.531475,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+TGO,48.463845,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+UGA,71.24392,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+ZMB,69.732775,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+ZWE,51.31317,1_4_p_pneum_care_access,% Children with pneumonia symptoms taken to health facility
+AGO,31.2291,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+BEN,55.51715,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+BWA,0,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+BFA,81.342465,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+BDI,86.137665,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+CMR,77.627685,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+CPV,0,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+CAF,17.28325,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+TCD,25.681545,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+COM,62.326735,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+CIV,42.373355,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+COD,45.32473,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+DJI,39.8057,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+GNQ,0,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+ERI,0,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+SWZ,78.72731,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+ETH,38.484775,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+GAB,31.31155,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+GMB,77.22187,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+GHA,78.197255,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+GIN,36.47637,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+GNB,69.50911,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+KEN,71.338255,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+LSO,69.91219,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+LBR,54.917695,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+MDG,61.674765,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+MWI,76.508475,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+MLI,30.26583,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+MRT,28.12379,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+MUS,0,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+MOZ,66.564045,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+NAM,68.442405,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+NER,52.45058,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+NGA,22.60189,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+COG,32.17315,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+RWA,92.70065,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+STP,85.36859,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+SEN,74.717795,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+SYC,0,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+SLE,68.393295,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+SOM,12.11595,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+ZAF,63.821875,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+SSD,7.350025,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+TZA,76.21542,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+TGO,61.44348,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+UGA,57.304065,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+ZMB,69.63224,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+ZWE,76.22691,1_4_p_full_vacc_1yos,% Full immunization coverage among 1yos
+AGO,49.6,1_4_p_births_att_by_skill,% Births attended by skilled staff
+BEN,78.1,1_4_p_births_att_by_skill,% Births attended by skilled staff
+BWA,99.7,1_4_p_births_att_by_skill,% Births attended by skilled staff
+BFA,79.8,1_4_p_births_att_by_skill,% Births attended by skilled staff
+BDI,85.1,1_4_p_births_att_by_skill,% Births attended by skilled staff
+CMR,64.7,1_4_p_births_att_by_skill,% Births attended by skilled staff
+CPV,91.4,1_4_p_births_att_by_skill,% Births attended by skilled staff
+CAF,40,1_4_p_births_att_by_skill,% Births attended by skilled staff
+TCD,20.2,1_4_p_births_att_by_skill,% Births attended by skilled staff
+COM,82.2,1_4_p_births_att_by_skill,% Births attended by skilled staff
+CIV,73.6,1_4_p_births_att_by_skill,% Births attended by skilled staff
+COD,80.1,1_4_p_births_att_by_skill,% Births attended by skilled staff
+DJI,87.4,1_4_p_births_att_by_skill,% Births attended by skilled staff
+GNQ,68.3,1_4_p_births_att_by_skill,% Births attended by skilled staff
+ERI,34.1,1_4_p_births_att_by_skill,% Births attended by skilled staff
+SWZ,88.3,1_4_p_births_att_by_skill,% Births attended by skilled staff
+ETH,27.7,1_4_p_births_att_by_skill,% Births attended by skilled staff
+GAB,89.3,1_4_p_births_att_by_skill,% Births attended by skilled staff
+GMB,57.2,1_4_p_births_att_by_skill,% Births attended by skilled staff
+GHA,70.8,1_4_p_births_att_by_skill,% Births attended by skilled staff
+GIN,62.7,1_4_p_births_att_by_skill,% Births attended by skilled staff
+GNB,45,1_4_p_births_att_by_skill,% Births attended by skilled staff
+KEN,61.8,1_4_p_births_att_by_skill,% Births attended by skilled staff
+LSO,77.9,1_4_p_births_att_by_skill,% Births attended by skilled staff
+LBR,61.1,1_4_p_births_att_by_skill,% Births attended by skilled staff
+MDG,44.3,1_4_p_births_att_by_skill,% Births attended by skilled staff
+MWI,89.8,1_4_p_births_att_by_skill,% Births attended by skilled staff
+MLI,43.7,1_4_p_births_att_by_skill,% Births attended by skilled staff
+MRT,69.3,1_4_p_births_att_by_skill,% Births attended by skilled staff
+MUS,99.8,1_4_p_births_att_by_skill,% Births attended by skilled staff
+MOZ,54.3,1_4_p_births_att_by_skill,% Births attended by skilled staff
+NAM,88.2,1_4_p_births_att_by_skill,% Births attended by skilled staff
+NER,39.7,1_4_p_births_att_by_skill,% Births attended by skilled staff
+NGA,40.3,1_4_p_births_att_by_skill,% Births attended by skilled staff
+COG,94.4,1_4_p_births_att_by_skill,% Births attended by skilled staff
+RWA,90.7,1_4_p_births_att_by_skill,% Births attended by skilled staff
+STP,92.5,1_4_p_births_att_by_skill,% Births attended by skilled staff
+SEN,68.4,1_4_p_births_att_by_skill,% Births attended by skilled staff
+SYC,99,1_4_p_births_att_by_skill,% Births attended by skilled staff
+SLE,59.7,1_4_p_births_att_by_skill,% Births attended by skilled staff
+SOM,9.4,1_4_p_births_att_by_skill,% Births attended by skilled staff
+ZAF,96.7,1_4_p_births_att_by_skill,% Births attended by skilled staff
+SSD,19.4,1_4_p_births_att_by_skill,% Births attended by skilled staff
+TZA,63.7,1_4_p_births_att_by_skill,% Births attended by skilled staff
+TGO,44.6,1_4_p_births_att_by_skill,% Births attended by skilled staff
+UGA,74.2,1_4_p_births_att_by_skill,% Births attended by skilled staff
+ZMB,63.3,1_4_p_births_att_by_skill,% Births attended by skilled staff
+ZWE,78.1,1_4_p_births_att_by_skill,% Births attended by skilled staff
+AGO,355,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+BEN,56,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+BWA,275,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+BFA,48,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+BDI,111,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+CMR,186,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+CPV,46,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+CAF,540,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+TCD,142,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+COM,35,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+CIV,142,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+COD,321,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+DJI,260,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+GNQ,201,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+ERI,89,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+SWZ,329,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+ETH,151,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+GAB,525,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+GMB,174,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+GHA,148,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+GIN,176,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+GNB,361,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+KEN,292,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+LSO,611,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+LBR,308,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+MDG,233,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+MWI,181,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+MLI,53,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+MRT,93,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+MUS,13,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+MOZ,551,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+NAM,524,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+NER,87,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+NGA,219,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+COG,375,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+RWA,59,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+STP,124,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+SEN,118,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+SYC,18,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+SLE,298,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+SOM,262,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+ZAF,520,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+SSD,146,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+TZA,253,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+TGO,36,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+UGA,200,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+ZMB,346,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+ZWE,210,2_1_inc_tuberculosis_p100k,TB incidence per 100 000 popn
+AGO,2,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+BEN,1,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+BWA,20.3,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+BFA,0.7,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+BDI,1,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+CMR,3.6,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+CPV,0.6,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+CAF,3.6,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+TCD,1.3,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+COM,0.1,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+CIV,2.6,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+COD,0.8,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+DJI,1.2,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+GNQ,7.1,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+ERI,0.7,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+SWZ,27.3,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+ETH,1,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+GAB,3.8,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+GMB,1.9,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+GHA,1.7,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+GIN,1.4,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+GNB,3.5,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+KEN,4.7,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+LSO,23.6,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+LBR,1.3,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+MDG,0.3,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+MWI,9.2,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+MLI,1.4,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+MRT,0.2,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+MUS,1.3,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+MOZ,12.6,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+NAM,11.8,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+NER,0.3,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+NGA,1.5,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+COG,2.6,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+RWA,2.5,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+STP,0,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+SEN,0.4,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+SYC,0,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+SLE,1.5,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+SOM,0.1,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+ZAF,20.4,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+SSD,2.5,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+TZA,4.6,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+TGO,2.3,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+UGA,5.7,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+ZMB,11.3,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+ZWE,12.7,2_1_prev_hiv_15_49_yos,% HIV prevalence among ages 15-49
+AGO,191.91119,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+BEN,212.55121,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+BWA,43.97753,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+BFA,264.99191,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+BDI,181.59608,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+CMR,201.42812,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+CPV,58.04272,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+CAF,188.47942,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+TCD,298.48258,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+COM,156.88241,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+CIV,230.97246,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+COD,167.9941,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+DJI,133.58629,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+GNQ,176.75589,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+ERI,155.81725,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+SWZ,110.2998,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+ETH,199.48352,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+GAB,103.07071,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+GMB,176.43535,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+GHA,144.21227,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+GIN,216.33282,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+GNB,251.62385,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+KEN,181.38991,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+LSO,110.76337,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+LBR,197.10941,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+MDG,97.32624,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+MWI,155.72408,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+MLI,115.74227,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+MRT,170.1101,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+MUS,22.92722,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+MOZ,137.64495,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+NAM,60.53381,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+NER,254.37067,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+NGA,289.97184,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+COG,115.63865,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+RWA,103.26202,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+STP,0,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+SEN,261.5415,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+SYC,0,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+SLE,315.58235,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+SOM,208.75833,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+ZAF,61.28733,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+SSD,194.71649,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+TZA,122.9928,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+TGO,195.90021,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+UGA,153.72741,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+ZMB,96.2361,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+ZWE,102.2406,2_2_ncd_mort_a_s_resp_infs,"Resp inf mortality per 100 000 popn, age-standardized"
+AGO,539.8892,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+BEN,641.552,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+BWA,637.6066,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+BFA,731.6946,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+BDI,664.1268,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+CMR,698.2707,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+CPV,561.4057,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+CAF,659.3095,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+TCD,751.648,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+COM,681.0099,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+CIV,944.8631,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+COD,585.7084,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+DJI,610.3252,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+GNQ,726.8362,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+ERI,652.3684,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+SWZ,801.4932,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+ETH,554.7012,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+GAB,505.1137,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+GMB,728.3333,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+GHA,708.4079,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+GIN,763.8712,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+GNB,679.6418,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+KEN,385.0958,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+LSO,772.3561,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+LBR,615.5234,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+MDG,625.7395,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+MWI,542.2601,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+MLI,807.5722,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+MRT,651.5848,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+MUS,565.4319,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+MOZ,522.6303,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+NAM,671.1801,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+NER,665.0794,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+NGA,813.2659,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+COG,534.5227,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+RWA,548.6224,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+STP,633.0417,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+SEN,626.6114,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+SYC,585.0601,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+SLE,985.7479,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+SOM,645.3905,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+ZAF,707.1837,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+SSD,563.9237,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+TZA,539.0174,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+TGO,796.6266,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+UGA,638.2631,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+ZMB,553.8394,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+ZWE,589.0291,2_2_ncd_mort_a_s_NCDs_overall,"NCDs overall mortality per 100 000 popn, age-standardized"
+AGO,47.70874,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+BEN,23.6958,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+BWA,15.09247,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+BFA,25.5384,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+BDI,22.12263,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+CMR,20.3375,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+CPV,29.64004,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+CAF,50.27918,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+TCD,24.44312,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+COM,24.18655,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+CIV,24.95284,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+COD,35.80789,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+DJI,19.64689,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+GNQ,51.10347,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+ERI,21.49685,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+SWZ,55.83948,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+ETH,22.27604,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+GAB,36.22137,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+GMB,20.57032,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+GHA,17.2229,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+GIN,22.08228,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+GNB,26.24935,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+KEN,9.21616,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+LSO,53.31098,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+LBR,63.62049,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+MDG,21.21328,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+MWI,21.85444,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+MLI,52.1514,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+MRT,17.00423,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+MUS,6.10737,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+MOZ,23.52049,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+NAM,38.79678,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+NER,21.34383,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+NGA,18.82897,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+COG,36.9445,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+RWA,13.35296,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+STP,0,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+SEN,25.03502,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+SYC,0,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+SLE,31.74453,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+SOM,18.51339,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+ZAF,27.91916,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+SSD,20.64895,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+TZA,17.21373,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+TGO,19.5889,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+UGA,19.50682,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+ZMB,10.81628,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+ZWE,26.01086,2_2_ncd_mort_a_s_COPD,"COPD mortality per 100 000 popn, age-standardized"
+AGO,4.5,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+BEN,1,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+BWA,5.8,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+BFA,7.3,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+BDI,5.1,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+CMR,6,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+CPV,2.4,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+CAF,6,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+TCD,6,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+COM,12.3,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+CIV,2.4,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+COD,6,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+DJI,5.1,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+GNQ,6,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+ERI,5.1,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+SWZ,4.5,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+ETH,4.3,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+GAB,6,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+GMB,1.9,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+GHA,2.5,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+GIN,2.4,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+GNB,2.4,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+KEN,3.1,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+LSO,4.5,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+LBR,2.4,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+MDG,4.5,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+MWI,4.5,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+MLI,2.4,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+MRT,7.1,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+MUS,22,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+MOZ,3.3,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+NAM,4.5,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+NER,2.4,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+NGA,3.1,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+COG,6,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+RWA,5.1,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+STP,2.4,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+SEN,2.4,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+SYC,12.3,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+SLE,2.4,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+SOM,5.1,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+ZAF,12.7,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+SSD,10.2,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+TZA,5.7,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+TGO,2.4,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+UGA,2.5,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+ZMB,4.5,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+ZWE,1.8,2_2_prev_diabetes_20_79yos,% Diabetes prevalence among ages 20-79
+AGO,47.2084,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+BEN,46.0225,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+BWA,29.9887,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+BFA,48.719,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+BDI,26.1914,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+CMR,40.603,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+CPV,32.7906,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+CAF,45.4329,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+TCD,47.0894,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+COM,28.8463,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+CIV,52.2504,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+COD,40.6367,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+DJI,32.4331,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+GNQ,42.7974,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+ERI,37.8488,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+SWZ,27.0023,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+ETH,23.3181,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+GAB,58.9344,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+GMB,56.9816,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+GHA,45.7188,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+GIN,49.4595,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+GNB,43.1298,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+KEN,26.15,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+LSO,26.9626,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+LBR,34.3582,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+MDG,36.9631,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+MWI,33.5771,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+MLI,50.2513,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+MRT,36.4756,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+MUS,25.0274,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+MOZ,51.0862,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+NAM,22.9718,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+NER,47.8341,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+NGA,48.8064,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+COG,51.2947,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+RWA,22.0924,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+STP,45.2963,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+SEN,49.0543,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+SYC,22.0957,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+SLE,47.2566,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+SOM,44.1039,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+ZAF,25.7289,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+SSD,33.4592,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+TZA,35.9243,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+TGO,47.6923,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+UGA,27.7777,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+ZMB,33.005,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+ZWE,28.3713,2_3_prev_anaemia_npws,% Anemia prevalence among NPW
+AGO,25,2_3_prev_undernourishment,% Undernourishment prevalence
+BEN,10.1,2_3_prev_undernourishment,% Undernourishment prevalence
+BWA,26.4,2_3_prev_undernourishment,% Undernourishment prevalence
+BFA,20,2_3_prev_undernourishment,% Undernourishment prevalence
+BDI,0,2_3_prev_undernourishment,% Undernourishment prevalence
+CMR,9.9,2_3_prev_undernourishment,% Undernourishment prevalence
+CPV,12.6,2_3_prev_undernourishment,% Undernourishment prevalence
+CAF,59.6,2_3_prev_undernourishment,% Undernourishment prevalence
+TCD,37.5,2_3_prev_undernourishment,% Undernourishment prevalence
+COM,0,2_3_prev_undernourishment,% Undernourishment prevalence
+CIV,19,2_3_prev_undernourishment,% Undernourishment prevalence
+COD,0,2_3_prev_undernourishment,% Undernourishment prevalence
+DJI,18.9,2_3_prev_undernourishment,% Undernourishment prevalence
+GNQ,0,2_3_prev_undernourishment,% Undernourishment prevalence
+ERI,0,2_3_prev_undernourishment,% Undernourishment prevalence
+SWZ,20.6,2_3_prev_undernourishment,% Undernourishment prevalence
+ETH,20.6,2_3_prev_undernourishment,% Undernourishment prevalence
+GAB,10.5,2_3_prev_undernourishment,% Undernourishment prevalence
+GMB,10.2,2_3_prev_undernourishment,% Undernourishment prevalence
+GHA,5.5,2_3_prev_undernourishment,% Undernourishment prevalence
+GIN,16.5,2_3_prev_undernourishment,% Undernourishment prevalence
+GNB,28,2_3_prev_undernourishment,% Undernourishment prevalence
+KEN,29.4,2_3_prev_undernourishment,% Undernourishment prevalence
+LSO,13.1,2_3_prev_undernourishment,% Undernourishment prevalence
+LBR,37.2,2_3_prev_undernourishment,% Undernourishment prevalence
+MDG,44.4,2_3_prev_undernourishment,% Undernourishment prevalence
+MWI,17.5,2_3_prev_undernourishment,% Undernourishment prevalence
+MLI,6.3,2_3_prev_undernourishment,% Undernourishment prevalence
+MRT,10.4,2_3_prev_undernourishment,% Undernourishment prevalence
+MUS,6.5,2_3_prev_undernourishment,% Undernourishment prevalence
+MOZ,27.9,2_3_prev_undernourishment,% Undernourishment prevalence
+NAM,27.3,2_3_prev_undernourishment,% Undernourishment prevalence
+NER,16.5,2_3_prev_undernourishment,% Undernourishment prevalence
+NGA,13.4,2_3_prev_undernourishment,% Undernourishment prevalence
+COG,40.3,2_3_prev_undernourishment,% Undernourishment prevalence
+RWA,36.8,2_3_prev_undernourishment,% Undernourishment prevalence
+STP,7,2_3_prev_undernourishment,% Undernourishment prevalence
+SEN,11.3,2_3_prev_undernourishment,% Undernourishment prevalence
+SYC,0,2_3_prev_undernourishment,% Undernourishment prevalence
+SLE,25.6,2_3_prev_undernourishment,% Undernourishment prevalence
+SOM,0,2_3_prev_undernourishment,% Undernourishment prevalence
+ZAF,6.2,2_3_prev_undernourishment,% Undernourishment prevalence
+SSD,0,2_3_prev_undernourishment,% Undernourishment prevalence
+TZA,30.7,2_3_prev_undernourishment,% Undernourishment prevalence
+TGO,16.1,2_3_prev_undernourishment,% Undernourishment prevalence
+UGA,41,2_3_prev_undernourishment,% Undernourishment prevalence
+ZMB,46.7,2_3_prev_undernourishment,% Undernourishment prevalence
+ZWE,51.3,2_3_prev_undernourishment,% Undernourishment prevalence
+AGO,27.5,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+BEN,29.5,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+BWA,43.4,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+BFA,23.2,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+BDI,22.2,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+CMR,33.6,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+CPV,34.8,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+CAF,26.2,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+TCD,23.1,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+COM,27.1,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+CIV,31.6,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+COD,25.3,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+DJI,38.6,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+GNQ,26.7,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+ERI,22,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+SWZ,38.4,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+ETH,20.9,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+GAB,40.2,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+GMB,31.9,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+GHA,32,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+GIN,26.6,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+GNB,29.9,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+KEN,25.5,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+LSO,38.7,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+LBR,30.9,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+MDG,23.9,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+MWI,23.4,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+MLI,28.1,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+MRT,34.4,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+MUS,32.3,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+MOZ,26.4,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+NAM,40.6,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+NER,22,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+NGA,28.9,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+COG,30.9,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+RWA,25.1,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+STP,35.4,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+SEN,28.4,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+SYC,36.8,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+SLE,27.7,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+SOM,28.4,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+ZAF,53.8,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+SSD,0,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+TZA,27.7,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+TGO,28.1,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+UGA,22.4,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+ZMB,27.8,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+ZWE,38.2,2_3_prev_overwt_bmi25_age_st,"% Overweight prevalence among adults, age-standardized"
+AGO,29.7,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+BEN,27.7,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+BWA,29.6,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+BFA,32.6,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+BDI,29.2,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+CMR,24.8,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+CPV,29.5,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+CAF,31.2,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+TCD,32.9,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+COM,27.9,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+CIV,27.2,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+COD,28.5,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+DJI,26.8,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+GNQ,28.4,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+ERI,29.1,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+SWZ,29.8,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+ETH,30.3,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+GAB,25.5,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+GMB,29.1,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+GHA,23.7,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+GIN,30.3,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+GNB,30.3,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+KEN,26.7,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+LSO,29,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+LBR,28.3,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+MDG,28.1,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+MWI,28.9,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+MLI,32.6,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+MRT,31.7,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+MUS,25,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+MOZ,29.1,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+NAM,28.5,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+NER,33.4,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+NGA,23.9,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+COG,26.2,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+RWA,26.7,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+STP,25.8,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+SEN,30.2,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+SYC,23.5,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+SLE,30.3,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+SOM,32.9,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+ZAF,26.9,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+SSD,0,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+TZA,27.3,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+TGO,28.9,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+UGA,27.3,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+ZMB,27.1,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+ZWE,28.2,2_3_raised_bp_age_st,"% Raised blood pressure prevalence, age-standardized"
+AGO,30.9,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+BEN,20.3,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+BWA,37.9,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+BFA,17.7,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+BDI,18.9,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+CMR,21.9,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+CPV,24.5,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+CAF,22.2,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+TCD,17.9,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+COM,24,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+CIV,21,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+COD,16.1,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+DJI,36.7,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+GNQ,40.9,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+ERI,21.4,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+SWZ,31.2,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+ETH,21.3,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+GAB,42.5,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+GMB,20.3,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+GHA,18.1,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+GIN,18.7,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+GNB,17,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+KEN,26.9,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+LSO,23,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+LBR,16.1,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+MDG,24.4,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+MWI,24.1,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+MLI,19.4,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+MRT,22.2,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+MUS,47.1,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+MOZ,26,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+NAM,33.1,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+NER,15.2,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+NGA,16.8,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+COG,29,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+RWA,23,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+STP,18.1,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+SEN,21.4,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+SYC,57.7,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+SLE,16.1,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+SOM,24.7,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+ZAF,35.5,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+SSD,0,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+TZA,23.7,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+TGO,17.1,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+UGA,22.2,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+ZMB,27.7,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+ZWE,23.9,2_3_raised_chol_age_st,"% Raised cholesterol prevalence, age-standardized"
+AGO,8.2,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+BEN,7.2,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+BWA,8.6,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+BFA,6.3,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+BDI,4.2,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+CMR,6.7,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+CPV,8.5,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+CAF,7.8,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+TCD,7,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+COM,8,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+CIV,6.9,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+COD,6.2,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+DJI,8.1,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+GNQ,9.4,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+ERI,5.5,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+SWZ,9.7,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+ETH,5.4,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+GAB,10,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+GMB,8.7,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+GHA,6.5,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+GIN,6.4,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+GNB,7.1,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+KEN,6,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+LSO,8.8,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+LBR,7.7,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+MDG,5.5,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+MWI,6.3,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+MLI,7.3,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+MRT,9,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+MUS,13,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+MOZ,6.4,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+NAM,7.4,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+NER,5.6,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+NGA,6.2,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+COG,7.7,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+RWA,4.4,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+STP,8,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+SEN,7.4,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+SYC,10.4,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+SLE,6.9,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+SOM,6.8,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+ZAF,11.3,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+SSD,0,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+TZA,6.1,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+TGO,7.1,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+UGA,4.6,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+ZMB,6.6,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+ZWE,7.1,2_3_raised_gluc_age_st,"% Raised glucose prevalence, age-standardized"
+AGO,28.40561,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+BEN,30.39602,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+BWA,20.87823,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+BFA,36.32772,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+BDI,35.64104,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+CMR,65.35664,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+CPV,31.64702,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+CAF,51.20008,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+TCD,50.75775,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+COM,18.62207,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+CIV,23.89898,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+COD,37.40427,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+DJI,40.97456,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+GNQ,49.11919,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+ERI,41.09833,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+SWZ,16.15562,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+ETH,33.96514,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+GAB,37.80204,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+GMB,32.32129,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+GHA,31.07339,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+GIN,22.23759,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+GNB,26.49467,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+KEN,25.78207,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+LSO,28.08657,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+LBR,17.03841,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+MDG,22.47518,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+MWI,21.89518,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+MLI,29.00644,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+MRT,41.70889,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+MUS,13.51868,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+MOZ,18.42574,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+NAM,20.95705,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+NER,73.0249,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+NGA,46.28043,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+COG,36.35885,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+RWA,40.70713,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+STP,25.15735,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+SEN,39.7479,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+SYC,18.63108,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+SLE,20.59591,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+SOM,27.97728,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+ZAF,24.2681,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+SSD,40.85368,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+TZA,25.09214,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+TGO,31.21783,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+UGA,48.73033,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+ZMB,23.81122,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+ZWE,19.13804,2_4_mean_pm25_exp_urban_areas,Annual mean PM2.5 concentration ug/m3 in urban areas
+AGO,0.84891,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+BEN,0.57289,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+BWA,1.37265,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+BFA,1.38971,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+BDI,1.08229,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+CMR,1.01234,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+CPV,0.81786,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+CAF,1.11713,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+TCD,0.79834,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+COM,1.31969,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+CIV,1.06524,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+COD,0.76465,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+DJI,1.87361,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+GNQ,2.33191,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+ERI,1.56134,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+SWZ,1.56627,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+ETH,1.9975,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+GAB,1.89516,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+GMB,1.46556,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+GHA,1.27948,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+GIN,0.79907,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+GNB,1.27622,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+KEN,1.47617,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+LSO,1.43289,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+LBR,0.91144,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+MDG,4.38633,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+MWI,0.64931,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+MLI,1.39249,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+MRT,0.70403,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+MUS,1.34313,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+MOZ,1.64881,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+NAM,1.82531,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+NER,0.50004,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+NGA,0.71902,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+COG,0.89002,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+RWA,1.05453,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+STP,9.31349,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+SEN,0.96466,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+SYC,2.38354,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+SLE,0.88515,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+SOM,1.39586,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+ZAF,4.76177,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+SSD,1.52267,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+TZA,0.52909,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+TGO,0.87986,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+UGA,1.82261,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+ZMB,1.14516,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+ZWE,1.89484,2_4_air_mort_a_s_lung_cancers,"Lung cancer air pollution mortality per 100 000 popn, age-standardized"
+AGO,33.94665,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+BEN,16.71727,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+BWA,0,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+BFA,22.68918,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+BDI,20.30865,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+CMR,14.5805,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+CPV,0,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+CAF,22.08544,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+TCD,17.6655,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+COM,17.86937,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+CIV,28.35562,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+COD,7.35026,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+DJI,0,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+GNQ,26.4492,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+ERI,0,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+SWZ,47.78454,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+ETH,23.348,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+GAB,0,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+GMB,12.28146,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+GHA,44.64609,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+GIN,26.28977,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+GNB,8.76647,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+KEN,31.66523,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+LSO,5.9377,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+LBR,1.7617,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+MDG,69.49576,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+MWI,15.29948,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+MLI,70.40374,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+MRT,55.21198,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+MUS,0,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+MOZ,21.07058,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+NAM,62.41457,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+NER,29.51421,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+NGA,52.84747,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+COG,56.1144,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+RWA,13.42173,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+STP,39.01265,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+SEN,41.83062,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+SYC,0,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+SLE,27.08377,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+SOM,12,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+ZAF,52.5555,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+SSD,0,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+TZA,63.07968,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+TGO,20.11675,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+UGA,34.26779,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+ZMB,25.59132,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+ZWE,48.54287,2_6_p_handwashing_at_hh_urban,% Urban popn with handwashing facilities at home
+AGO,13.63227,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+BEN,13.2807,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+BWA,13.14724,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+BFA,11.70589,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+BDI,12.30221,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+CMR,12.53677,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+CPV,14.48243,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+CAF,11.17585,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+TCD,11.55074,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+COM,12.58508,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+CIV,10.75834,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+COD,12.77121,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+DJI,13.66607,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+GNQ,13.61259,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+ERI,13.19464,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+SWZ,11.46321,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+ETH,13.49625,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+GAB,13.94906,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+GMB,11.74332,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+GHA,12.30396,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+GIN,11.37122,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+GNB,10.86642,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+KEN,14.23198,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+LSO,11.73624,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+LBR,11.79473,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+MDG,13.10717,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+MWI,12.82285,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+MLI,11.49558,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+MRT,12.36855,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+MUS,15.91226,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+MOZ,12.97548,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+NAM,12.79204,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+NER,11.93322,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+NGA,10.69412,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+COG,13.48224,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+RWA,14.17806,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+STP,14.11141,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+SEN,12.89521,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+SYC,15.72753,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+SLE,10.31621,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+SOM,12.70796,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+ZAF,12.45843,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+SSD,12.30409,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+TZA,13.44829,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+TGO,11.87644,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+UGA,12.81514,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+ZMB,12.73931,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+ZWE,13.3596,3_1_hale_age_60,Healthy life expectancy (HALE) at 60 (in years)
+AGO,114.45964,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+BEN,30.76645,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+BWA,465.92932,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+BFA,44.40349,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+BDI,23.50043,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+CMR,67.81181,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+CPV,167.58961,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+CAF,24.15005,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+TCD,29.73086,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+COM,58.76093,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+CIV,69.74924,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+COD,19.43165,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+DJI,70.33089,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+GNQ,301.15005,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+ERI,32.912,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+SWZ,224.73677,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+ETH,25.26195,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+GAB,204.49225,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+GMB,23.27233,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+GHA,66.74941,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+GIN,33.72011,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+GNB,52.35941,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+KEN,76.61032,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+LSO,104.5528,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+LBR,56.59903,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+MDG,24.67084,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+MWI,32.25938,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+MLI,31.37811,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+MRT,48.81713,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+MUS,599.69977,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+MOZ,21.07116,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+NAM,447.28064,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+NER,29.26165,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+NGA,73.92498,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+COG,49.98372,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+RWA,49.20446,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+STP,119.69566,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+SEN,55.01404,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+SYC,791.65668,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+SLE,66.40218,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+SOM,0,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+ZAF,499.23755,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+SSD,22.88857,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+TZA,33.91658,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+TGO,38.04871,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+UGA,38.90887,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+ZMB,67.64867,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+ZWE,110.14962,3_2_health_exp_che_per_cap,Health expenditure per capita in USD
+AGO,34.12101,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+BEN,44.97993,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+BWA,2.99324,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+BFA,31.67759,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+BDI,25.46298,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+CMR,70.9576,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+CPV,28.89648,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+CAF,31.1891,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+TCD,58.02316,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+COM,74.64713,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+CIV,39.36074,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+COD,40.12472,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+DJI,26.50422,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+GNQ,76.79201,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+ERI,59.12153,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+SWZ,10.49675,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+ETH,34.40899,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+GAB,25.15639,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+GMB,22.03141,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+GHA,40.2917,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+GIN,56.68355,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+GNB,72.0612,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+KEN,24.04331,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+LSO,16.64264,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+LBR,45.50636,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+MDG,24.68541,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+MWI,10.59039,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+MLI,35.11301,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+MRT,49.54548,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+MUS,48.86565,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+MOZ,7.39533,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+NAM,7.7342,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+NER,47.82851,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+NGA,77.2248,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+COG,48.40124,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+RWA,6.248,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+STP,13.77656,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+SEN,52.39982,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+SYC,24.59943,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+SLE,50.41255,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+SOM,0,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+ZAF,7.76692,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+SSD,19.19281,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+TZA,24.09614,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+TGO,58.42013,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+UGA,38.58697,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+ZMB,11.84913,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+ZWE,20.62234,3_2_oop_exp_vs_che_p,% Health expenditures that are out-of-pocket
+AGO,30.1,3_2_p_popn_below_pov_line,% of Popn below poverty line
+BEN,49.5,3_2_p_popn_below_pov_line,% of Popn below poverty line
+BWA,16.1,3_2_p_popn_below_pov_line,% of Popn below poverty line
+BFA,43.7,3_2_p_popn_below_pov_line,% of Popn below poverty line
+BDI,71.8,3_2_p_popn_below_pov_line,% of Popn below poverty line
+CMR,23.8,3_2_p_popn_below_pov_line,% of Popn below poverty line
+CPV,8.1,3_2_p_popn_below_pov_line,% of Popn below poverty line
+CAF,66.3,3_2_p_popn_below_pov_line,% of Popn below poverty line
+TCD,38.4,3_2_p_popn_below_pov_line,% of Popn below poverty line
+COM,17.9,3_2_p_popn_below_pov_line,% of Popn below poverty line
+CIV,28.2,3_2_p_popn_below_pov_line,% of Popn below poverty line
+COD,76.6,3_2_p_popn_below_pov_line,% of Popn below poverty line
+DJI,17.1,3_2_p_popn_below_pov_line,% of Popn below poverty line
+GNQ,0,3_2_p_popn_below_pov_line,% of Popn below poverty line
+ERI,0,3_2_p_popn_below_pov_line,% of Popn below poverty line
+SWZ,42,3_2_p_popn_below_pov_line,% of Popn below poverty line
+ETH,27.3,3_2_p_popn_below_pov_line,% of Popn below poverty line
+GAB,3.4,3_2_p_popn_below_pov_line,% of Popn below poverty line
+GMB,10.1,3_2_p_popn_below_pov_line,% of Popn below poverty line
+GHA,13.3,3_2_p_popn_below_pov_line,% of Popn below poverty line
+GIN,35.3,3_2_p_popn_below_pov_line,% of Popn below poverty line
+GNB,67.1,3_2_p_popn_below_pov_line,% of Popn below poverty line
+KEN,36.8,3_2_p_popn_below_pov_line,% of Popn below poverty line
+LSO,59.7,3_2_p_popn_below_pov_line,% of Popn below poverty line
+LBR,40.9,3_2_p_popn_below_pov_line,% of Popn below poverty line
+MDG,77.6,3_2_p_popn_below_pov_line,% of Popn below poverty line
+MWI,70.3,3_2_p_popn_below_pov_line,% of Popn below poverty line
+MLI,49.7,3_2_p_popn_below_pov_line,% of Popn below poverty line
+MRT,6,3_2_p_popn_below_pov_line,% of Popn below poverty line
+MUS,0.5,3_2_p_popn_below_pov_line,% of Popn below poverty line
+MOZ,62.4,3_2_p_popn_below_pov_line,% of Popn below poverty line
+NAM,13.4,3_2_p_popn_below_pov_line,% of Popn below poverty line
+NER,44.5,3_2_p_popn_below_pov_line,% of Popn below poverty line
+NGA,53.5,3_2_p_popn_below_pov_line,% of Popn below poverty line
+COG,37,3_2_p_popn_below_pov_line,% of Popn below poverty line
+RWA,55.5,3_2_p_popn_below_pov_line,% of Popn below poverty line
+STP,32.3,3_2_p_popn_below_pov_line,% of Popn below poverty line
+SEN,38,3_2_p_popn_below_pov_line,% of Popn below poverty line
+SYC,1.1,3_2_p_popn_below_pov_line,% of Popn below poverty line
+SLE,52.2,3_2_p_popn_below_pov_line,% of Popn below poverty line
+SOM,0,3_2_p_popn_below_pov_line,% of Popn below poverty line
+ZAF,18.9,3_2_p_popn_below_pov_line,% of Popn below poverty line
+SSD,42.7,3_2_p_popn_below_pov_line,% of Popn below poverty line
+TZA,49.1,3_2_p_popn_below_pov_line,% of Popn below poverty line
+TGO,49.2,3_2_p_popn_below_pov_line,% of Popn below poverty line
+UGA,41.7,3_2_p_popn_below_pov_line,% of Popn below poverty line
+ZMB,57.5,3_2_p_popn_below_pov_line,% of Popn below poverty line
+ZWE,21.4,3_2_p_popn_below_pov_line,% of Popn below poverty line
+AGO,55.5,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+BEN,61.5,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+BWA,59.2,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+BFA,65.8,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+BDI,57.9,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+CMR,37.8,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+CPV,70.3,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+CAF,93.3,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+TCD,88.2,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+COM,69.6,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+CIV,56,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+COD,74.8,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+DJI,65.6,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+GNQ,66.2,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+ERI,69.9,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+SWZ,32.7,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+ETH,73.9,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+GAB,37,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+GMB,34.8,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+GHA,37.9,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+GIN,43.3,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+GNB,82.3,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+KEN,56,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+LSO,50.8,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+LBR,65.7,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+MDG,77.2,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+MWI,66.7,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+MLI,56.3,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+MRT,79.9,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+MUS,0,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+MOZ,80.3,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+NAM,33.2,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+NER,70.1,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+NGA,50.2,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+COG,46.9,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+RWA,53.2,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+STP,86.6,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+SEN,39.4,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+SYC,0,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+SLE,75.6,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+SOM,73.6,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+ZAF,23,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+SSD,95.6,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+TZA,50.7,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+TGO,51.2,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+UGA,53.6,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+ZMB,54,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+ZWE,25.1,3_2_p_urb_popn_in_slums,% of Urban popn living in slums
+AGO,0.075736771,prop_over_50,Proportion of households with an individual over age 50
+BDI,0.077594483,prop_over_50,Proportion of households with an individual over age 50
+BEN,0.097991223,prop_over_50,Proportion of households with an individual over age 50
+BFA,0.08024086,prop_over_50,Proportion of households with an individual over age 50
+BWA,0.124848987,prop_over_50,Proportion of households with an individual over age 50
+CAF,0.087107155,prop_over_50,Proportion of households with an individual over age 50
+CIV,0.091401807,prop_over_50,Proportion of households with an individual over age 50
+CMR,0.085467363,prop_over_50,Proportion of households with an individual over age 50
+COD,0.089442859,prop_over_50,Proportion of households with an individual over age 50
+COG,0.097063623,prop_over_50,Proportion of households with an individual over age 50
+COM,0.102747831,prop_over_50,Proportion of households with an individual over age 50
+CPV,0.152246092,prop_over_50,Proportion of households with an individual over age 50
+DJI,0.143326633,prop_over_50,Proportion of households with an individual over age 50
+ERI,0.106815395,prop_over_50,Proportion of households with an individual over age 50
+ETH,0.096657165,prop_over_50,Proportion of households with an individual over age 50
+GAB,0.105860644,prop_over_50,Proportion of households with an individual over age 50
+GHA,0.113362219,prop_over_50,Proportion of households with an individual over age 50
+GIN,0.088451717,prop_over_50,Proportion of households with an individual over age 50
+GMB,0.081598435,prop_over_50,Proportion of households with an individual over age 50
+GNB,0.08674145,prop_over_50,Proportion of households with an individual over age 50
+GNQ,0.076405664,prop_over_50,Proportion of households with an individual over age 50
+KEN,0.087086475,prop_over_50,Proportion of households with an individual over age 50
+LBR,0.101696886,prop_over_50,Proportion of households with an individual over age 50
+LSO,0.133529109,prop_over_50,Proportion of households with an individual over age 50
+MDG,0.098942043,prop_over_50,Proportion of households with an individual over age 50
+MLI,0.075065748,prop_over_50,Proportion of households with an individual over age 50
+MOZ,0.083107978,prop_over_50,Proportion of households with an individual over age 50
+MRT,0.101339023,prop_over_50,Proportion of households with an individual over age 50
+MUS,0.309180848,prop_over_50,Proportion of households with an individual over age 50
+MWI,0.079557427,prop_over_50,Proportion of households with an individual over age 50
+NAM,0.108071656,prop_over_50,Proportion of households with an individual over age 50
+NER,0.079367245,prop_over_50,Proportion of households with an individual over age 50
+NGA,0.090685274,prop_over_50,Proportion of households with an individual over age 50
+RWA,0.101578426,prop_over_50,Proportion of households with an individual over age 50
+SEN,0.091887269,prop_over_50,Proportion of households with an individual over age 50
+SLE,0.092317586,prop_over_50,Proportion of households with an individual over age 50
+SOM,0.086177508,prop_over_50,Proportion of households with an individual over age 50
+SSD,0.098287086,prop_over_50,Proportion of households with an individual over age 50
+STP,0.1013684,prop_over_50,Proportion of households with an individual over age 50
+SWZ,0.095661475,prop_over_50,Proportion of households with an individual over age 50
+SYC,0.247406955,prop_over_50,Proportion of households with an individual over age 50
+TCD,0.07433042,prop_over_50,Proportion of households with an individual over age 50
+TGO,0.094542078,prop_over_50,Proportion of households with an individual over age 50
+TZA,0.085148372,prop_over_50,Proportion of households with an individual over age 50
+UGA,0.067614329,prop_over_50,Proportion of households with an individual over age 50
+ZAF,0.158390094,prop_over_50,Proportion of households with an individual over age 50
+ZMB,0.070279922,prop_over_50,Proportion of households with an individual over age 50
+ZWE,0.087485931,prop_over_50,Proportion of households with an individual over age 50
+AGO,4.468490566,household_size,Household size: Mean household size for households with an individual over age 50
+BEN,5.816155989,household_size,Household size: Mean household size for households with an individual over age 50
+BWA,0,household_size,Household size: Mean household size for households with an individual over age 50
+BFA,6.668942577,household_size,Household size: Mean household size for households with an individual over age 50
+BDI,4.555133767,household_size,Household size: Mean household size for households with an individual over age 50
+CPV,0,household_size,Household size: Mean household size for households with an individual over age 50
+CMR,5.878345099,household_size,Household size: Mean household size for households with an individual over age 50
+CAF,5.391006843,household_size,Household size: Mean household size for households with an individual over age 50
+TCD,6.095558546,household_size,Household size: Mean household size for households with an individual over age 50
+COM,5.93599615,household_size,Household size: Mean household size for households with an individual over age 50
+COD,5.309993831,household_size,Household size: Mean household size for households with an individual over age 50
+COG,4.518761017,household_size,Household size: Mean household size for households with an individual over age 50
+CIV,6.461083997,household_size,Household size: Mean household size for households with an individual over age 50
+DJI,0,household_size,Household size: Mean household size for households with an individual over age 50
+GNQ,0,household_size,Household size: Mean household size for households with an individual over age 50
+ERI,0,household_size,Household size: Mean household size for households with an individual over age 50
+SWZ,6.007575758,household_size,Household size: Mean household size for households with an individual over age 50
+ETH,4.613078596,household_size,Household size: Mean household size for households with an individual over age 50
+GAB,4.483773258,household_size,Household size: Mean household size for households with an individual over age 50
+GMB,0,household_size,Household size: Mean household size for households with an individual over age 50
+GHA,4.121376028,household_size,Household size: Mean household size for households with an individual over age 50
+GIN,6.94021999,household_size,Household size: Mean household size for households with an individual over age 50
+GNB,0,household_size,Household size: Mean household size for households with an individual over age 50
+KEN,4.506832989,household_size,Household size: Mean household size for households with an individual over age 50
+LSO,4.675748752,household_size,Household size: Mean household size for households with an individual over age 50
+LBR,5.914927345,household_size,Household size: Mean household size for households with an individual over age 50
+MDG,5.009211187,household_size,Household size: Mean household size for households with an individual over age 50
+MWI,4.665865109,household_size,Household size: Mean household size for households with an individual over age 50
+MLI,6.45251938,household_size,Household size: Mean household size for households with an individual over age 50
+MRT,0,household_size,Household size: Mean household size for households with an individual over age 50
+MUS,0,household_size,Household size: Mean household size for households with an individual over age 50
+MOZ,4.646875649,household_size,Household size: Mean household size for households with an individual over age 50
+NAM,5.265375556,household_size,Household size: Mean household size for households with an individual over age 50
+NER,6.579874517,household_size,Household size: Mean household size for households with an individual over age 50
+NGA,5.002175633,household_size,Household size: Mean household size for households with an individual over age 50
+RWA,4.355045002,household_size,Household size: Mean household size for households with an individual over age 50
+STP,0,household_size,Household size: Mean household size for households with an individual over age 50
+SEN,10.94005259,household_size,Household size: Mean household size for households with an individual over age 50
+SYC,0,household_size,Household size: Mean household size for households with an individual over age 50
+SLE,6.799119986,household_size,Household size: Mean household size for households with an individual over age 50
+SOM,0,household_size,Household size: Mean household size for households with an individual over age 50
+ZAF,4.104623356,household_size,Household size: Mean household size for households with an individual over age 50
+SSD,0,household_size,Household size: Mean household size for households with an individual over age 50
+TZA,5.775004913,household_size,Household size: Mean household size for households with an individual over age 50
+TGO,5.587746625,household_size,Household size: Mean household size for households with an individual over age 50
+UGA,5.03718593,household_size,Household size: Mean household size for households with an individual over age 50
+ZMB,5.307596822,household_size,Household size: Mean household size for households with an individual over age 50
+ZWE,0,household_size,Household size: Mean household size for households with an individual over age 50
