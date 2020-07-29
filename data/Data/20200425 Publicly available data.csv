@@ -1,0 +1,93 @@
+﻿indicator_id,indicator_label,alias,spatial_scale,priority_rank,reference_code,data_dis_re_aggregation_notes,source,category_id,category_label,source_url
+1.0.0.0.0,Category 1: Measures and proxies of healthcare capacity,,,,,,,1.0.0.0,Category 1: Measures and proxies of healthcare capacity,
+1.1.0.0.0,Category 1.1.0.0: Health professional workforce,,,,,,,1.1.0.0,Health professional workforce,
+1.1.1.0.0,Category 1.1.1.0: Medical doctors (General),,,,,,,1.1.1.0,Medical doctors (General),
+1.1.1.0.6,"Physicians (per 1,000 people)",1_1_physicians_p1k,country,high_priority,SH.MED.PHYS.ZS,none,WORLDBANK,1.1.1.0,Medical doctors (General),https://data.worldbank.org/indicator/SH.MED.PHYS.ZS?end=2018&start=1985
+1.1.2.0.0,Category 1.1.2.0: Medical doctors (Specialist),,,,,,,1.1.2.0,Medical doctors (Specialist),
+1.1.2.0.2,Number of licensed qualified anaesthesiologists actively working,1_1_num_anaesthesiologists,country,high_priority,HRH_43,none,WHO_GHO,1.1.2.0,Medical doctors (Specialist),https://www.who.int/data/gho/data/indicators/indicator-details/GHO/number-of-licensed-qualified-anaesthesiologists-actively-working
+1.1.2.0.7,"Specialist surgical workforce (per 100,000 population)",1_1_surgical_workforce_p100k,country,high_priority,SH.MED.SAOP.P5,none,WORLDBANK,1.1.2.0,Medical doctors (Specialist),https://data.worldbank.org/indicator/SH.MED.SAOP.P5?view=chart
+1.1.3.0.0,Category 1.1.3.0: Nurse and midwife staff,,,,,,,1.1.3.0,Nurse and midwife staff,
+1.1.3.0.3,"Nurses and midwives (per 1,000 people)",1_1_nurses_midwives_p1k,country,high_priority,SH.MED.NUMW.P3,none,WORLDBANK,1.1.3.0,Nurse and midwife staff,https://data.worldbank.org/indicator/SH.MED.NUMW.P3?end=2018&start=1985
+1.1.5.0.0,Category 1.1.5.0: Community health workers,,,,,,,1.1.5.0,Community health workers,
+1.1.5.0.2,"Community health workers (per 1,000 people)",1_1_chws_p1k,country,high_priority,SH.MED.CMHW.P3,none,WORLDBANK,1.1.5.0,Community health workers,https://data.worldbank.org/indicator/SH.MED.CMHW.P3?view=chart
+1.2.0.0.0,Category 1.2.0.0: Health facility physical infrastructure capacity,,,,,,,1.2.0.0,Health facility physical infrastructure capacity,
+1.2.1.0.0,Category 1.2.1.0: Hospitals,,,,,,,1.2.1.0,Hospitals,
+1.2.1.0.3,Total density per 100 000 population: Health centres,1_2_health_centers_p100k,country,high_priority,DEVICES02,none,WHO_GHO,1.2.1.0,Hospitals,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/total-density-per-100-000-population-health-centres
+1.2.1.0.4,Total density per 100 000 population: Hospitals,1_2_hospitals_p100k,country,high_priority,DEVICES00,none,WHO_GHO,1.2.1.0,Hospitals,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/total-density-per-100-000-population-hospitals
+1.2.1.0.6,Total density per 100 000 population: Specialized hospitals,1_2_special_hospitals_p100k,country,high_priority,DEVICES05,none,WHO_GHO,1.2.1.0,Hospitals,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/total-density-per-100-000-population-specialized-hospitals
+1.2.1.0.7,"Hospital beds (per 1,000 people)",1_2_hospital_beds_p1k,country,high_priority,SH.MED.BEDS.ZS,none,WORLDBANK,1.2.1.0,Hospitals,https://data.worldbank.org/indicator/SH.MED.BEDS.ZS?view=chart
+1.2.3.0.0,Category 1.2.3.0: Ambulance capacity,,,,,,,1.2.3.0,Ambulance capacity,
+1.2.3.0.1,Reported % of seriously injured patients transported by ambulance,1_2_p_ambulance,country,high_priority,RS_239,Convert categorical value from Display Value,WHO_GHO,1.2.3.0,Ambulance capacity,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/reported-of-seriously-injured-patients-transported-by-ambulance
+1.3.0.0.0,Category 1.3.0.0: Health facility laboratory and techonology capacity,,,,,,,1.3.0.0,Health facility laboratory and techonology capacity,
+1.3.1.0.0,Category 1.3.1.0: Laboratory capacity,,,,,,,1.3.1.0,Laboratory capacity,
+1.3.1.0.2,Medical and Pathology Laboratory scientists (number),1_3_num_lab_scientists,country,high_priority,HWF_0019,none,WHO_GHO,1.3.1.0,Laboratory capacity,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/medical-and-pathology-laboratory-scientists-(number)
+1.3.1.0.3,Medical and Pathology Laboratory Technicians (number),1_3_num_lab_techs,country,high_priority,HWF_0020,none,WHO_GHO,1.3.1.0,Laboratory capacity,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/medical-and-pathology-laboratory-technicians-(number)
+1.3.3.0.0,Category 1.3.3.0: Health technology equipment,,,,,,,1.3.3.0,Health technology equipment,
+1.3.3.0.1,CTs - Total density per million population: Computed tomography units,1_3_ct_machines_p_million,country,high_priority,DEVICES09,none,WHO_GHO,1.3.3.0,Health technology equipment,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/total-density-per-million-population-computed-tomography-units
+1.3.3.0.2,MRIs - Total density per million population: Magnetic Resonance Imaging,1_3_mri_machines_p_million,country,high_priority,DEVICES08,none,WHO_GHO,1.3.3.0,Health technology equipment,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/total-density-per-million-population-magnetic-resonance-imaging
+1.4.0.0.0,Category 1.4.0.0: Routine health service coverage,,,,,,,1.4.0.0,Routine health service coverage,
+1.4.1.0.0,Category 1.4.1.0: Access to care,,,,,,,1.4.1.0,Access to care,
+1.4.1.0.1,Children aged < 5 years with pneumonia symptoms taken to a health facility (%),1_4_p_pneum_care_access,country,high_priority,carep,Calculated by taking the average of the male and female estimates,WHO_GHO,1.4.1.0,Access to care,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/children-aged-5-years-with-pneumonia-symptoms-taken-to-a-health-facility-(-)
+1.4.1.0.6,"Number of surgical procedures (per 100,000 population)",1_4_surgical_proc_p100k,country,high_priority,SH.SGR.PROC.P5,none,WORLDBANK,1.4.1.0,Access to care,https://data.worldbank.org/indicator/SH.SGR.PROC.P5?view=chart
+1.4.2.0.0,Category 1.4.2.0: Death registration,,,,,,,1.4.2.0,Death registration,
+1.4.2.0.2,Completeness of death registration with cause-of-death information (%),1_4_p_complete_of_death_reg,country,high_priority,SP.REG.DTHS.ZS,none,WORLDBANK,1.4.2.0,Death registration,https://data.worldbank.org/indicator/SP.REG.DTHS.ZS?view=chart
+1.4.3.0.0,Category 1.4.3.0: Vaccination,,,,,,,1.4.3.0,Vaccination,
+1.4.3.0.17,"Immunization, measles (% of children ages 12-23 months)",1_4_p_vacc_measles,country,high_priority,SH.IMM.MEAS,none,WORLDBANK,1.4.3.0,Vaccination,https://data.worldbank.org/indicator/SH.IMM.MEAS?view=chart
+1.4.3.0.8,Full immunization coverage among 1-year-olds (%),1_4_p_full_vacc_1yos,country,high_priority,vfull,Calculated by taking the average of the male and female estimates,WHO_GHO,1.4.3.0,Vaccination,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/-full-immunization-coverage-among-1-year-olds-(-);https://www.who.int/data/gho/data/indicators/indicator-details/GHO/full-immunization-coverage-among-one-year-olds-(-)
+1.4.4.0.0,Category 1.4.4.0: Maternal and antenatal care,,,,,,,1.4.4.0,Maternal and antenatal care,
+1.4.4.0.7,Births attended by skilled health staff (% of total),1_4_p_births_att_by_skill,country,high_priority,SH.STA.BRTC.ZS,none,WORLDBANK,1.4.4.0,Maternal and antenatal care,https://data.worldbank.org/indicator/SH.STA.BRTC.ZS?view=chart
+2.0.0.0.0,Category 2: Measures and proxies of risk factors,,,,,,,2.0.0.0,Category 2: Measures and proxies of risk factors,
+2.1.0.0.0,Category 2.1.0.0: Comorbidities (Infectious diseases),,,,,,,2.1.0.0,Comorbidities (Infectious diseases),
+2.1.1.0.0,"Category 2.1.1.0: HIV, TB, Malaria burden",,,,,,,2.1.1.0,"HIV, TB, Malaria burden",
+2.1.1.0.10,"Incidence of tuberculosis (per 100,000 people)",2_1_inc_tuberculosis_p100k,country,high_priority,SH.TBS.INCD,none,WORLDBANK,2.1.1.0,"HIV, TB, Malaria burden",https://data.worldbank.org/indicator/SH.TBS.INCD?view=chart
+2.1.1.0.7,Malaria incidence (per 1 000 population at risk),2_1_inc_malaria_p1k_at_risk,country,high_priority,SDGMALARIA,none,WHO_GHO,2.1.1.0,"HIV, TB, Malaria burden",https://www.who.int/data/gho/data/indicators/indicator-details/GHO/malaria-incidence-(per-1-000-population-at-risk)
+2.1.1.0.9,"Prevalence of HIV, total (% of population ages 15-49)",2_1_prev_hiv_15_49_yos,country,high_priority,SH.DYN.AIDS.ZS,none,WORLDBANK,2.1.1.0,"HIV, TB, Malaria burden",https://data.worldbank.org/indicator/SH.DYN.AIDS.ZS?view=chart
+2.1.2.0.0,Category 2.1.2.0: Vaccine preventable infections,,,,,,,2.1.2.0,Vaccine preventable infections,
+2.1.2.0.2,Measles - number of reported cases,2_1_num_measles_cases,country,high_priority,WHS3_62,none,WHO_GHO,2.1.2.0,Vaccine preventable infections,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/measles---number-of-reported-cases
+2.2.0.0.0,Category 2.2.0.0: Comorbidities (NCDs),,,,,,,2.2.0.0,Comorbidities (NCDs),
+2.2.1.0.0,Category 2.2.1.0: Overall summaries,,,,,,,2.2.1.0,Overall summaries,
+2.2.1.0.3,Age-standardized NCD mortality rate (per 100 000 population),2_2_ncd_mort_rate_age_st,country,high_priority,WHS2_131,"Selecting BTSX  (for both sexes) and GHE causes: ""GHE038"", ""GHE060"", ""GHE118"", ""GHE119"", ""GHE120""",WHO_GHO,2.2.1.0,Overall summaries,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/age-standardized-ncd-mortality-rate-(per-100-000-population)
+2.2.2.0.0,Category 2.2.2.0: Diabetes,,,,,,,2.2.2.0,Diabetes,
+2.2.2.0.1,Diabetes prevalence (% of population ages 20 to 79),2_2_prev_diabetes_20_79yos,country,high_priority,SH.STA.DIAB.ZS,none,WORLDBANK,2.2.2.0,Diabetes,https://data.worldbank.org/indicator/SH.STA.DIAB.ZS?view=chart
+2.3.0.0.0,Category 2.3.0.0: Nutrition,,,,,,,2.3.0.0,Nutrition,
+2.3.1.4.0,Category 2.3.1.4: Anemia,,,,,,,2.3.1.4,Anemia,
+2.3.1.4.2,Prevalence of anaemia in non-pregnant women (%),2_3_prev_anaemia_npws,country,high_priority,ANEMIANPW,none,WHO_GHO,2.3.1.4,Anemia,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/prevalence-of-anaemia-in-non-pregnant-women-(-)
+2.3.1.4.3,"Anemia, Prevalence of anemia among children (% of children under 5)",2_3_prev_anaemia_5yos,country,high_priority,SH.ANM.CHLD.ZS,none,WORLDBANK,2.3.1.4,Anemia,https://data.worldbank.org/indicator/SH.ANM.CHLD.ZS?view=chart
+2.3.1.5.0,Category 2.3.1.5: Undernourishment,,,,,,,2.3.1.5,Undernourishment,
+2.3.1.5.2,Prevalence of undernourishment (% of population),2_3_prev_undernourishment,country,high_priority,SN.ITK.DEFC.ZS,none,WORLDBANK,2.3.1.5,Undernourishment,https://data.worldbank.org/indicator/SN.ITK.DEFC.ZS?view=chart
+2.3.2.0.0,Category 2.3.2.0: Obesity and metabolic disease,,,,,,,2.3.2.0,Obesity and metabolic disease,
+2.3.2.1.0,Category 2.3.2.1: Overweight and obesity,,,,,,,2.3.2.1,Overweight and obesity,
+2.3.2.1.8,"Prevalence of overweight among adults, BMI >= 25 (age-standardized estimate) (%)",2_3_prev_overwt_bmi25_age_st,country,high_priority,NCD_BMI_25A,Selecting BTSX (for both sexes),WHO_GHO,2.3.2.1,Overweight and obesity,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/prevalence-of-overweight-among-adults-bmi-=-25-(age-standardized-estimate)-(-)
+2.3.2.2.0,Category 2.3.2.2: Blood pressure,,,,,,,2.3.2.2,Blood pressure,
+2.3.2.2.2,Raised blood pressure (SBP>=140 OR DBP>=90) (age-standardized estimate),2_3_raised_bp_age_st,country,high_priority,BP_04,Selecting BTSX (for both sexes),WHO_GHO,2.3.2.2,Blood pressure,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/raised-blood-pressure-(sbp-=140-or-dbp-=90)-(age-standardized-estimate)
+2.3.2.3.0,Category 2.3.2.3: Cholesterol,,,,,,,2.3.2.3,Cholesterol,
+2.3.2.3.2,Raised total cholesterol (>= 5.0 mmol/L) (age-standardized estimate),2_3_raised_chol_age_st,country,high_priority,CHOL_02,Parse Display Value; Selecting BTSX (for both sexes),WHO_GHO,2.3.2.3,Cholesterol,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/raised-total-cholesterol-(-=-5-0-mmol-l)-(age-standardized-estimate)
+2.3.2.4.0,Category 2.3.2.4: Blood glucose,,,,,,,2.3.2.4,Blood glucose,
+2.3.2.4.1,Raised fasting blood glucose (>=7.0 mmol/L or on medication)(age-standardized estimate),2_3_raised_gluc_age_st,country,high_priority,NCD_GLUC_04,Selecting BTSX (for both sexes),WHO_GHO,2.3.2.4,Blood glucose,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/raised-fasting-blood-glucose-(-=7-0-mmol-l-or-on-medication)(age-standardized-estimate)
+2.4.0.0.0,Category 2.4.0.0: Pollution induced respiratory disease,,,,,,,2.4.0.0,Pollution induced respiratory disease,
+2.4.1.0.0,Category 2.4.1.0: Pollution (Air particulate matter PM2.5),,,,,,,2.4.1.0,Pollution (Air particulate matter PM2.5),
+2.4.1.0.1,Annual mean concentration of particulate matter of less than 2.5 microns of diameter (PM2.5) [ug/m3] in urban areas,2_4_mean_pm2_5_exp_urban,country,high_priority,SDGPM25,"Disaggregate into total, rural, and urban for residence area type",WHO_GHO,2.4.1.0,Pollution (Air particulate matter PM2.5),https://www.who.int/data/gho/data/indicators/indicator-details/GHO/concentrations-of-fine-particulate-matter-(pm2-5)
+2.4.4.0.0,Category 2.4.4.0: Pollution (Ambient and household air),,,,,,,2.4.4.0,Pollution (Ambient and household air),
+2.4.4.0.1,"Ambient and household air pollution attributable death rate (per 100 000 population, age-standardized)",2_4_air_death_p100k_age_st,country,high_priority,SDGAIRBODA,"Selecting BTSX  (for both sexes) and ENV causes: ""ENVCAUSE068"", ""ENVCAUSE113""",WHO_GHO,2.4.4.0,Pollution (Ambient and household air),https://www.who.int/data/gho/data/indicators/indicator-details/GHO/ambient-and-household-air-pollution-attributable-death-rate-(per-100-000-population-age-standardized)
+2.5.0.0.0,Category 2.5.0.0: Smoking,,,,,,,2.5.0.0,Smoking,
+2.5.1.0.0,Category 2.5.1.0: Smoking prevalence or frequency,,,,,,,2.5.1.0,Smoking prevalence or frequency,
+2.5.1.0.1,Age-standardized prevalence of current tobacco smoking among persons aged 15 years and older,2_5_prev_smoking_age_st,country,high_priority,SDGTOBACCO,Selecting BTSX (for both sexes),WHO_GHO,2.5.1.0,Smoking prevalence or frequency,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/age-standardized-prevalence-of-current-tobacco-smoking-among-persons-aged-15-years-and-older
+2.6.0.0.0,Category 2.6.0.0: WASH,,,,,,,2.6.0.0,WASH,
+2.6.1.0.0,Category 2.6.1.0: Handwashing capacity,,,,,,,2.6.1.0,Handwashing capacity,
+2.6.1.0.1,Population with basic handwashing facilities at home (%),2_6_p_handwashing_at_hh,country,high_priority,WSH_HYGIENE_BASIC,"Disaggregate into total, rural, and urban for residence area type",WHO_GHO,2.6.1.0,Handwashing capacity,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/population-with-basic-handwashing-facilities-at-home-(-)
+2.6.2.0.0,Category 2.6.2.0: Burden attributable to WASH inadequacies,,,,,,,2.6.2.0,Burden attributable to WASH inadequacies,
+2.6.2.0.1,"Mortality rate attributed to unsafe water, sanitation and hygiene services (per 100,000 population)",2_6_wash_attr_mort_p100k,country,high_priority,174606,none,UNDP,2.6.2.0,Burden attributable to WASH inadequacies,http://hdr.undp.org/en/indicators/174606
+3.0.0.0.0,Category 3: Measures and proxies of development,,,,,,,3.0.0.0,Category 3: Measures and proxies of development,
+3.1.0.0.0,Category 3.1.0.0: Demography,,,,,,,3.1.0.0,Demography,
+3.1.1.0.0,Category 3.1.1.0: Life expectancy,,,,,,,3.1.1.0,Life expectancy,
+3.1.1.0.1,Healthy life expectancy (HALE) at age 60 (years),3_1_hale_age_60,country,high_priority,WHOSIS_000007,Selecting BTSX (for both sexes),WHO_GHO,3.1.1.0,Life expectancy,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/healthy-life-expectancy-(hale)-at-age-60-(years)
+3.2.0.0.0,Category 3.2.0.0: Development and poverty,,,,,,,3.2.0.0,Development and poverty,
+3.2.1.0.0,Category 3.2.1.0: Government expenditures on health,,,,,,,3.2.1.0,Government expenditures on health,
+3.2.1.0.3,Current health expenditure (CHE) per capita in US$,3_2_health_exp_che_per_cap,country,high_priority,GHED_CHE_pc_US_SHA2011,none,WHO_GHO,3.2.1.0,Government expenditures on health,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/current-health-expenditure-(che)-per-capita-in-us$
+3.2.2.0.0,Category 3.2.2.0: Household and individual expenditures on health,,,,,,,3.2.2.0,Household and individual expenditures on health,
+3.2.2.0.1,Percentage of the Multidimensional Poverty Index attributed to deprivations in the health dimension,3_2_mdpi_attr_to_health_p,country,high_priority,117906,none,UNDP,3.2.2.0,Household and individual expenditures on health,http://hdr.undp.org/en/indicators/117906
+3.2.2.0.5,Out-of-pocket expenditure as percentage of current health expenditure (CHE) (%),3_2_oop_exp_vs_che_p,country,high_priority,GHED_OOPSCHE_SHA2011,none,WHO_GHO,3.2.2.0,Household and individual expenditures on health,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/out-of-pocket-expenditure-as-percentage-of-current-health-expenditure-(che)-(-)
+3.2.3.0.0,Category 3.2.3.0: General development and poverty indices,,,,,,,3.2.3.0,General development and poverty indices,
+3.2.3.0.5,Proportion of population below the international poverty line of US$1.90 per day (%),3_2_p_popn_below_pov_line,country,high_priority,SI_POV_DAY1,none,WHO_GHO,3.2.3.0,General development and poverty indices,https://www.who.int/data/gho/data/indicators/indicator-details/GHO/proportion-of-population-below-the-international-poverty-line-of-us$1-90-per-day-(-)
+3.2.3.0.6,Access to electricity (% of population),3_2_p_access_elec,country,high_priority,EG.ELC.ACCS.ZS,none,WORLDBANK,3.2.3.0,General development and poverty indices,https://data.worldbank.org/indicator/EG.ELC.ACCS.ZS?view=chart
+3.2.3.0.8,Population living in slums (% of urban population),3_2_p_urb_popn_in_slums,country,high_priority,EN.POP.SLUM.UR.ZS,none,WORLDBANK,3.2.3.0,General development and poverty indices,https://data.worldbank.org/indicator/EN.POP.SLUM.UR.ZS
