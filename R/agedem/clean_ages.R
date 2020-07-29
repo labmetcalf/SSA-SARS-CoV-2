@@ -10,7 +10,7 @@ library(here)
 # Data
 un_ages <- read_excel(here("data/raw/WPP2019_INT_F03_1_POPULATION_BY_AGE_ANNUAL_BOTH_SEXES.xlsx"), 
                       skip = 16)
-iso_codes <- read_csv(here("output/iso_codes.csv"))
+iso_codes <- read_csv(here("data/Data/iso_codes.csv"))
 
 # UN Data -------------------------------------------------------------------------------------
 # Clean and match to country iso codes

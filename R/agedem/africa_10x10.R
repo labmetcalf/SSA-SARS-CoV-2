@@ -24,6 +24,7 @@ files <- list.files(directory, recursive = TRUE)
 files <- files[grepl(".tif$", files)] # only tifs
 ages <- unique(substring(files, 9, 13)) # get the unique age bins
 
+# Aggregate up to make easier -------------------------------------------------------
 foreach(i = 1:length(ages), .combine = cbind, .packages = c("raster", "glue"),
         .export = c("directory", "out_dir", "ages")) %dopar% {
           
@@ -40,36 +41,6 @@ foreach(i = 1:length(ages), .combine = cbind, .packages = c("raster", "glue"),
           values(pop)
           
         } -> out_mat
-
-colnames(out_mat) <- ages
-fwrite(out_mat, here("output/temp_out_afr.gz"))
-
-# Read in shapefiles --------------------------------------------------------------------------
-raster_base <- raster(here("data/processed/africa_10km_2020/afr_f_A0004_2020_10km.tif"))
-values(raster_base) <- 1:ncell(raster_base)
-
-# Admin 3
-admin3 <- readOGR(here("data/processed/shapefiles/admin3.shp"))
-admin3$id_match <- 1:length(admin3)
-id_match <- values(rasterize(admin3, raster_base, field = "id_match"))
-
-afr_dt <- data.table(cell_id = values(raster_base), iso_code = admin3$iso[id_match], 
-                     admin1_code = admin3$id_1[id_match], admin2_code = admin3$id_2[id_match],
-                     admin3_code = admin3$id_3[id_match], out_mat)
-
-fwrite(afr_dt, here("output/afr_dt.gz"))
-
-afr_admin1 <- afr_dt[, lapply(.SD, sum, na.rm = TRUE), .SDcols = 6:ncol(afr_dt), 
-                       by = c("admin1_code")]
-fwrite(afr_admin1, here("output/afr_admin1.csv"))
-
-afr_admin2 <- afr_dt[, lapply(.SD, sum, na.rm = TRUE), .SDcols = 6:ncol(afr_dt), 
-                       by = c("admin2_code")]
-fwrite(afr_admin2, here("output/afr_admin2.csv"))
-
-afr_admin3 <- afr_dt[, lapply(.SD, sum, na.rm = TRUE), .SDcols = 6:ncol(afr_dt), 
-                       by = c("admin3_code")]
-fwrite(afr_admin3, here("output/afr_admin3.csv"))
 
 # Make into raster brick per Marjolein -------------------------------------------------------
 # Load data
@@ -94,7 +65,7 @@ names(datsubs) <- paste(agelower, ageupper)
 dat <- brick(datsubs)
 
 # save output
-writeRaster(dat, filename = here('output/demoMapAfrica2020.tif'), format = "GTiff",
+writeRaster(dat, filename = here('data/processed/demoMapAfrica2020.tif'), format = "GTiff",
             overwrite = TRUE, options = c("INTERLEAVE=BAND", "COMPRESS=LZW"))
 
 # Close out

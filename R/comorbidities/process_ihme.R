@@ -8,7 +8,7 @@ library(here)
 
 # Data
 ncds <- read_csv(here("data/raw/IHME_ageNCDs/IHME-GBD_2017_DATA-f8d93ddd-1.csv"))
-iso_codes <- read_csv(here("output/iso_codes.csv"))
+iso_codes <- read_csv(here("data/Data/iso_codes.csv"))
 
 # Filter to countries 
 ihme_countries <- unique(ncds$location_name)

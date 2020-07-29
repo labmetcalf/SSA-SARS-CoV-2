@@ -15,7 +15,7 @@ library(sf)
 # metadata
 metadata <- read_csv(here("data/raw/Africa_1km_Age_structures_2020/Demographic_data_organisation_per country_AFRICA.csv"))
 iso_codes <- data.frame(iso = metadata$ISO_3, country = metadata$name_english)
-write_csv(iso_codes, here("output/iso_codes.csv"))
+write_csv(iso_codes, here("data/Data/iso_codes.csv"))
 
 # Country level
 countries <- getShp(ISO = metadata$ISO_3)
@@ -62,7 +62,7 @@ writeOGR(admin3, dsn = here("data/processed/shapefiles"), layer = "admin3",
 # Master shapefile (finest admin unit available)
 admin3@data %>%
   mutate(id_1 = case_when(is.na(type_1) ~ as.character(id_0), 
-                     !is.na(type_1) ~ as.character(id_1)), 
+                          !is.na(type_1) ~ as.character(id_1)), 
          id_2 = case_when(is.na(type_2) ~ as.character(id_1), 
                           !is.na(type_2) ~ as.character(id_2)),
          id_3 = case_when(is.na(type_3) ~ as.character(id_2), 
@@ -121,6 +121,10 @@ library(rgeos)
 # annoyingly convert back to sp
 gadm_admin <- as(gadm_admin, Class = "Spatial")
 centroids <- rgeos::gCentroid(gadm_admin, byid = TRUE) 
+centroids <- data.frame(feature_id = gadm_admin$feature_id, GID_0 = gadm_admin$GID_0, centroids)
+write_csv(centroids, "data/processed/gadm_centroids.csv")
+
+# Distances if you want them
 dist_mat <- distm(centroids)/1000 # in km get a distance matrix
 colnames(dist_mat) <- gadm_admin$feature_id
 dist_mat <- data.frame(feature_id = gadm_admin$feature_id, GID_0 = gadm_admin$GID_0, centroids, dist_mat)
@@ -130,7 +134,7 @@ dist_mat %>%
   mutate(country_to = GID_0[match(gid_to, feature_id)]) %>%
   filter(GID_0 == country_to & feature_id != gid_to) -> gadm_distances # select only within countries
 
-write_csv(gadm_distances, "data/processed/distances_SSA.csv")
+# write_csv(gadm_distances, "data/processed/distances_SSA.csv") # this is really large
 
 # If you want this as for each admin unit, distance to closest city, then you just need the city 
 # points for each country used in the travel time estimates (use geosphere::distGeo instead)
