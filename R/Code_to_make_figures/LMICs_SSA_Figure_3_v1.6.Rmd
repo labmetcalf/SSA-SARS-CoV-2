@@ -1,0 +1,454 @@
+---
+title: "SARS-CoV-2 and LMICs: Risk Tiering in Africa v1.6"
+author: "Benny Rice"
+date: "6/19/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = FALSE)
+```
+
+***
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+## HEADER INFO
+
+**Metcalf Lab | Department of Ecology and Evolutionary Biology | Princeton University**
+
+- April-June 2020
+- Code associated with project aimed at predicting COVID-19 burden in LMICs, in particular sub-Saharan Africa
+- Apologies in advance for amateurish code (ie all the loops and clunkiness)
+
+</div>
+
+***
+
+##### (i) SET UP
+
+Defining main working directory, loading necessary packages
+```{r define mainDir + packages, echo = FALSE, eval = TRUE, message = FALSE}
+mainDir <- '/Users/blrice/Dropbox/Lab Projects/1 Post Doc/9 THE RONA/LMICs and Risk Tiering in Africa/Code/'
+library(tidyverse)
+library(RJSONIO)      #Retrieving coordinates of cities from text strings by searching OpenStreetMap
+library(kableExtra)   #For printing tables in R markdown
+library(knitr)        #For printing tables in R markdown
+library(rgho)         #Querying the WHO GHO database
+library(reshape2)     #Melting data frames as needed
+library(ggrepel)      #Plotting country names neatly
+library(cowplot)      #ggplot add on for better plots
+library(patchwork)    #Combining ggplots neatly
+library(mgcv)         #Gams
+library(here)         #Finding files easily
+```
+
+Reading in data sets:
+
+1. IFR estimates: `ifrs_from_lit.csv`
+2. UN age data: `un_ages.csv`
+3. Country codes (ISO): `iso_codes.csv`
+4. Hospitalization estimates: `hosp_from_salje.csv`
+5. SSA indicator data: `SSA_2020_06_14_WHO_WBK_UNDP_indicators.csv`
+6. Metadata to get risk direction: `METADATA_2020_07_03_SSA_indicators.csv`
+
+```{r i2, echo = FALSE, eval = TRUE}
+#1
+filename.ifr_ests <- "ifrs_from_lit.csv"
+ifr_ests <- read.csv(file.path(mainDir, filename.ifr_ests), stringsAsFactors = FALSE)
+#2
+filename.un_ages <- "un_ages.csv"
+un_ages <- read.csv(file.path(mainDir, filename.un_ages), stringsAsFactors = FALSE)
+#3
+filename.iso_codes <- "iso_codes.csv"
+iso_codes <- read.csv(file.path(mainDir, filename.iso_codes), stringsAsFactors = FALSE)
+#4
+filename.hosp_ests <- "hosp_from_salje.csv"
+hosp_ests <- read.csv(file.path(mainDir, filename.hosp_ests), stringsAsFactors = FALSE)
+#5
+filename.df.SSA <- "SSA_2020_06_14_WHO_WBK_UNDP_indicators.csv"
+df.SSA <- read.csv(file.path(mainDir, filename.df.SSA), stringsAsFactors = FALSE)
+#6
+filename.metadata <- "METADATA_2020_07_03_SSA_indicators.csv"
+metadata <- read.csv(file.path(mainDir, filename.metadata), stringsAsFactors = FALSE)
+```
+
+Pasting country codes and names:
+```{r i3, echo = FALSE, eval = TRUE}
+v.country_names_manual <- c("Afghanistan", "Aland", "Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Anguilla", "Antarctica", "Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cabo Verde", "Cayman Islands", "Central African Republic", "Chad", "Chile", "China", "Christmas Island", "Cocos Keeling Islands", "Collectivity of Saint Martin", "Colombia", "Comoros", "Cook Islands", "Costa Rica", "Cote d Ivoire", "Croatia", "Cuba", "Curacao", "Cyprus", "Czech Republic", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Falkland Islands", "Faroe Islands", "Federated States of Micronesia", "Fiji", "Finland", "France", "French Guiana", "French Polynesia", "French Southern and Antarctic Land", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guernsey", "Guinea", "Guinea Bissau", "Guyana", "Haiti", "Heard Island and McDonald Islands", "Holy See", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica", "Jan Mayen", "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macau", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Niue", "Norfolk Island", "North Korea", "North Macedonia", "Northern Mariana Islands", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcairn Islands", "Poland", "Portugal", "Puerto Rico", "Qatar", "Republic of the Congo", "Reunion", "Romania", "Russia", "Rwanda", "Saba", "Saint Barthelemy", "Saint Kitts and Nevis", "Saint Lucia", "Saint Pierre and Miquelon", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Sint Maarten", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Georgia and the South Sandwich Islands", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo", "Tokelau", "Tonga", "Trinidad and Tobago", "Tristan da Cunha", "Tunisia", "Turkey", "Turkmenistan", "Turks and Caicos Islands", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States Minor Outlying Islands", "United States of America", "United States Virgin Islands", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam", "Wallis and Futuna", "Western Sahara", "Yemen", "Zambia", "Zimbabwe")
+  
+v.country_codes_manual <- c("AFG", "ALA", "ALB", "DZA", "ASM", "AND", "AGO", "AIA", "ATA", "ATG", 
+                            "ARG", "ARM", "ABW", "AUS", "AUT", "AZE", "BHS", "BHR", "BGD", "BRB", 
+                            "BLR", "BEL", "BLZ", "BEN", "BMU", "BTN", "BOL", "BIH", "BWA", "BVT", 
+                            "BRA", "IOT", "VGB", "BRN", "BGR", "BFA", "BDI", "KHM", "CMR", "CAN", 
+                            "CPV", "CYM", "CAF", "TCD", "CHL", "CHN", "CXR", "CCK", "MAF", "COL", 
+                            "COM", "COK", "CRI", "CIV", "HRV", "CUB", "CUW", "CYP", "CZE", "COD", 
+                            "DNK", "DJI", "DMA", "DOM", "TLS", "ECU", "EGY", "SLV", "GNQ", "ERI", 
+                            "EST", "SWZ", "ETH", "FLK", "FRO", "FSM", "FJI", "FIN", "FRA", "GUF", 
+                            "PYF", "ATF", "GAB", "GMB", "GEO", "DEU", "GHA", "GIB", "GRC", "GRL", 
+                            "GRD", "GLP", "GUM", "GTM", "GGY", "GIN", "GNB", "GUY", "HTI", "HMD", 
+                            "VAT", "HND", "HKG", "HUN", "ISL", "IND", "IDN", "IRN", "IRQ", "IRL", 
+                            "IMN", "ISR", "ITA", "JAM", "SJM", "JPN", "JEY", "JOR", "KAZ", "KEN", 
+                            "KIR", "KWT", "KGZ", "LAO", "LVA", "LBN", "LSO", "LBR", "LBY", "LIE", 
+                            "LTU", "LUX", "MAC", "MDG", "MWI", "MYS", "MDV", "MLI", "MLT", "MHL", 
+                            "MTQ", "MRT", "MUS", "MYT", "MEX", "MDA", "MCO", "MNG", "MNE", "MSR", 
+                            "MAR", "MOZ", "MMR", "NAM", "NRU", "NPL", "NLD", "NCL", "NZL", "NIC", 
+                            "NER", "NGA", "NIU", "NFK", "PRK", "MKD", "MNP", "NOR", "OMN", "PAK", 
+                            "PLW", "PSE", "PAN", "PNG", "PRY", "PER", "PHL", "PCN", "POL", "PRT", 
+                            "PRI", "QAT", "COG", "REU", "ROU", "RUS", "RWA", "BES", "BLM", "KNA", 
+                            "LCA", "SPM", "VCT", "WSM", "SMR", "STP", "SAU", "SEN", "SRB", "SYC", 
+                            "SLE", "SGP", "SXM", "SVK", "SVN", "SLB", "SOM", "ZAF", "SGS", "KOR", 
+                            "SSD", "ESP", "LKA", "SDN", "SUR", "SWE", "CHE", "SYR", "TWN", "TJK", 
+                            "TZA", "THA", "TGO", "TKL", "TON", "TTO", "SHN", "TUN", "TUR", "TKM", 
+                            "TCA", "TUV", "UGA", "UKR", "ARE", "GBR", "UMI", "USA", "VIR", "URY", 
+                            "UZB", "VUT", "VEN", "VNM", "WLF", "ESH", "YEM", "ZMB", "ZWE")
+  
+v.region_codes_manual  <- c("EMR", "NDR", "EUR", "EMR", "WPR", "EUR", "SSA", "AMR", "NDR", "AMR", 
+                            "AMR", "EUR", "AMR", "WPR", "EUR", "EUR", "AMR", "EMR", "SEA", "AMR", 
+                            "EUR", "EUR", "AMR", "SSA", "AMR", "SEA", "AMR", "EUR", "SSA", "NDR", 
+                            "AMR", "NDR", "AMR", "WPR", "EUR", "SSA", "SSA", "WPR", "SSA", "AMR", 
+                            "SSA", "AMR", "SSA", "SSA", "AMR", "WPR", "NDR", "NDR", "NDR", "AMR", 
+                            "SSA", "WPR", "AMR", "SSA", "EUR", "AMR", "AMR", "EUR", "EUR", "SSA", 
+                            "EUR", "SSA", "AMR", "AMR", "WPR", "AMR", "EMR", "AMR", "SSA", "SSA", 
+                            "EUR", "SSA", "SSA", "NDR", "EUR", "WPR", "WPR", "EUR", "EUR", "AMR", 
+                            "WPR", "NDR", "SSA", "SSA", "EUR", "EUR", "SSA", "EUR", "EUR", "EUR", 
+                            "AMR", "AMR", "WPR", "AMR", "NDR", "SSA", "SSA", "AMR", "AMR", "NDR", 
+                            "EUR", "AMR", "WPR", "EUR", "EUR", "SEA", "SEA", "EMR", "EMR", "EUR", 
+                            "EUR", "EUR", "EUR", "AMR", "NDR", "WPR", "EUR", "EMR", "EUR", "SSA", 
+                            "WPR", "EMR", "EUR", "WPR", "EUR", "EMR", "SSA", "SSA", "EMR", "EUR", 
+                            "EUR", "EUR", "WPR", "SSA", "SSA", "WPR", "SEA", "SSA", "EUR", "WPR", 
+                            "AMR", "SSA", "SSA", "NDR", "AMR", "EUR", "EUR", "WPR", "EUR", "AMR", 
+                            "EMR", "SSA", "SEA", "SSA", "WPR", "SEA", "EUR", "WPR", "WPR", "AMR", 
+                            "SSA", "SSA", "WPR", "NDR", "SEA", "EUR", "WPR", "EUR", "EMR", "EMR", 
+                            "WPR", "EMR", "AMR", "WPR", "AMR", "AMR", "WPR", "NDR", "EUR", "EUR", 
+                            "AMR", "EMR", "SSA", "NDR", "EUR", "EUR", "SSA", "NDR", "NDR", "AMR", 
+                            "AMR", "NDR", "AMR", "WPR", "EUR", "SSA", "EMR", "SSA", "EUR", "SSA", 
+                            "SSA", "WPR", "NDR", "EUR", "EUR", "WPR", "SSA", "SSA", "NDR", "SEA", 
+                            "SSA", "EUR", "SEA", "EMR", "AMR", "EUR", "EUR", "EMR", "WPR", "EUR", 
+                            "SSA", "SEA", "SSA", "NDR", "WPR", "AMR", "NDR", "EMR", "EUR", "EUR", 
+                            "AMR", "WPR", "SSA", "EUR", "EMR", "EUR", "NDR", "AMR", "AMR", "AMR", 
+                            "EUR", "WPR", "AMR", "WPR", "NDR", "EMR", "EMR", "SSA", "SSA")
+
+#Pasting the UNDP country names
+v.country_names_unclean_UNDP <- c("Afghanistan", NA, "Albania", "Algeria", NA, "Andorra", "Angola", NA, NA, "Antigua and Barbuda", "Argentina", "Armenia", NA, "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", NA, "Bhutan", "Bolivia (Plurinational State of)", "Bosnia and Herzegovina", "Botswana", NA, "Brazil", NA, NA, "Brunei Darussalam", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cabo Verde", NA, "Central African Republic", "Chad", "Chile", "China", NA, NA, NA, "Colombia", "Comoros", NA, "Costa Rica", "Côte d'Ivoire", "Croatia", "Cuba", NA, "Cyprus", "Czechia", "Congo (Democratic Republic of the)", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Timor-Leste", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini (Kingdom of)", "Ethiopia", NA, NA, "Micronesia (Federated States of)", "Fiji", "Finland", "France", NA, NA, NA, "Gabon", "Gambia", "Georgia", "Germany", "Ghana", NA, "Greece", NA, "Grenada", NA, NA, "Guatemala", NA, "Guinea", "Guinea-Bissau", "Guyana", "Haiti", NA, NA, "Honduras", "Hong Kong, China (SAR)", "Hungary", "Iceland", "India", "Indonesia", "Iran (Islamic Republic of)", "Iraq", "Ireland", NA, "Israel", "Italy", "Jamaica", NA, "Japan", NA, "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Lao People's Democratic Republic", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", NA, "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", NA, "Mauritania", "Mauritius", NA, "Mexico", "Moldova (Republic of)", NA, "Mongolia", "Montenegro", NA, "Morocco", "Mozambique", "Myanmar", "Namibia", NA, "Nepal", "Netherlands", NA, "New Zealand", "Nicaragua", "Niger", "Nigeria", NA, NA, "Korea (Democratic People's Rep. of)", "North Macedonia", NA, "Norway", "Oman", "Pakistan", "Palau", "Palestine, State of", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", NA, "Poland", "Portugal", NA, "Qatar", "Congo", NA, "Romania", "Russian Federation", "Rwanda", NA, NA, "Saint Kitts and Nevis", "Saint Lucia", NA, "Saint Vincent and the Grenadines", "Samoa", NA, "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", NA, "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", NA, "Korea (Republic of)", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syrian Arab Republic", NA, "Tajikistan", "Tanzania (United Republic of)", "Thailand", "Togo", NA, "Tonga", "Trinidad and Tobago", NA, "Tunisia", "Turkey", "Turkmenistan", NA, NA, "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", NA, "United States", NA, "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela (Bolivarian Republic of)", "Viet Nam", NA, NA, "Yemen", "Zambia", "Zimbabwe")
+  
+#Adding country codes and country names to a data frame and taking care of factor issues
+df.country_codes_names <- data.frame(
+  REGION_CODE       = v.region_codes_manual,
+  COUNTRY_CODE      = v.country_codes_manual, 
+  COUNTRY_NAME      = v.country_names_manual,
+  COUNTRY_NAME_UNDP = v.country_names_unclean_UNDP)
+df.country_codes_names$REGION_CODE       <- as.character(df.country_codes_names$REGION_CODE)
+df.country_codes_names$COUNTRY_CODE      <- as.character(df.country_codes_names$COUNTRY_CODE)
+df.country_codes_names$COUNTRY_NAME      <- as.character(df.country_codes_names$COUNTRY_NAME)
+df.country_codes_names$COUNTRY_NAME_UNDP <- as.character(df.country_codes_names$COUNTRY_NAME_UNDP)
+
+#Trimming to keep only SSA region
+df.country_codes_names <- df.country_codes_names[df.country_codes_names$REGION_CODE == "SSA", ]
+row.names(df.country_codes_names) <- NULL
+```
+
+
+
+***
+***
+
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+### Figure 3 | Expected burden under different IFR scenarios
+
+</div>
+
+***
+***
+
+##### Section 1: Making age vs IFR curves: Fitting age to IFR estimates
+
+***
+
+- Fitting age to IFR estimates from France, Italy, China using a GAM
+
+```{r 1.01, echo = FALSE, eval = TRUE}
+# Fit age to IFR estimates ------------------------------------------------
+ifr_ests$predictor <- (ifr_ests$age_lower + ifr_ests$age_upper)/2
+ifr_ests$ifr_prop_est <- ifr_ests$ifr_perc_est/100
+
+ifr_fit_age <- gam(ifr_prop_est ~ s(predictor), family = betar(link="logit"), 
+               data = ifr_ests, method = "REML")
+
+ages <- seq(0, 100, by = 1)
+ifr_preds_age <- predict(ifr_fit_age,  data.frame(predictor = ages), 
+                     type = "response", se.fit = TRUE)
+ifrs_to_plot_age <- data.frame(ages = ages, 
+                           est = ifr_preds_age$fit, upper = ifr_preds_age$fit + 2*ifr_preds_age$se.fit, 
+                           lower = ifr_preds_age$fit - 2*ifr_preds_age$se.fit)
+```
+
+- Fitting age to hospitalization estimates from France using a GAM
+
+```{r 1.02, echo = FALSE, eval = TRUE}
+# Fit age to hosp estimates ------------------------------------------------
+# Have to choose k in smoothing term because not many data points
+# Look into other papers to see if they have age-stratified ests
+hosp_ests %>%
+  mutate(predictor = (age_lower + age_upper)/2, hosp_rate = inf_to_hosp_mean/100, 
+         icu_rate = (inf_to_hosp_mean/100)*(hosp_to_icu_mean/100)) -> hosp_ests
+# IFR equal to hospitalization rate
+hosp_fit_age <- gam(hosp_rate ~ s(predictor, k = 8), family = betar(link="logit"), 
+                    data = hosp_ests, method = "REML")
+```
+
+***
+
+##### Section 2: Plotting projected mortality 
+
+***
+
+- Writing a function to fit and shift IFR curves
+
+```{r 2.01, echo = FALSE, eval = TRUE}
+predict_ifr <- function(predictor, gam = ifr_fit_age) {
+  predict(gam, newdata = data.frame(predictor = predictor), type = "response")
+}
+```
+
+- Plotting baseline and shifted IFR vs age curves
+
+```{r 2.02, echo = FALSE, eval = TRUE}
+#Creating a ifr by age table for plotting
+age_ifrs <- data.frame(age = seq(1, 100, by = 1))
+age_ifrs %>%
+  mutate(ifr_by_age       = predict_ifr(predictor = age,      gam = ifr_fit_age), 
+         ifr_by_ageplus2  = predict_ifr(predictor = age + 2,  gam = ifr_fit_age),
+         ifr_by_ageplus5  = predict_ifr(predictor = age + 5,  gam = ifr_fit_age),
+         ifr_by_ageplus10 = predict_ifr(predictor = age + 10, gam = ifr_fit_age)) %>%
+  pivot_longer(starts_with("ifr"), names_to = "ifr_type", values_to = "ifr_est") -> ages_to_plot
+#Setting colors
+ifr_cols <- c("ifr_by_age"       = "black", 
+              "ifr_by_ageplus2"  = "darkgray", 
+              "ifr_by_ageplus5"  = "darkgray", 
+              "ifr_by_ageplus10" = "darkgray")
+ifr_labs <- c("Baseline", 
+              "Shifted (2y younger)", 
+              "Shifted (5y younger)", 
+              "Shifted (10y younger)")
+names(ifr_labs) <- names(ifr_cols)
+#Plotting
+ggplot(data = ages_to_plot, aes(x = age, y = ifr_est, group = ifr_type)) +
+  geom_line(aes(color = ifr_type)) + 
+  scale_color_manual(values = ifr_cols, labels = ifr_labs,
+                     name = "Predictor of IFR") +
+  theme_minimal_hgrid(color = "white") +
+  labs(x = "Age", y = "IFR") +
+  theme(legend.position = "none",
+        text = element_text(size = 12))
+```
+
+- Cleaning up UN age data
+  - **FIX** Tanzania and Tunisia are confused in the UN data
+  - **FIX** Swaziland / Eswatini age data are missing
+  - Matching country names and country codes (iso) with those used elsewhere
+  - Shortening names for easier plotting
+
+```{r 2.03, echo = FALSE, eval = TRUE}
+#Standardizing country names
+names(un_ages)[names(un_ages) == "iso"] <- "COUNTRY_CODE"
+un_ages <- full_join(un_ages, df.country_codes_names, by = "COUNTRY_CODE")
+#Trimming out other regions and rows without data
+un_ages <- un_ages[un_ages$REGION_CODE == "SSA", ]
+un_ages <- un_ages[!is.na(un_ages$COUNTRY_CODE), ]
+un_ages <- un_ages[!is.na(un_ages$pop), ]
+#Shortening some names:
+un_ages$COUNTRY_NAME[un_ages$COUNTRY_NAME == "Democratic Republic of the Congo"] <- "Congo (DRC)"
+un_ages$COUNTRY_NAME[un_ages$COUNTRY_NAME == "Republic of the Congo"]            <- "Congo (ROC)"
+un_ages$COUNTRY_NAME[un_ages$COUNTRY_NAME == "Central African Republic"]         <- "CAR"
+```
+
+- Creating a `burden_by_age` table for plotting
+
+```{r 2.04, echo = FALSE, eval = TRUE}
+burden_by_age <- un_ages %>%
+  mutate(ifr_by_age       = predict_ifr(predictor = age,      gam = ifr_fit_age), 
+         ifr_by_ageplus2  = predict_ifr(predictor = age + 2,  gam = ifr_fit_age),
+         ifr_by_ageplus5  = predict_ifr(predictor = age + 5,  gam = ifr_fit_age),
+         ifr_by_ageplus10 = predict_ifr(predictor = age + 10, gam = ifr_fit_age), 
+         pop_over_50      = ifelse(age > 50, pop, 0)) %>%
+  pivot_longer(starts_with("ifr"), names_to = "ifr_type", values_to = "ifr_est") %>%
+  mutate(burden = ifr_est*pop*0.2) %>%
+  group_by(COUNTRY_NAME, COUNTRY_CODE, ifr_type) %>%
+  summarize(burden_age  = sum(burden), 
+            pop         = sum(pop), 
+            pop_over_50 = sum(pop_over_50)) %>%
+  mutate(prop_over_50   = pop_over_50/pop,
+         burden_per100k = burden_age/pop*1e5) %>% ungroup() %>%
+  group_by(ifr_type) %>% mutate(demo.rank_for_plotting = order(order(burden_per100k))) %>% ungroup() %>%
+  group_by(COUNTRY_CODE) %>% mutate(demo.rank_for_plotting = demo.rank_for_plotting[ifr_type == "ifr_by_age"]) %>% ungroup()
+```
+
+- Plotting burder by IFR scenarios
+
+```{r 2.04, echo = FALSE, eval = TRUE}
+ggplot(data = burden_by_age, aes(x = reorder(COUNTRY_NAME, demo.rank_for_plotting), group = COUNTRY_CODE)) +
+  geom_point(aes(y = burden_age/pop*1e5, color = ifr_type)) +
+  geom_line(aes(y = burden_age/pop*1e5), color = "darkgray") +
+  coord_flip() +
+  scale_color_manual(values = ifr_cols, labels = ifr_labs,
+                     name = "Predictor of IFR") +
+  theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
+  theme(legend.position = "none", 
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
+        axis.title.x = element_blank(),
+        axis.text.y = element_text(size = 7),
+        axis.title.y = element_blank())
+```
+
+- Heatmap
+
+```{r 2.05, echo = FALSE, eval = TRUE}
+#Selecting inidcators of comorbidity and healthcare access
+# Subset used for Figure 3:
+# v.comos <- c("% Diabetes prevalence among ages 20-79", "% Raised cholesterol prevalence, age-standardized", "% Raised blood pressure prevalence, age-standardized", "% Overweight prevalence among adults, age-standardized", "COPD mortality per 100 000 popn, age-standardized", "Annual mean PM2.5 concentration ug/m3 in urban areas", "TB incidence per 100 000 popn")
+
+# v.access <- c("Physicians per 100 000 popn", "Nurses and midwives per 100 000 popn", "Hospitals per 100 000 popn", "Hospital beds 100 000 popn",  "% Full immunization coverage among 1yos", "% Births attended by skilled staff", "Health expenditure per capita in USD")
+
+# Set used for Figure S4:
+v.comos <-  c("TB incidence per 100 000 popn", 
+              "% HIV prevalence among ages 15-49", 
+              "Resp inf mortality per 100 000 popn, age-standardized", 
+              "NCDs overall mortality per 100 000 popn, age-standardized", 
+              "COPD mortality per 100 000 popn, age-standardized", 
+              "% Diabetes prevalence among ages 20-79", 
+              "% Anemia prevalence among NPW", 
+              "% Undernourishment prevalence", 
+              "% Overweight prevalence among adults, age-standardized", 
+              "% Raised blood pressure prevalence, age-standardized", 
+              "% Raised cholesterol prevalence, age-standardized", 
+              "% Raised glucose prevalence, age-standardized", 
+              "Annual mean PM2.5 concentration ug/m3 in urban areas", 
+              "Lung cancer air pollution mortality per 100 000 popn, age-standardized")
+
+v.access <- c("Physicians per 100 000 popn",
+              "Nurses and midwives per 100 000 popn", 
+              "Hospitals per 100 000 popn", 
+              "Hospital beds 100 000 popn", 
+              "% Children with pneumonia symptoms taken to health facility", 
+              "% Full immunization coverage among 1yos", 
+              "% Births attended by skilled staff", 
+              "Health expenditure per capita in USD", 
+              "% Health expenditures that are out-of-pocket")
+
+heat.df.SSA <- df.SSA %>% mutate(
+  #Adding a variable group
+  variable_group = case_when(
+    indicator_label_standard %in% v.comos  ~ "Group_Comorbidities",
+    indicator_label_standard %in% v.access ~ "Group_Access",
+    TRUE ~ NA_character_)) %>%
+  #Fixing up country names
+  mutate(COUNTRY_NAME = case_when(
+    COUNTRY_NAME == "Djibouti "                        ~ "Djibouti",
+    COUNTRY_NAME == "Cape Verde"                       ~ "Cabo Verde",
+    COUNTRY_NAME == "Democratic Republic of the Congo" ~ "Congo (DRC)",
+    COUNTRY_NAME == "Republic of the Congo"            ~ "Congo (ROC)",
+    COUNTRY_NAME == "Central African Republic"         ~ "CAR",
+    TRUE ~ as.character(COUNTRY_NAME)
+  ))
+#Deleting data from unselected indicators
+heat.df.SSA <- heat.df.SSA[!is.na(heat.df.SSA$variable_group), ]
+#Joining the age burden data to allow ranking the same as in the projected mortality plot above
+heat.df.SSA <- full_join(heat.df.SSA, burden_by_age[burden_by_age$ifr_type == "ifr_by_age", ], by = c("COUNTRY_CODE", "COUNTRY_NAME"))
+#Joining the metadata to get the risk direction
+heat.df.SSA <- full_join(heat.df.SSA, metadata, by = c("alias", "indicator_label_standard", "reference_code"))
+#Deleting data from unselected indicators
+heat.df.SSA <- heat.df.SSA[!is.na(heat.df.SSA$variable_group), ]
+#Calculating order
+#Making percentile ranks categorical
+heat.df.SSA <- heat.df.SSA %>% group_by(alias) %>%
+  mutate(value_order = ifelse(value > 0, order(order(value[value > 0])), NA),
+         rank_break.25 = max(value_order, na.rm = TRUE)*0.25,
+         rank_break.50 = max(value_order, na.rm = TRUE)*0.50,
+         rank_break.75 = max(value_order, na.rm = TRUE)*0.75) %>% ungroup() %>% 
+  mutate(risk_quartile = case_when(
+    risk_direction == "less_is_bad" & value_order >= rank_break.75                               ~ "1",
+    risk_direction == "less_is_bad" & value_order >= rank_break.50 & value_order < rank_break.75 ~ "2",
+    risk_direction == "less_is_bad" & value_order >= rank_break.25 & value_order < rank_break.50 ~ "3",
+    risk_direction == "less_is_bad" & value_order >   0            & value_order < rank_break.25 ~ "4",
+    
+    risk_direction == "more_is_bad" & value_order >= rank_break.75                               ~ "4",
+    risk_direction == "more_is_bad" & value_order >= rank_break.50 & value_order < rank_break.75 ~ "3",
+    risk_direction == "more_is_bad" & value_order >= rank_break.25 & value_order < rank_break.50 ~ "2",
+    risk_direction == "more_is_bad" & value_order >   0            & value_order < rank_break.25 ~ "1",
+
+    TRUE ~ NA_character_))
+#Replacing NA ranks with 0
+heat.df.SSA <- heat.df.SSA %>% mutate(risk_quartile = if_else(is.na(risk_quartile), "0", risk_quartile))
+#Shortening label names
+heat.df.SSA <- heat.df.SSA %>% mutate(label = case_when(
+  alias == "1_1_physicians_p100k"          ~ "Physicians",
+  alias == "1_1_nurses_midwives_p100k"     ~ "Nurses and midwives",
+  alias == "1_2_hospitals_p100k"           ~ "Hospitals",
+  alias == "1_2_hospital_beds_p100k"       ~ "Hospital beds",
+  alias == "1_4_p_full_vacc_1yos"          ~ "Immunization coverage",
+  alias == "1_4_p_births_att_by_skill"     ~ "Births with skilled staff",
+  alias == "2_1_inc_tuberculosis_p100k"    ~ "Tubercolis incidence",
+  alias == "2_2_ncd_mort_a_s_COPD"         ~ "COPD mortality",
+  alias == "2_2_prev_diabetes_20_79yos"    ~ "Diabetes prevalence",
+  alias == "2_3_prev_overwt_bmi25_age_st"  ~ "Overweight prevalence",
+  alias == "2_3_raised_bp_age_st"          ~ "Raised BP prevalence",
+  alias == "2_3_raised_chol_age_st"        ~ "Raised chol prevalence",
+  alias == "2_4_mean_pm25_exp_urban_areas" ~ "PM2.5 exposure urban",
+  alias == "3_2_health_exp_che_per_cap"    ~ "Health expenditure per cap"
+))
+#Selecting columns
+heat.df.SSA <- heat.df.SSA %>% select("label", "indicator_label_standard", "REGION_CODE", "COUNTRY_CODE", "COUNTRY_NAME", "value", "value.mean", "value.pct_diff", "percentile.rank", "variable_group", "demo.rank_for_plotting", "risk_direction", "risk_quartile")
+#Factoring
+heat.df.SSA$label <- factor(heat.df.SSA$label, levels = c("Physicians", "Nurses and midwives", "Hospitals", "Hospital beds", "Immunization coverage", "Births with skilled staff", "Tubercolis incidence", "COPD mortality", "Diabetes prevalence", "Overweight prevalence", "Raised BP prevalence", "Raised chol prevalence", "PM2.5 exposure urban", "Health expenditure per cap"))
+
+
+#Colors: https://colorbrewer2.org/#type=diverging&scheme=RdYlBu&n=11
+mycolors <- c("1" = '#fee5d9',
+              "2" = '#fcae91',
+              "3" = '#fb6a4a',
+              "4" = '#cb181d',
+              "0" = '#DBDBDB')
+
+
+heat.df.SSA %>% filter(variable_group == "Group_Comorbidities") %>% ggplot(aes(x = indicator_label_standard, 
+                        y = reorder(COUNTRY_NAME, demo.rank_for_plotting), 
+                        fill = risk_quartile)) + 
+  geom_tile() +
+  scale_fill_manual(values = mycolors) +
+  facet_grid(cols = vars(variable_group), scales = "free_x") +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 45, size = 7, hjust = 0.95),
+        axis.title.x = element_blank(), axis.ticks.x = element_blank(),
+        axis.text.y = element_text(size = 6),
+        axis.title.y = element_blank(),
+        strip.text.x = element_text(size = 7), strip.text.y = element_text(size = 6),
+        panel.background = element_rect(fill = "white")
+        )
+
+heat.df.SSA %>% filter(variable_group == "Group_Access") %>% ggplot(aes(x = indicator_label_standard, 
+                        y = reorder(COUNTRY_NAME, demo.rank_for_plotting), 
+                        fill = risk_quartile)) + 
+  geom_tile() +
+  scale_fill_manual(values = mycolors) +
+  facet_grid(cols = vars(variable_group), scales = "free_x") +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 45, size = 7, hjust = 0.95),
+        axis.title.x = element_blank(), axis.ticks.x = element_blank(),
+        axis.text.y = element_text(size = 6),
+        axis.title.y = element_blank(),
+        strip.text.x = element_text(size = 7), strip.text.y = element_text(size = 6),
+        panel.background = element_rect(fill = "white")
+        )
+```
+

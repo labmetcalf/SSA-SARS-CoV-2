@@ -1,0 +1,402 @@
+---
+title: "SARS-CoV-2 and LMICs: Risk Tiering in Africa v1.7"
+author: "Benny Rice"
+date: "6/30/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = FALSE)
+```
+
+***
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+## HEADER INFO
+
+**Metcalf Lab | Department of Ecology and Evolutionary Biology | Princeton University**
+
+- April-June 2020
+- Code associated with project aimed at predicting COVID-19 burden in LMICs, in particular sub-Saharan Africa
+- Apologies in advance for amateurish code (ie all the loops and clunkiness)
+
+</div>
+
+***
+
+##### (i) SET UP
+
+Defining main working directory, loading necessary packages
+```{r i1, echo = FALSE, eval = TRUE, message = FALSE}
+mainDir <- '/Users/blrice/Dropbox/Lab Projects/1 Post Doc/9 THE RONA/LMICs and Risk Tiering in Africa/Code/'
+library(tidyverse)
+library(RJSONIO)      #Retrieving coordinates of cities from text strings by searching OpenStreetMap
+library(kableExtra)   #For printing tables in R markdown
+library(knitr)        #For printing tables in R markdown
+library(rgho)         #Querying the WHO GHO database
+library(reshape2)     #Melting data frames as needed
+library(ggrepel)      #Plotting country names neatly
+library(cowplot)      #ggplot add on for better plots
+library(patchwork)    #Combining ggplots neatly
+library(mgcv)         #Gams
+library(here)         #Finding files easily
+library(scales)       #Axis scales in plots
+```
+
+***
+***
+
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+### Figure S1 | Variation in testing and case counts
+
+</div>
+
+***
+***
+
+Reading in data sets:
+
+1. SSA testing data: `manual_africa_cdc_data_20200629.csv`
+2. UN age data: `un_ages.csv`
+
+```{r i2, echo = FALSE, eval = TRUE}
+#1
+filename.df.testing <- "manual_africa_cdc_data_20200629.csv"
+df.testing <- read.csv(file.path(mainDir, filename.df.testing), stringsAsFactors = FALSE)
+#2
+filename.un_ages <- "un_ages.csv"
+un_ages <- read.csv(file.path(mainDir, filename.un_ages), stringsAsFactors = FALSE)
+```
+
+- Pasting country codes and names
+```{r i3, echo = FALSE, eval = TRUE}
+v.country_names_manual <- c("Afghanistan", "Aland", "Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Anguilla", "Antarctica", "Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cabo Verde", "Cayman Islands", "Central African Republic", "Chad", "Chile", "China", "Christmas Island", "Cocos Keeling Islands", "Collectivity of Saint Martin", "Colombia", "Comoros", "Cook Islands", "Costa Rica", "Cote d Ivoire", "Croatia", "Cuba", "Curacao", "Cyprus", "Czech Republic", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Falkland Islands", "Faroe Islands", "Federated States of Micronesia", "Fiji", "Finland", "France", "French Guiana", "French Polynesia", "French Southern and Antarctic Land", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guernsey", "Guinea", "Guinea Bissau", "Guyana", "Haiti", "Heard Island and McDonald Islands", "Holy See", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica", "Jan Mayen", "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macau", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Niue", "Norfolk Island", "North Korea", "North Macedonia", "Northern Mariana Islands", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcairn Islands", "Poland", "Portugal", "Puerto Rico", "Qatar", "Republic of the Congo", "Reunion", "Romania", "Russia", "Rwanda", "Saba", "Saint Barthelemy", "Saint Kitts and Nevis", "Saint Lucia", "Saint Pierre and Miquelon", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Sint Maarten", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Georgia and the South Sandwich Islands", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo", "Tokelau", "Tonga", "Trinidad and Tobago", "Tristan da Cunha", "Tunisia", "Turkey", "Turkmenistan", "Turks and Caicos Islands", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States Minor Outlying Islands", "United States of America", "United States Virgin Islands", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam", "Wallis and Futuna", "Western Sahara", "Yemen", "Zambia", "Zimbabwe")
+  
+v.country_codes_manual <- c("AFG", "ALA", "ALB", "DZA", "ASM", "AND", "AGO", "AIA", "ATA", "ATG", 
+                            "ARG", "ARM", "ABW", "AUS", "AUT", "AZE", "BHS", "BHR", "BGD", "BRB", 
+                            "BLR", "BEL", "BLZ", "BEN", "BMU", "BTN", "BOL", "BIH", "BWA", "BVT", 
+                            "BRA", "IOT", "VGB", "BRN", "BGR", "BFA", "BDI", "KHM", "CMR", "CAN", 
+                            "CPV", "CYM", "CAF", "TCD", "CHL", "CHN", "CXR", "CCK", "MAF", "COL", 
+                            "COM", "COK", "CRI", "CIV", "HRV", "CUB", "CUW", "CYP", "CZE", "COD", 
+                            "DNK", "DJI", "DMA", "DOM", "TLS", "ECU", "EGY", "SLV", "GNQ", "ERI", 
+                            "EST", "SWZ", "ETH", "FLK", "FRO", "FSM", "FJI", "FIN", "FRA", "GUF", 
+                            "PYF", "ATF", "GAB", "GMB", "GEO", "DEU", "GHA", "GIB", "GRC", "GRL", 
+                            "GRD", "GLP", "GUM", "GTM", "GGY", "GIN", "GNB", "GUY", "HTI", "HMD", 
+                            "VAT", "HND", "HKG", "HUN", "ISL", "IND", "IDN", "IRN", "IRQ", "IRL", 
+                            "IMN", "ISR", "ITA", "JAM", "SJM", "JPN", "JEY", "JOR", "KAZ", "KEN", 
+                            "KIR", "KWT", "KGZ", "LAO", "LVA", "LBN", "LSO", "LBR", "LBY", "LIE", 
+                            "LTU", "LUX", "MAC", "MDG", "MWI", "MYS", "MDV", "MLI", "MLT", "MHL", 
+                            "MTQ", "MRT", "MUS", "MYT", "MEX", "MDA", "MCO", "MNG", "MNE", "MSR", 
+                            "MAR", "MOZ", "MMR", "NAM", "NRU", "NPL", "NLD", "NCL", "NZL", "NIC", 
+                            "NER", "NGA", "NIU", "NFK", "PRK", "MKD", "MNP", "NOR", "OMN", "PAK", 
+                            "PLW", "PSE", "PAN", "PNG", "PRY", "PER", "PHL", "PCN", "POL", "PRT", 
+                            "PRI", "QAT", "COG", "REU", "ROU", "RUS", "RWA", "BES", "BLM", "KNA", 
+                            "LCA", "SPM", "VCT", "WSM", "SMR", "STP", "SAU", "SEN", "SRB", "SYC", 
+                            "SLE", "SGP", "SXM", "SVK", "SVN", "SLB", "SOM", "ZAF", "SGS", "KOR", 
+                            "SSD", "ESP", "LKA", "SDN", "SUR", "SWE", "CHE", "SYR", "TWN", "TJK", 
+                            "TZA", "THA", "TGO", "TKL", "TON", "TTO", "SHN", "TUN", "TUR", "TKM", 
+                            "TCA", "TUV", "UGA", "UKR", "ARE", "GBR", "UMI", "USA", "VIR", "URY", 
+                            "UZB", "VUT", "VEN", "VNM", "WLF", "ESH", "YEM", "ZMB", "ZWE")
+  
+v.region_codes_manual  <- c("EMR", "NDR", "EUR", "EMR", "WPR", "EUR", "SSA", "AMR", "NDR", "AMR", 
+                            "AMR", "EUR", "AMR", "WPR", "EUR", "EUR", "AMR", "EMR", "SEA", "AMR", 
+                            "EUR", "EUR", "AMR", "SSA", "AMR", "SEA", "AMR", "EUR", "SSA", "NDR", 
+                            "AMR", "NDR", "AMR", "WPR", "EUR", "SSA", "SSA", "WPR", "SSA", "AMR", 
+                            "SSA", "AMR", "SSA", "SSA", "AMR", "WPR", "NDR", "NDR", "NDR", "AMR", 
+                            "SSA", "WPR", "AMR", "SSA", "EUR", "AMR", "AMR", "EUR", "EUR", "SSA", 
+                            "EUR", "SSA", "AMR", "AMR", "WPR", "AMR", "EMR", "AMR", "SSA", "SSA", 
+                            "EUR", "SSA", "SSA", "NDR", "EUR", "WPR", "WPR", "EUR", "EUR", "AMR", 
+                            "WPR", "NDR", "SSA", "SSA", "EUR", "EUR", "SSA", "EUR", "EUR", "EUR", 
+                            "AMR", "AMR", "WPR", "AMR", "NDR", "SSA", "SSA", "AMR", "AMR", "NDR", 
+                            "EUR", "AMR", "WPR", "EUR", "EUR", "SEA", "SEA", "EMR", "EMR", "EUR", 
+                            "EUR", "EUR", "EUR", "AMR", "NDR", "WPR", "EUR", "EMR", "EUR", "SSA", 
+                            "WPR", "EMR", "EUR", "WPR", "EUR", "EMR", "SSA", "SSA", "EMR", "EUR", 
+                            "EUR", "EUR", "WPR", "SSA", "SSA", "WPR", "SEA", "SSA", "EUR", "WPR", 
+                            "AMR", "SSA", "SSA", "NDR", "AMR", "EUR", "EUR", "WPR", "EUR", "AMR", 
+                            "EMR", "SSA", "SEA", "SSA", "WPR", "SEA", "EUR", "WPR", "WPR", "AMR", 
+                            "SSA", "SSA", "WPR", "NDR", "SEA", "EUR", "WPR", "EUR", "EMR", "EMR", 
+                            "WPR", "EMR", "AMR", "WPR", "AMR", "AMR", "WPR", "NDR", "EUR", "EUR", 
+                            "AMR", "EMR", "SSA", "NDR", "EUR", "EUR", "SSA", "NDR", "NDR", "AMR", 
+                            "AMR", "NDR", "AMR", "WPR", "EUR", "SSA", "EMR", "SSA", "EUR", "SSA", 
+                            "SSA", "WPR", "NDR", "EUR", "EUR", "WPR", "SSA", "SSA", "NDR", "SEA", 
+                            "SSA", "EUR", "SEA", "EMR", "AMR", "EUR", "EUR", "EMR", "WPR", "EUR", 
+                            "SSA", "SEA", "SSA", "NDR", "WPR", "AMR", "NDR", "EMR", "EUR", "EUR", 
+                            "AMR", "WPR", "SSA", "EUR", "EMR", "EUR", "NDR", "AMR", "AMR", "AMR", 
+                            "EUR", "WPR", "AMR", "WPR", "NDR", "EMR", "EMR", "SSA", "SSA")
+
+#Pasting the UNDP country names
+v.country_names_unclean_UNDP <- c("Afghanistan", NA, "Albania", "Algeria", NA, "Andorra", "Angola", NA, NA, "Antigua and Barbuda", "Argentina", "Armenia", NA, "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", NA, "Bhutan", "Bolivia (Plurinational State of)", "Bosnia and Herzegovina", "Botswana", NA, "Brazil", NA, NA, "Brunei Darussalam", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cabo Verde", NA, "Central African Republic", "Chad", "Chile", "China", NA, NA, NA, "Colombia", "Comoros", NA, "Costa Rica", "Côte d'Ivoire", "Croatia", "Cuba", NA, "Cyprus", "Czechia", "Congo (Democratic Republic of the)", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Timor-Leste", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini (Kingdom of)", "Ethiopia", NA, NA, "Micronesia (Federated States of)", "Fiji", "Finland", "France", NA, NA, NA, "Gabon", "Gambia", "Georgia", "Germany", "Ghana", NA, "Greece", NA, "Grenada", NA, NA, "Guatemala", NA, "Guinea", "Guinea-Bissau", "Guyana", "Haiti", NA, NA, "Honduras", "Hong Kong, China (SAR)", "Hungary", "Iceland", "India", "Indonesia", "Iran (Islamic Republic of)", "Iraq", "Ireland", NA, "Israel", "Italy", "Jamaica", NA, "Japan", NA, "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Lao People's Democratic Republic", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", NA, "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", NA, "Mauritania", "Mauritius", NA, "Mexico", "Moldova (Republic of)", NA, "Mongolia", "Montenegro", NA, "Morocco", "Mozambique", "Myanmar", "Namibia", NA, "Nepal", "Netherlands", NA, "New Zealand", "Nicaragua", "Niger", "Nigeria", NA, NA, "Korea (Democratic People's Rep. of)", "North Macedonia", NA, "Norway", "Oman", "Pakistan", "Palau", "Palestine, State of", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", NA, "Poland", "Portugal", NA, "Qatar", "Congo", NA, "Romania", "Russian Federation", "Rwanda", NA, NA, "Saint Kitts and Nevis", "Saint Lucia", NA, "Saint Vincent and the Grenadines", "Samoa", NA, "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", NA, "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", NA, "Korea (Republic of)", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syrian Arab Republic", NA, "Tajikistan", "Tanzania (United Republic of)", "Thailand", "Togo", NA, "Tonga", "Trinidad and Tobago", NA, "Tunisia", "Turkey", "Turkmenistan", NA, NA, "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", NA, "United States", NA, "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela (Bolivarian Republic of)", "Viet Nam", NA, NA, "Yemen", "Zambia", "Zimbabwe")
+  
+#Adding country codes and country names to a data frame and taking care of factor issues
+df.country_codes_names <- data.frame(
+  REGION_CODE       = v.region_codes_manual,
+  COUNTRY_CODE      = v.country_codes_manual, 
+  COUNTRY_NAME      = v.country_names_manual,
+  COUNTRY_NAME_UNDP = v.country_names_unclean_UNDP)
+df.country_codes_names$REGION_CODE       <- as.character(df.country_codes_names$REGION_CODE)
+df.country_codes_names$COUNTRY_CODE      <- as.character(df.country_codes_names$COUNTRY_CODE)
+df.country_codes_names$COUNTRY_NAME      <- as.character(df.country_codes_names$COUNTRY_NAME)
+df.country_codes_names$COUNTRY_NAME_UNDP <- as.character(df.country_codes_names$COUNTRY_NAME_UNDP)
+
+#Trimming to keep only SSA region
+df.country_codes_names <- df.country_codes_names[df.country_codes_names$REGION_CODE == "SSA", ]
+row.names(df.country_codes_names) <- NULL
+```
+
+- Cleaning up age data
+```{r i4, echo = FALSE, eval = TRUE}
+#Standardizing country names
+names(un_ages)[names(un_ages) == "iso"] <- "COUNTRY_CODE"
+un_ages <- full_join(un_ages, df.country_codes_names, by = "COUNTRY_CODE")
+#Trimming out other regions and rows without data
+un_ages <- un_ages[un_ages$REGION_CODE == "SSA", ]
+un_ages <- un_ages[!is.na(un_ages$COUNTRY_CODE), ]
+un_ages <- un_ages[!is.na(un_ages$pop), ]
+
+df.demo <- un_ages %>% group_by(COUNTRY_CODE) %>% 
+  summarize(popn = sum(pop)) %>% ungroup()
+```
+
+***
+
+##### Section 1: Prepping data for plotting
+
+***
+
+- Joining population size data with testing data
+
+```{r 1.01, echo = FALSE, eval = TRUE}
+df.plot <- full_join(df.testing, df.demo, by = "COUNTRY_CODE")
+#Shortening some names:
+df.plot$COUNTRY_NAME[df.plot$COUNTRY_NAME == "Democratic Republic of the Congo"] <- "Congo (DRC)"
+df.plot$COUNTRY_NAME[df.plot$COUNTRY_NAME == "Republic of the Congo"]            <- "Congo (ROC)"
+df.plot$COUNTRY_NAME[df.plot$COUNTRY_NAME == "Central African Republic"]         <- "CAR"
+```
+
+- Recalculating per popn stats and proportions using the UN age data
+
+```{r 1.02, echo = FALSE, eval = TRUE}
+#Trimming out columns from Africa CDC data entry
+df.plot <- df.plot %>% select("COUNTRY_NAME", "COUNTRY_CODE", "cases", "deaths", "tests", "popn")
+#Calculating cases and tests per 100,000 popn, positivity, cfr
+df.plot <- df.plot %>% mutate(
+  cases_p100k = cases/popn*100000,
+  tests_p100k = tests/popn*100000,
+  positivity  = cases/tests*100,
+  cfr         = deaths/cases*100)
+```
+
+***
+
+##### Section 2: Plotting testing rates, testing versus cases, and their correlation from a simple linear model
+
+***
+
+***
+
+**Figure S1 | Part A | Testing rates for sub-Saharan Africa countries**
+
+***
+
+- Defining a function to create the XY scatter plot
+
+```{r 2.01, echo = FALSE, eval = TRUE}
+function.ps1a <- function(data){
+  p <- data %>% ggplot(aes(x = reorder(COUNTRY_CODE, tests_p100k), y = tests_p100k)) +
+    geom_point(color = "#7B7B7B") +
+    geom_segment(aes(x=reorder(COUNTRY_CODE, tests_p100k), xend=reorder(COUNTRY_CODE, tests_p100k), y=0, yend=tests_p100k),
+                 color = "#7B7B7B") +
+    theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
+    scale_y_log10(labels = comma) +
+    ylab("Reported number of tests completed\n(per 100,000 population)") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 7),
+          axis.text.y = element_text(size = 7),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 10))
+  return(p)
+}
+
+```
+
+***
+
+- Plotting:
+
+```{r 2.02, echo = FALSE, eval = TRUE, warning = FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
+df.plot %>% function.ps1a
+```
+
+***
+
+**Figure S1 | Part B | Relationship between testing and case counts for sub-Saharan Africa**
+
+***
+
+- Defining a function to create the XY scatter plot
+
+```{r 2.03, echo = FALSE, eval = TRUE}
+function.ps1b <- function(data){
+  
+  p <- data %>% ggplot(aes(x = tests, y = cases)) +
+    geom_point(color = "#7B7B7B") +
+    geom_text_repel(aes(x = tests, 
+                  y = cases, 
+                  label = COUNTRY_CODE),
+              color = "#7B7B7B",
+              size = 2,
+              segment.size = 0.2,
+              point.padding	= 0.2,
+              min.segment.length = 0) +
+    stat_smooth(method='lm', geom = "line", se = FALSE, fullrange = TRUE, color = "black", size = 0.5, alpha = 0.3) +
+    scale_y_log10(labels = comma) + 
+    scale_x_log10(labels = comma) +
+    xlab("Reported number of tests completed") +
+    ylab("Reported number of infections") +
+    theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
+    theme(axis.text.x = element_text(size = 7),
+        axis.text.y = element_text(size = 7),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
+  return(p)
+}
+```
+
+***
+
+- Plotting:
+
+```{r 2.04, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10, fig.align = "center"}
+df.plot %>% function.ps1b
+```
+
+***
+
+- Calculating correlation and R^2: `tests ~ cases`
+
+```{r 2.05, echo = TRUE, eval = TRUE}
+#Correlation
+cor(df.plot$tests, df.plot$cases, method="pearson")
+#Correlation p value
+cor.test(df.plot$tests, df.plot$cases, method="pearson")
+#Linear regression
+m1 <- lm(formula = cases ~ tests, data = df.plot)
+summary(m1)
+```
+
+
+***
+
+***
+
+**Figure S1 | Part C | Cases vs infections (and CFR)**
+
+***
+
+- Defining a function to create the XY scatter plot and CFR diagonal lines
+
+```{r 2.06, echo = FALSE, eval = TRUE}
+function.ps1c <- function(data){
+  
+  cfr.labels <- c("10%", "5%", "2%", "1%", "0.5%")
+
+  p <- data %>% filter(deaths > 0) %>% ggplot(aes(x = cases, y = deaths)) +
+    geom_point(color = "#7B7B7B") +
+    geom_text_repel(aes(x = cases, 
+                  y = deaths, 
+                  label = COUNTRY_CODE),
+              color = "#7B7B7B",
+              size = 2,
+              segment.size = 0.2,
+              point.padding	= 0.2,
+              min.segment.length = 0) +
+    geom_abline(aes(intercept = log10(0.005), slope = 1, color = "#ef9a9a"), linetype = 1, size = 0.4, alpha = 0.5) +
+    geom_abline(aes(intercept = log10(0.010), slope = 1, color = "#ef5350"), linetype = 1, size = 0.4, alpha = 0.5) +
+    geom_abline(aes(intercept = log10(0.020), slope = 1, color = "#e53935"), linetype = 1, size = 0.4, alpha = 0.5) +
+    geom_abline(aes(intercept = log10(0.050), slope = 1, color = "#c62828"), linetype = 1, size = 0.4, alpha = 0.5) +
+    geom_abline(aes(intercept = log10(0.100), slope = 1, color = "#b71c1c"), linetype = 1, size = 0.4, alpha = 0.5) +
+    scale_color_identity(labels=cfr.labels, guide="legend") +
+    xlab("Reported number of infections") +
+    ylab("Reported number of deaths") +
+    scale_x_log10(labels = comma) +
+    scale_y_log10(labels = comma) +
+    theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
+    theme(legend.position = "right",
+          axis.text.x = element_text(size = 7),
+          axis.text.y = element_text(size = 7),
+          axis.title.x = element_text(size = 10),
+          axis.title.y = element_text(size = 10))
+
+  return(p)
+}
+```
+
+***
+
+- Plotting:
+
+```{r 2.07, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10, fig.align = "center"}
+df.plot %>% function.ps1c
+```
+
+***
+
+
+***
+
+***
+
+**Figure S1 | Part D | Tests versus date of first detection**
+
+***
+
+- Defining a function to create the XY scatter plot and CFR diagonal lines
+
+```{r 2.08, echo = FALSE, eval = TRUE}
+filename.df.hop <- "Xdf.hop.csv"
+df.hop <- read.csv(file.path(mainDir, filename.df.hop), stringsAsFactors = FALSE)
+
+df.hop <- df.hop %>% filter(REGION_CODE == "SSA") %>% group_by(COUNTRY_CODE) %>% summarize(date_detect = min(DATE[CASES > 0]))
+
+df.p <- full_join(df.plot, df.hop, by = "COUNTRY_CODE")
+
+df.p %>% ggplot(aes(x = tests, y = date_detect)) +
+    geom_point(color = "#7B7B7B") +
+    geom_text_repel(aes(x = tests, 
+                  y = date_detect, 
+                  label = COUNTRY_CODE),
+              color = "#7B7B7B",
+              size = 2,
+              segment.size = 0.2,
+              point.padding	= 0.2,
+              min.segment.length = 0) +
+    scale_x_log10(labels = comma) +
+    xlab("Reported number of tests completed") +
+    ylab("Reported date of first detected cases") +
+    theme_minimal_hgrid(line_size = 0.1, color = "#E4E4E4") +
+    theme(axis.text.x = element_text(size = 7),
+        axis.text.y = element_text(size = 7),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

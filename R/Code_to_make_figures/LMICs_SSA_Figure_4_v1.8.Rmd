@@ -1,0 +1,719 @@
+---
+title: "SARS-CoV-2 and LMICs: Risk Tiering in Africa v1.8"
+author: "Benny Rice"
+date: "6/30/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = FALSE)
+```
+
+***
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+## HEADER INFO
+
+**Metcalf Lab | Department of Ecology and Evolutionary Biology | Princeton University**
+
+- April-June 2020
+- Code associated with project aimed at predicting COVID-19 burden in LMICs, in particular sub-Saharan Africa
+- Apologies in advance for amateurish code (ie all the loops and clunkiness)
+
+</div>
+
+***
+
+##### (i) SET UP
+
+Defining main working directory, loading necessary packages
+```{r i1, echo = FALSE, eval = TRUE, message = FALSE}
+mainDir <- '/Users/blrice/Dropbox/Lab Projects/1 Post Doc/9 THE RONA/LMICs and Risk Tiering in Africa/Code/'
+library(tidyverse)
+library(RJSONIO)      #Retrieving coordinates of cities from text strings by searching OpenStreetMap
+library(kableExtra)   #For printing tables in R markdown
+library(knitr)        #For printing tables in R markdown
+library(rgho)         #Querying the WHO GHO database
+library(reshape2)     #Melting data frames as needed
+library(ggrepel)      #Plotting country names neatly
+library(cowplot)      #ggplot add on for better plots
+library(patchwork)    #Combining ggplots neatly
+library(mgcv)         #Gams
+library(here)         #Finding files easily
+library(lubridate)    #Cleaning up dates for case time series
+library(scales)       #Prettier plot labels
+```
+
+Reading in data sets:
+
+1. SSA indicator data: `SSA_2020_06_14_WHO_WBK_UNDP_indicators.csv`
+2. Connectivity data: `ttimes_SSA.csv`
+3. Metapopulation model output data: `dataBenMetapop.csv`
+4. Flight data: `Princeton_Uni_AFRICA_JobId1590035.csv`
+5. Hopkins global case count data: `hopkins_time_series_covid19_confirmed_global.csv`
+6. Climate model output data: `TSAfrica.csv`
+
+```{r i2, echo = FALSE, eval = TRUE}
+#1
+filename.df.SSA <- "SSA_2020_06_14_WHO_WBK_UNDP_indicators.csv"
+df.SSA <- read.csv(file.path(mainDir, filename.df.SSA), stringsAsFactors = FALSE)
+#2
+filename.df.conn <- "ttimes_SSA.csv"
+df.conn <- read.csv(file.path(mainDir, filename.df.conn), stringsAsFactors = FALSE)
+#3
+filename.df.metapop <- "dataBenMetapop.csv"
+df.metapop <- read.csv(file.path(mainDir, filename.df.metapop), stringsAsFactors = FALSE)
+#4
+filename.air <- "Princeton_Uni_AFRICA_JobId1590035.csv"
+df.air <- read.csv(file.path(mainDir, filename.air), stringsAsFactors = FALSE)
+#5
+filename.hop <- "hopkins_time_series_covid19_confirmed_global.csv"
+df.hop <- read.csv(file.path(mainDir, filename.hop), stringsAsFactors = FALSE)
+#6
+filename.df.clim <- "TSAfrica.csv"
+df.clim <- read.csv(file.path(mainDir, filename.df.clim), stringsAsFactors = FALSE)
+```
+
+Pasting country codes and names:
+```{r i3, echo = FALSE, eval = TRUE}
+v.country_names_manual <- c("Afghanistan", "Aland", "Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Anguilla", "Antarctica", "Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cabo Verde", "Cayman Islands", "Central African Republic", "Chad", "Chile", "China", "Christmas Island", "Cocos Keeling Islands", "Collectivity of Saint Martin", "Colombia", "Comoros", "Cook Islands", "Costa Rica", "Cote d Ivoire", "Croatia", "Cuba", "Curacao", "Cyprus", "Czech Republic", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Falkland Islands", "Faroe Islands", "Federated States of Micronesia", "Fiji", "Finland", "France", "French Guiana", "French Polynesia", "French Southern and Antarctic Land", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guernsey", "Guinea", "Guinea Bissau", "Guyana", "Haiti", "Heard Island and McDonald Islands", "Holy See", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica", "Jan Mayen", "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macau", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Niue", "Norfolk Island", "North Korea", "North Macedonia", "Northern Mariana Islands", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcairn Islands", "Poland", "Portugal", "Puerto Rico", "Qatar", "Republic of the Congo", "Reunion", "Romania", "Russia", "Rwanda", "Saba", "Saint Barthelemy", "Saint Kitts and Nevis", "Saint Lucia", "Saint Pierre and Miquelon", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Sint Maarten", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Georgia and the South Sandwich Islands", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo", "Tokelau", "Tonga", "Trinidad and Tobago", "Tristan da Cunha", "Tunisia", "Turkey", "Turkmenistan", "Turks and Caicos Islands", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States Minor Outlying Islands", "United States of America", "United States Virgin Islands", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam", "Wallis and Futuna", "Western Sahara", "Yemen", "Zambia", "Zimbabwe")
+  
+v.country_codes_manual <- c("AFG", "ALA", "ALB", "DZA", "ASM", "AND", "AGO", "AIA", "ATA", "ATG", 
+                            "ARG", "ARM", "ABW", "AUS", "AUT", "AZE", "BHS", "BHR", "BGD", "BRB", 
+                            "BLR", "BEL", "BLZ", "BEN", "BMU", "BTN", "BOL", "BIH", "BWA", "BVT", 
+                            "BRA", "IOT", "VGB", "BRN", "BGR", "BFA", "BDI", "KHM", "CMR", "CAN", 
+                            "CPV", "CYM", "CAF", "TCD", "CHL", "CHN", "CXR", "CCK", "MAF", "COL", 
+                            "COM", "COK", "CRI", "CIV", "HRV", "CUB", "CUW", "CYP", "CZE", "COD", 
+                            "DNK", "DJI", "DMA", "DOM", "TLS", "ECU", "EGY", "SLV", "GNQ", "ERI", 
+                            "EST", "SWZ", "ETH", "FLK", "FRO", "FSM", "FJI", "FIN", "FRA", "GUF", 
+                            "PYF", "ATF", "GAB", "GMB", "GEO", "DEU", "GHA", "GIB", "GRC", "GRL", 
+                            "GRD", "GLP", "GUM", "GTM", "GGY", "GIN", "GNB", "GUY", "HTI", "HMD", 
+                            "VAT", "HND", "HKG", "HUN", "ISL", "IND", "IDN", "IRN", "IRQ", "IRL", 
+                            "IMN", "ISR", "ITA", "JAM", "SJM", "JPN", "JEY", "JOR", "KAZ", "KEN", 
+                            "KIR", "KWT", "KGZ", "LAO", "LVA", "LBN", "LSO", "LBR", "LBY", "LIE", 
+                            "LTU", "LUX", "MAC", "MDG", "MWI", "MYS", "MDV", "MLI", "MLT", "MHL", 
+                            "MTQ", "MRT", "MUS", "MYT", "MEX", "MDA", "MCO", "MNG", "MNE", "MSR", 
+                            "MAR", "MOZ", "MMR", "NAM", "NRU", "NPL", "NLD", "NCL", "NZL", "NIC", 
+                            "NER", "NGA", "NIU", "NFK", "PRK", "MKD", "MNP", "NOR", "OMN", "PAK", 
+                            "PLW", "PSE", "PAN", "PNG", "PRY", "PER", "PHL", "PCN", "POL", "PRT", 
+                            "PRI", "QAT", "COG", "REU", "ROU", "RUS", "RWA", "BES", "BLM", "KNA", 
+                            "LCA", "SPM", "VCT", "WSM", "SMR", "STP", "SAU", "SEN", "SRB", "SYC", 
+                            "SLE", "SGP", "SXM", "SVK", "SVN", "SLB", "SOM", "ZAF", "SGS", "KOR", 
+                            "SSD", "ESP", "LKA", "SDN", "SUR", "SWE", "CHE", "SYR", "TWN", "TJK", 
+                            "TZA", "THA", "TGO", "TKL", "TON", "TTO", "SHN", "TUN", "TUR", "TKM", 
+                            "TCA", "TUV", "UGA", "UKR", "ARE", "GBR", "UMI", "USA", "VIR", "URY", 
+                            "UZB", "VUT", "VEN", "VNM", "WLF", "ESH", "YEM", "ZMB", "ZWE")
+  
+v.region_codes_manual  <- c("EMR", "NDR", "EUR", "EMR", "WPR", "EUR", "SSA", "AMR", "NDR", "AMR", 
+                            "AMR", "EUR", "AMR", "WPR", "EUR", "EUR", "AMR", "EMR", "SEA", "AMR", 
+                            "EUR", "EUR", "AMR", "SSA", "AMR", "SEA", "AMR", "EUR", "SSA", "NDR", 
+                            "AMR", "NDR", "AMR", "WPR", "EUR", "SSA", "SSA", "WPR", "SSA", "AMR", 
+                            "SSA", "AMR", "SSA", "SSA", "AMR", "WPR", "NDR", "NDR", "NDR", "AMR", 
+                            "SSA", "WPR", "AMR", "SSA", "EUR", "AMR", "AMR", "EUR", "EUR", "SSA", 
+                            "EUR", "SSA", "AMR", "AMR", "WPR", "AMR", "EMR", "AMR", "SSA", "SSA", 
+                            "EUR", "SSA", "SSA", "NDR", "EUR", "WPR", "WPR", "EUR", "EUR", "AMR", 
+                            "WPR", "NDR", "SSA", "SSA", "EUR", "EUR", "SSA", "EUR", "EUR", "EUR", 
+                            "AMR", "AMR", "WPR", "AMR", "NDR", "SSA", "SSA", "AMR", "AMR", "NDR", 
+                            "EUR", "AMR", "WPR", "EUR", "EUR", "SEA", "SEA", "EMR", "EMR", "EUR", 
+                            "EUR", "EUR", "EUR", "AMR", "NDR", "WPR", "EUR", "EMR", "EUR", "SSA", 
+                            "WPR", "EMR", "EUR", "WPR", "EUR", "EMR", "SSA", "SSA", "EMR", "EUR", 
+                            "EUR", "EUR", "WPR", "SSA", "SSA", "WPR", "SEA", "SSA", "EUR", "WPR", 
+                            "AMR", "SSA", "SSA", "NDR", "AMR", "EUR", "EUR", "WPR", "EUR", "AMR", 
+                            "EMR", "SSA", "SEA", "SSA", "WPR", "SEA", "EUR", "WPR", "WPR", "AMR", 
+                            "SSA", "SSA", "WPR", "NDR", "SEA", "EUR", "WPR", "EUR", "EMR", "EMR", 
+                            "WPR", "EMR", "AMR", "WPR", "AMR", "AMR", "WPR", "NDR", "EUR", "EUR", 
+                            "AMR", "EMR", "SSA", "NDR", "EUR", "EUR", "SSA", "NDR", "NDR", "AMR", 
+                            "AMR", "NDR", "AMR", "WPR", "EUR", "SSA", "EMR", "SSA", "EUR", "SSA", 
+                            "SSA", "WPR", "NDR", "EUR", "EUR", "WPR", "SSA", "SSA", "NDR", "SEA", 
+                            "SSA", "EUR", "SEA", "EMR", "AMR", "EUR", "EUR", "EMR", "WPR", "EUR", 
+                            "SSA", "SEA", "SSA", "NDR", "WPR", "AMR", "NDR", "EMR", "EUR", "EUR", 
+                            "AMR", "WPR", "SSA", "EUR", "EMR", "EUR", "NDR", "AMR", "AMR", "AMR", 
+                            "EUR", "WPR", "AMR", "WPR", "NDR", "EMR", "EMR", "SSA", "SSA")
+
+#Pasting the UNDP country names
+v.country_names_unclean_UNDP <- c("Afghanistan", NA, "Albania", "Algeria", NA, "Andorra", "Angola", NA, NA, "Antigua and Barbuda", "Argentina", "Armenia", NA, "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", NA, "Bhutan", "Bolivia (Plurinational State of)", "Bosnia and Herzegovina", "Botswana", NA, "Brazil", NA, NA, "Brunei Darussalam", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cabo Verde", NA, "Central African Republic", "Chad", "Chile", "China", NA, NA, NA, "Colombia", "Comoros", NA, "Costa Rica", "Côte d'Ivoire", "Croatia", "Cuba", NA, "Cyprus", "Czechia", "Congo (Democratic Republic of the)", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Timor-Leste", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini (Kingdom of)", "Ethiopia", NA, NA, "Micronesia (Federated States of)", "Fiji", "Finland", "France", NA, NA, NA, "Gabon", "Gambia", "Georgia", "Germany", "Ghana", NA, "Greece", NA, "Grenada", NA, NA, "Guatemala", NA, "Guinea", "Guinea-Bissau", "Guyana", "Haiti", NA, NA, "Honduras", "Hong Kong, China (SAR)", "Hungary", "Iceland", "India", "Indonesia", "Iran (Islamic Republic of)", "Iraq", "Ireland", NA, "Israel", "Italy", "Jamaica", NA, "Japan", NA, "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Lao People's Democratic Republic", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", NA, "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", NA, "Mauritania", "Mauritius", NA, "Mexico", "Moldova (Republic of)", NA, "Mongolia", "Montenegro", NA, "Morocco", "Mozambique", "Myanmar", "Namibia", NA, "Nepal", "Netherlands", NA, "New Zealand", "Nicaragua", "Niger", "Nigeria", NA, NA, "Korea (Democratic People's Rep. of)", "North Macedonia", NA, "Norway", "Oman", "Pakistan", "Palau", "Palestine, State of", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", NA, "Poland", "Portugal", NA, "Qatar", "Congo", NA, "Romania", "Russian Federation", "Rwanda", NA, NA, "Saint Kitts and Nevis", "Saint Lucia", NA, "Saint Vincent and the Grenadines", "Samoa", NA, "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", NA, "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", NA, "Korea (Republic of)", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syrian Arab Republic", NA, "Tajikistan", "Tanzania (United Republic of)", "Thailand", "Togo", NA, "Tonga", "Trinidad and Tobago", NA, "Tunisia", "Turkey", "Turkmenistan", NA, NA, "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", NA, "United States", NA, "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela (Bolivarian Republic of)", "Viet Nam", NA, NA, "Yemen", "Zambia", "Zimbabwe")
+  
+#Adding country codes and country names to a data frame and taking care of factor issues
+df.country_codes_names <- data.frame(
+  REGION_CODE       = v.region_codes_manual,
+  COUNTRY_CODE      = v.country_codes_manual, 
+  COUNTRY_NAME      = v.country_names_manual,
+  COUNTRY_NAME_UNDP = v.country_names_unclean_UNDP)
+df.country_codes_names$REGION_CODE       <- as.character(df.country_codes_names$REGION_CODE)
+df.country_codes_names$COUNTRY_CODE      <- as.character(df.country_codes_names$COUNTRY_CODE)
+df.country_codes_names$COUNTRY_NAME      <- as.character(df.country_codes_names$COUNTRY_NAME)
+df.country_codes_names$COUNTRY_NAME_UNDP <- as.character(df.country_codes_names$COUNTRY_NAME_UNDP)
+
+#Shortening some names:
+df.country_codes_names$COUNTRY_NAME[df.country_codes_names$COUNTRY_NAME == "Democratic Republic of the Congo"] <- "Congo (DRC)"
+df.country_codes_names$COUNTRY_NAME[df.country_codes_names$COUNTRY_NAME == "Republic of the Congo"]            <- "Congo (ROC)"
+df.country_codes_names$COUNTRY_NAME[df.country_codes_names$COUNTRY_NAME == "Central African Republic"]         <- "CAR"
+
+row.names(df.country_codes_names) <- NULL
+```
+
+- `df.conn`: Cleaning up dataframe and country names
+```{r i4, echo = FALSE, eval = TRUE}
+#Standardizing column names
+names(df.conn)[names(df.conn) == "Country.code"] <- "COUNTRY_CODE"
+df.conn$Country.name <- NULL
+names(df.conn)[names(df.conn) == 
+                 "Population.weighted.mean.travel.time.to.the.nearest.urban.centre..mins."] <- "mean_travel_time_popn_weighted"
+names(df.conn)[names(df.conn) == "pop"] <- "popn"
+#Standardizing country names
+df.conn <- full_join(df.country_codes_names[df.country_codes_names$REGION_CODE == "SSA", ], df.conn, by = "COUNTRY_CODE")
+#Trimming out other regions and rows without data
+df.conn <- df.conn[df.conn$mean_travel_time_popn_weighted != "#NUM!", ]
+df.conn$mean_travel_time_popn_weighted <- as.numeric(as.character(df.conn$mean_travel_time_popn_weighted))
+df.conn <- df.conn[!is.na(df.conn$REGION_CODE), ]
+df.conn <- df.conn[!is.na(df.conn$popn), ]
+row.names(df.conn) <- NULL
+#Dropping unnecessary columns
+df.conn <- df.conn %>% select("REGION_CODE", "COUNTRY_CODE", "COUNTRY_NAME", "COUNTRY_NAME_UNDP", "mean_travel_time_popn_weighted", "popn")
+```
+
+- `df.metapop`: Cleaning up dataframe and country names
+```{r i5, echo = FALSE, eval = TRUE}
+#Standardizing column names
+names(df.metapop)[names(df.metapop) == "countries"]        <- "COUNTRY_NAME"
+names(df.metapop)[names(df.metapop) == "prop.at.1yr...2."] <- "prop_inf_at_1y"
+df.metapop$X <- NULL
+#Standardizing country names
+df.metapop <- df.metapop %>% mutate(
+  #Fixing up country names
+  COUNTRY_NAME = case_when(
+    COUNTRY_NAME == "Central African Republic"         ~ "CAR",
+    COUNTRY_NAME == "Côte d'Ivoire"                    ~ "Cote d Ivoire",
+    COUNTRY_NAME == "Democratic Republic of the Congo" ~ "Congo (DRC)",
+    COUNTRY_NAME == "Republic of Congo"                ~ "Congo (ROC)",
+    COUNTRY_NAME == "Cape Verde"                       ~ "Cabo Verde",
+    COUNTRY_NAME == "Guinea-Bissau"                    ~ "Guinea Bissau",
+    COUNTRY_NAME == "São Tomé and Príncipe"            ~ "Sao Tome and Príncipe",
+    COUNTRY_NAME == "Swaziland"                        ~ "Eswatini",
+    TRUE ~ as.character(COUNTRY_NAME)
+  ))
+df.metapop <- full_join(df.country_codes_names[df.country_codes_names$REGION_CODE == "SSA", ], df.metapop, by = "COUNTRY_NAME")
+#Trimming out other regions and rows without data
+df.metapop <- df.metapop[!is.na(df.metapop$COUNTRY_CODE), ]
+df.metapop <- df.metapop[!is.na(df.metapop$prop_inf_at_1y), ]
+row.names(df.metapop) <- NULL
+```
+
+- `df.hop`: Cleaning up dataframe and country names
+```{r i6, echo = FALSE, eval = TRUE}
+#Standardizing column names
+names(df.hop)[names(df.hop) == "Country.Region"] <- "COUNTRY_NAME"
+df.hop$Lat  <- NULL
+df.hop$Long <- NULL
+#Standardizing country names
+df.hop <- df.hop %>% mutate(
+  #Fixing up country names
+  COUNTRY_NAME = case_when(
+    COUNTRY_NAME == "Congo (Brazzaville)"              ~ "Congo (ROC)",
+    COUNTRY_NAME == "Cote d'Ivoire"                    ~ "Cote d Ivoire",
+    COUNTRY_NAME == "Guinea-Bissau"                    ~ "Guinea Bissau",
+    COUNTRY_NAME == "Central African Republic"         ~ "CAR",
+    COUNTRY_NAME == "Congo (Kinshasa)"                 ~ "Congo (DRC)",
+    COUNTRY_NAME == "Czechia"                          ~ "Czech Republic",
+    COUNTRY_NAME == "Korea, South"                     ~ "South Korea",
+    COUNTRY_NAME == "Taiwan*"                          ~ "Taiwan",
+    COUNTRY_NAME == "US"                               ~ "United States of America",
+    COUNTRY_NAME == "Timor-Leste"                      ~ "East Timor",
+    COUNTRY_NAME == "West Bank and Gaza"               ~ "Palestine",
+    COUNTRY_NAME == "Burma"                            ~ "Myanmar",
+    TRUE ~ as.character(COUNTRY_NAME))) %>% 
+  mutate(COUNTRY_NAME = case_when(
+    Province.State == "Hong Kong" ~ "Hong Kong",
+    TRUE ~ as.character(COUNTRY_NAME)))
+df.hop <- full_join(df.country_codes_names, df.hop, by = "COUNTRY_NAME")
+#Trimming out other regions and rows without data
+df.hop <- df.hop[!is.na(df.hop$COUNTRY_CODE), ]
+df.hop <- df.hop[!is.na(df.hop$X1.22.20), ]
+#For the 8 countries dis-aggregated by province/territory: Melt then group to calculate country sums
+df.hop <- df.hop %>% melt(id = c("REGION_CODE", "COUNTRY_CODE", "COUNTRY_NAME", "COUNTRY_NAME_UNDP", "Province.State")) %>%
+  group_by(variable, COUNTRY_CODE, COUNTRY_NAME, REGION_CODE) %>% summarize(value = sum(value)) %>% ungroup() %>%
+  select("REGION_CODE", "COUNTRY_CODE", "COUNTRY_NAME", "variable", "value")
+names(df.hop)[names(df.hop) == "variable"] <- "DATE"
+names(df.hop)[names(df.hop) == "value"]    <- "CASES"
+#Clean up dates
+df.hop$DATE <- gsub("X", "", df.hop$DATE)
+df.hop$DATE <- mdy(df.hop$DATE)
+
+#Manually specifying case counts for prior to January 22 (when Hopkins began tabulating daily):
+# Countries and cases by date:
+#   China:                      548 cases from Dec 31 to Jan 21
+#   Thailand:                     1 case  from Jan 13 to Jan 21
+#   Japan:                        1 case  from Jan 16 to Jan 21
+#   South Korea:                  1 case  from Jan 20 to Jan 21
+#   Taiwan:                       1 case  from Jan 21 to Jan 21
+#   United States of America:     1 case  from Jan 21 to Jan 21
+#   Hong Kong:                    1 case  from Jan 21 to Jan 22*
+df.back_fill_cases <- data.frame(REGION_CODE  = rep(df.hop$REGION_CODE[df.hop$DATE  == "2020-01-22"], 22),
+                                 COUNTRY_CODE = rep(df.hop$COUNTRY_CODE[df.hop$DATE == "2020-01-22"], 22),
+                                 COUNTRY_NAME = rep(df.hop$COUNTRY_NAME[df.hop$DATE == "2020-01-22"], 22),
+                                 DATE         = rep(seq(as.Date("2019-12-31"), as.Date("2020-01-21"), by="days"),
+                                                            each = length(df.hop$COUNTRY_NAME[df.hop$DATE == "2020-01-22"])),
+                                 CASES        = rep(0, length(df.hop$REGION_CODE[df.hop$DATE  == "2020-01-22"])*22),
+                                 stringsAsFactors = FALSE)
+df.back_fill_cases <- df.back_fill_cases %>% mutate(CASES = case_when(
+  COUNTRY_NAME == "China" ~ 548,
+  COUNTRY_NAME == "Thailand"                 & DATE >= as.Date("2020-01-13") ~ 1,
+  COUNTRY_NAME == "Japan"                    & DATE >= as.Date("2020-01-16") ~ 1,
+  COUNTRY_NAME == "South Korea"              & DATE >= as.Date("2020-01-20") ~ 1,
+  COUNTRY_NAME == "Taiwan"                   & DATE >= as.Date("2020-01-21") ~ 1,
+  COUNTRY_NAME == "United States of America" & DATE >= as.Date("2020-01-21") ~ 1,
+  COUNTRY_NAME == "Hong Kong"                & DATE >= as.Date("2020-01-21") ~ 1,
+  TRUE ~ as.numeric(CASES)))
+#Binding the pre Jan 22 cases specified above to the Hopkins data
+df.hop <- rbind(df.back_fill_cases, df.hop, stringsAsFactors = FALSE)
+#Cleaning up the one date for Hong Kong
+df.hop <- df.hop %>% mutate(CASES = case_when(
+  COUNTRY_NAME == "Hong Kong" & DATE == as.Date("2020-01-22") ~ 1,
+  TRUE ~ as.numeric(CASES)))
+#Ordering by date and country of arrival
+df.hop <- df.hop %>% arrange(COUNTRY_NAME, DATE)
+row.names(df.hop) <- NULL
+```
+
+- `df.air`: Cleaning up dataframe and country names
+```{r i7, echo = FALSE, eval = TRUE}
+#Standardizing column names
+names(df.air)[names(df.air) == "Dep.DOT.Country.Name"] <- "DEP.COUNTRY_NAME"
+names(df.air)[names(df.air) == "Arr.DOT.Country.Name"] <- "ARR.COUNTRY_NAME"
+names(df.air)[names(df.air) == "Seats..Total."]        <- "SEAT_COUNT"
+names(df.air)[names(df.air) == "Time.series"]          <- "DATE"
+#Converting to date format
+df.air$DATE <- mdy(df.air$DATE)
+#Standardizing country names
+df.air <- df.air %>% mutate(
+  #Fixing up country names (DEPARTURE)
+  DEP.COUNTRY_NAME = case_when(
+    DEP.COUNTRY_NAME == "Tanzania United Republic of"      ~ "Tanzania",
+    DEP.COUNTRY_NAME == "Congo Democratic Republic of"     ~ "Congo (DRC)",
+    DEP.COUNTRY_NAME == "USA"                              ~ "United States of America",
+    DEP.COUNTRY_NAME == "Russian Federation"               ~ "Russia",
+    DEP.COUNTRY_NAME == "Cote D'Ivoire"                    ~ "Cote d Ivoire",
+    DEP.COUNTRY_NAME == "Cape Verde"                       ~ "Cabo Verde",
+    DEP.COUNTRY_NAME == "Congo"                            ~ "Congo (ROC)",
+    DEP.COUNTRY_NAME == "Hong Kong (sar) China"            ~ "Hong Kong",
+    DEP.COUNTRY_NAME == "Central African Republic"         ~ "CAR",
+    DEP.COUNTRY_NAME == "Guinea-Bissau"                    ~ "Guinea Bissau",
+    DEP.COUNTRY_NAME == "Syrian Arab Republic"             ~ "Syria",
+    DEP.COUNTRY_NAME == "Korea Republic of"                ~ "South Korea",
+    DEP.COUNTRY_NAME == "Ireland Republic of"              ~ "Ireland",
+    DEP.COUNTRY_NAME == "Viet Nam"                         ~ "Vietnam",
+    TRUE ~ as.character(DEP.COUNTRY_NAME))) %>%
+    #Fixing up country names (ARRIVAL)
+  mutate(ARR.COUNTRY_NAME = case_when(
+    ARR.COUNTRY_NAME == "Tanzania United Republic of"      ~ "Tanzania",
+    ARR.COUNTRY_NAME == "Congo Democratic Republic of"     ~ "Congo (DRC)",
+    ARR.COUNTRY_NAME == "USA"                              ~ "United States of America",
+    ARR.COUNTRY_NAME == "Russian Federation"               ~ "Russia",
+    ARR.COUNTRY_NAME == "Cote D'Ivoire"                    ~ "Cote d Ivoire",
+    ARR.COUNTRY_NAME == "Cape Verde"                       ~ "Cabo Verde",
+    ARR.COUNTRY_NAME == "Congo"                            ~ "Congo (ROC)",
+    ARR.COUNTRY_NAME == "Hong Kong (sar) China"            ~ "Hong Kong",
+    ARR.COUNTRY_NAME == "Central African Republic"         ~ "CAR",
+    ARR.COUNTRY_NAME == "Guinea-Bissau"                    ~ "Guinea Bissau",
+    ARR.COUNTRY_NAME == "Syrian Arab Republic"             ~ "Syria",
+    ARR.COUNTRY_NAME == "Korea Republic of"                ~ "South Korea",
+    ARR.COUNTRY_NAME == "Ireland Republic of"              ~ "Ireland",
+    ARR.COUNTRY_NAME == "Viet Nam"                         ~ "Vietnam",
+    TRUE ~ as.character(ARR.COUNTRY_NAME)))
+#Excluding Saint Helena
+df.air <- df.air[df.air$DEP.COUNTRY_NAME != "Saint Helena", ]
+df.air <- df.air[df.air$ARR.COUNTRY_NAME != "Saint Helena", ]
+#Adding country codes to DEP
+df.air <- full_join(df.air, 
+                    df.country_codes_names %>% 
+                      mutate(DEP.COUNTRY_CODE = COUNTRY_CODE, DEP.REGION_CODE = REGION_CODE) %>% 
+                      select(DEP.COUNTRY_CODE, DEP.REGION_CODE, COUNTRY_NAME),
+                    by = c("DEP.COUNTRY_NAME" = "COUNTRY_NAME"))
+#Dropping rows for countries that do not have any flights to Africa
+df.air <- df.air[!is.na(df.air$Carrier.Code), ]
+#Adding country codes to ARR
+df.air <- full_join(df.air, 
+                    df.country_codes_names %>% 
+                      mutate(ARR.COUNTRY_CODE = COUNTRY_CODE, ARR.REGION_CODE = REGION_CODE) %>% 
+                      select(ARR.COUNTRY_CODE, ARR.REGION_CODE, COUNTRY_NAME),
+                    by = c("ARR.COUNTRY_NAME" = "COUNTRY_NAME"))
+#Dropping rows for countries that do not have any flights to Africa
+df.air <- df.air[!is.na(df.air$Carrier.Code), ]
+
+#Cleaning up SEAT_COUNT column
+#Removing commas from SEAT_COUNT column
+df.air <- df.air %>% mutate(SEAT_COUNT = gsub(",", "", SEAT_COUNT))
+#Converting SEAT_COUNT to numeric (missing data = 0)
+df.air <- df.air %>% mutate(SEAT_COUNT = as.numeric(ifelse(SEAT_COUNT == "", 0, SEAT_COUNT)))
+#Accounting for missing data: 177 rows without SEAT_COUNT; Imputed from mean SEAT_COUNT of other flights using the same aircraft type
+#Aircraft type for the 177 rows missing SEAT_COUNT data and imputed value:
+  # Airbus A350-900             --> SEAT_COUNT = 326
+  # Beechcraft 1900 Airliner    --> SEAT_COUNT =  19
+  # Boeing 777-300ER Passenger  --> SEAT_COUNT = 373
+  # Boeing 787-9                --> SEAT_COUNT = 299
+#Means calculated as: 
+# mean(df.air$SEAT_COUNT[df.air$Specific.Aircraft.Name == "Boeing 787-9" & df.air$Frequency == 1 & df.air$SEAT_COUNT > 0])
+df.air <- df.air %>% mutate(SEAT_COUNT = case_when(
+  Specific.Aircraft.Name == "Airbus A350-900"            & df.air$SEAT_COUNT == 0 ~ 326*Frequency,
+  Specific.Aircraft.Name == "Beechcraft 1900 Airliner"   & df.air$SEAT_COUNT == 0 ~  19*Frequency,
+  Specific.Aircraft.Name == "Boeing 777-300ER Passenger" & df.air$SEAT_COUNT == 0 ~ 373*Frequency,
+  Specific.Aircraft.Name == "Boeing 787-9"               & df.air$SEAT_COUNT == 0 ~ 299*Frequency,
+  TRUE ~ as.numeric(SEAT_COUNT)))
+
+#Re-ordering columns
+df.air <- df.air %>% select("ARR.REGION_CODE", "ARR.COUNTRY_CODE", "ARR.COUNTRY_NAME",
+                            "DEP.REGION_CODE", "DEP.COUNTRY_CODE", "DEP.COUNTRY_NAME", 
+                            "Dep.Airport.Code", "Dep.Airport.Name", "Arr.Airport.Code", "Arr.Airport.Name",
+                            "Carrier.Code", "Local.Days.Of.Op", "Specific.Aircraft.Code", "Specific.Aircraft.Name", "Frequency",
+                            "SEAT_COUNT",
+                            "DATE")
+
+#Deleting flights that do not have SSA as a destination (e.g., flights leaving SSA for elsewhere, flights to North Africa)
+df.air <- df.air[df.air$ARR.REGION_CODE == "SSA", ]
+#Deleting domestic flights (country of departure and country of arrival are the same)
+df.air <- df.air[df.air$ARR.COUNTRY_CODE != df.air$DEP.COUNTRY_CODE, ]
+#Ordering by date and country of arrival
+df.air <- df.air %>% arrange(DATE, ARR.COUNTRY_NAME)
+row.names(df.air) <- NULL
+```
+
+***
+***
+
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+### Figure 4 and Table S5| Expected epidemic pace: Travel, Connectivity, and Climate
+
+</div>
+
+***
+***
+
+##### Section 1: Prepping data for plotting
+
+***
+
+- Calculating national monthly totals of travelers from countries with a given level of SARS-CoV-2 infection
+
+```{r 1.01, echo = FALSE, eval = TRUE}
+#Trimming flight and case data to date range Dec 31 2019-April 30 2020, joining flight and case data
+df.fly <- full_join(df.air %>% filter(DATE <= as.Date("2020-04-30")) %>% filter(DEP.REGION_CODE != "NDR"),
+                    df.hop %>% filter(DATE <= as.Date("2020-04-30")) %>% select(COUNTRY_CODE, DATE, CASES), 
+                    by = c("DEP.COUNTRY_CODE" = "COUNTRY_CODE", "DATE" = "DATE"))
+df.fly <- df.fly %>% filter(!is.na(SEAT_COUNT))
+names(df.fly)[names(df.fly) == "CASES"] <- "CASES.AT.DEP"
+df.fly <- df.fly %>% mutate(MONTH = case_when(
+  DATE >= as.Date("2019-12-31") & DATE <= as.Date("2020-01-31") ~ "2020-01",
+  DATE >= as.Date("2020-02-01") & DATE <= as.Date("2020-02-29") ~ "2020-02",
+  DATE >= as.Date("2020-03-01") & DATE <= as.Date("2020-03-31") ~ "2020-03",
+  DATE >= as.Date("2020-04-01") & DATE <= as.Date("2020-04-30") ~ "2020-04"
+))
+
+month.df.fly <- df.fly %>% group_by(ARR.COUNTRY_CODE, ARR.COUNTRY_NAME, MONTH) %>% summarize(
+  total.seats = sum(SEAT_COUNT),
+  n.0         = sum(SEAT_COUNT[CASES.AT.DEP == 0]),
+  n.1_100     = sum(SEAT_COUNT[CASES.AT.DEP >= 1   & CASES.AT.DEP <= 100]),
+  n.101_1000  = sum(SEAT_COUNT[CASES.AT.DEP >= 101 & CASES.AT.DEP <= 1000]),
+  n.1p        = sum(SEAT_COUNT[CASES.AT.DEP >= 1]),
+  n.100p      = sum(SEAT_COUNT[CASES.AT.DEP >= 100]),
+  n.1000p     = sum(SEAT_COUNT[CASES.AT.DEP >= 1000])) %>% ungroup()
+
+total.df.fly <- df.fly %>% group_by(ARR.COUNTRY_CODE, ARR.COUNTRY_NAME) %>% summarize(
+  total.seats = sum(SEAT_COUNT),
+  n.0         = sum(SEAT_COUNT[CASES.AT.DEP == 0]),
+  n.1_100     = sum(SEAT_COUNT[CASES.AT.DEP >= 1   & CASES.AT.DEP <= 100]),
+  n.101_1000  = sum(SEAT_COUNT[CASES.AT.DEP >= 101 & CASES.AT.DEP <= 1000]),
+  n.1p        = sum(SEAT_COUNT[CASES.AT.DEP >= 1]),
+  n.100p      = sum(SEAT_COUNT[CASES.AT.DEP >= 100]),
+  n.1000p     = sum(SEAT_COUNT[CASES.AT.DEP >= 1000])) %>% 
+  mutate(MONTH = "TOTAL") %>% ungroup() %>% select(ARR.COUNTRY_CODE, ARR.COUNTRY_NAME, MONTH, 
+                                                   total.seats, n.0, n.1_100, n.101_1000, n.1p, n.100p, n.1000p)
+#Binding the monthly totals and overall total together
+df.fly <- rbind(month.df.fly, total.df.fly) %>% arrange(ARR.COUNTRY_NAME, MONTH)
+```
+
+***
+
+- Calculating national populated weighted mean travel time
+
+```{r 1.02, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10}
+#Calculating: sum of an admin 2's proportion of the population * its mean popn weighted travel time
+df.national.mean.conn <- df.conn %>% group_by(COUNTRY_CODE, COUNTRY_NAME) %>% summarize(
+  national.mean_travel_time_popn_weighted = sum(popn/sum(popn)*mean_travel_time_popn_weighted)) %>% ungroup()
+#Simple plot for previewing
+ggplot(data = df.national.mean.conn, 
+       aes(x = reorder(COUNTRY_NAME, national.mean_travel_time_popn_weighted), y = national.mean_travel_time_popn_weighted)) +
+  geom_col() +
+  theme_classic() +
+  xlab("COUNTRY") + ylab("Mean travel time (mins)") +
+  theme(
+    axis.text.x = element_text(size = 6, angle = 90, hjust = 1, vjust = 0.5),
+  )
+```
+
+- Joining travel time with metapop simulation result data (% of population infected at time t)
+- Adding a column that ranks from slowest pace (lowest proportion of population infected at one year) to fastest
+
+```{r 1.03, echo = FALSE, eval = TRUE}
+df.plot <- full_join(df.national.mean.conn, df.metapop, by = c("COUNTRY_CODE", "COUNTRY_NAME"))
+df.plot <- df.plot[!is.na(df.plot$prop_inf_at_1y), ]
+df.plot <- df.plot %>% mutate(rank_for_plotting = rank(prop_inf_at_1y))
+```
+
+
+***
+***
+
+**Figure 4 | Part A | Map of countries colored by traveler count**
+
+***
+
+```{r 4A.01, echo = FALSE, eval = TRUE}
+#Getting the map data for SSA countries 
+v.Countries <- c("Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cape Verde", "Cameroon", 
+                 "Central African Republic", "Chad", "Comoros", "Republic of Congo", "Ivory Coast", 
+                 "Democratic Republic of the Congo", "Djibouti", "Equatorial Guinea", "Eritrea", 
+                 "Swaziland", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Kenya", 
+                 "Lesotho", "Liberia", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Mozambique", 
+                 "Namibia", "Niger", "Nigeria", "Rwanda", "Sao Tome and Principe", "Senegal", "Seychelles", 
+                 "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Tanzania", "Togo", "Uganda", "Zambia", 
+                 "Zimbabwe")
+SSAfrica <- map_data("world", region = v.Countries)
+
+#Cleaning up SSA country names
+SSAfrica <- SSAfrica %>% mutate(region = case_when(
+  region == "Cape Verde"                       ~ "Cabo Verde",
+  region == "Central African Republic"         ~ "CAR",
+  region == "Republic of Congo"                ~ "Congo (ROC)",
+  region == "Ivory Coast"                      ~ "Cote d Ivoire",
+  region == "Democratic Republic of the Congo" ~ "Congo (DRC)",
+  region == "Swaziland"                        ~ "Eswatini",
+  region == "Guinea-Bissau"                    ~ "Guinea Bissau",
+  TRUE ~ as.character(region)
+  ))
+#Adding the travelers data (seat counts on arriving international flights) to the map data
+#   total.seats = total arriving international travelers (regardless of case count at departure)
+#   n.1p        = arriving international travelers (from a departure country with 1+ confirmed SARS-CoV-2 case by that date)
+SSAfrica <- full_join(SSAfrica %>% select(long, lat, group, order, region),
+                      df.fly   %>% filter(MONTH == "TOTAL") %>% 
+                        select(ARR.COUNTRY_CODE, ARR.COUNTRY_NAME, total.seats, n.1p),
+                      by = c("region" = "ARR.COUNTRY_NAME"))
+
+my_breaks <- c(20000, 200000, 2000000)
+#Plotting the map
+ggplot() + 
+  geom_polygon(data = SSAfrica, aes(x=long, y = lat, group = group, fill = total.seats)) + 
+  coord_fixed(1) +
+  #scale_fill_viridis_c(option = "inferno") +
+  scale_fill_gradient(low = "#ffecb3", high = "#ff6f00", 
+                      name = "International travelers\nfrom Jan-Apr 2020", 
+                      trans = "log10",
+                      breaks = my_breaks, 
+                      labels = comma) +
+  theme(legend.position = "right",
+        panel.grid = element_blank(),
+        axis.title.x = element_blank(), axis.text.x = element_blank(),
+        axis.title.y = element_blank(), axis.text.y = element_blank(),
+        panel.background = element_rect(fill = "white"))
+```
+
+***
+
+**Figure 4 | Part B | Disproportionate share of travel goes to X countries**
+
+***
+
+```{r 4A.02, echo = FALSE, eval = TRUE}
+# Bar charts, y = number of travelers for that country
+# coloring by SARS-CoV-2 status (0, 1_100, 101_1000, 1000+)
+df.fly %>% group_by(MONTH) %>%
+  mutate(national_percent.mo = total.seats/sum(total.seats)*100) %>% ungroup() %>%
+  filter(ARR.COUNTRY_CODE %in% c("ZAF", "ETH", "KEN", "NGA")) %>%
+  select(ARR.COUNTRY_NAME, MONTH, n.0, n.1_100, n.101_1000, n.1000p, national_percent.mo) %>%
+  arrange(desc(national_percent.mo)) %>%
+  mutate(ARR.COUNTRY_NAME = factor(ARR.COUNTRY_NAME, levels = unique(ARR.COUNTRY_NAME))) %>%
+  melt(id = c("ARR.COUNTRY_NAME", "MONTH", "national_percent.mo")) %>%
+  mutate(variable = factor(variable, levels = rev(unique(variable)))) %>%
+  filter(MONTH != "TOTAL") %>% 
+  mutate(MONTH = case_when(
+    MONTH == "2020-01" ~ "Jan", MONTH == "2020-02" ~ "Feb", MONTH == "2020-03" ~ "Mar", MONTH == "2020-04" ~ "Apr"
+  )) %>%
+  mutate(MONTH = factor(MONTH, levels = c("Jan", "Feb", "Mar", "Apr"))) %>%
+  ggplot(aes(x = MONTH, y = value, fill = variable)) +
+    geom_bar(position = "stack", stat='identity') + 
+    facet_grid(~ ARR.COUNTRY_NAME) +
+    scale_fill_manual(values = rev(c("#d7ccc8", "#a1887f", "#795548", "#4e342e")),
+                      labels = c("1000+", "101-1000", "1-100", "0"),
+                      name = "Number of reported cases\nat source location\nat time of travel") +
+    scale_y_continuous(labels = comma) +
+    theme(panel.background = element_blank(), 
+          axis.title.x = element_blank(), axis.title.y = element_blank(),
+          axis.text.x = element_text(angle = 90))
+```
+
+
+***
+
+**Figure 4 | Part D.1 | % Infected at 1 year, Y Scatter, centered on a horizontal mean line**
+
+***
+
+- Defining a function to create the Y scatter plot
+
+```{r 4D.01, echo = FALSE, eval = TRUE}
+function.center.y <- function(data){
+  
+  #Horizontal mean line
+  mean_line <- mean(data$prop_inf_at_1y)
+  #Centering on the mean
+  data <- data %>% mutate(diff_from_mean = (prop_inf_at_1y - mean(prop_inf_at_1y))*100)
+  #Calculating mins and max for symmetrical plotting
+  my_limit_ceiling <- max(abs(min(data$diff_from_mean)), max(data$diff_from_mean)) + 5
+
+  p <- data %>% ggplot(aes(x = rank_for_plotting, y = diff_from_mean)) +
+    geom_point(color = "#7B7B7B") +
+    geom_text(aes(x = rank_for_plotting, 
+                  y = -my_limit_ceiling, 
+                  label = COUNTRY_NAME),
+              angle = 90,
+              size = 3,
+              hjust = 0,
+              color = "#7B7B7B") +
+    geom_hline(aes(yintercept=0), size=0.3, color = "#7B7B7B", linetype="solid") +
+    ylim(-my_limit_ceiling, my_limit_ceiling) +
+    theme(legend.position = "none",
+          panel.grid = element_blank(),
+          #Removing x axis labels and ticks
+          panel.background = element_rect(fill = "white"),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.x  = element_blank(), axis.ticks.x = element_blank())
+  
+  return(p)
+}
+```
+
+***
+
+- Plotting:
+
+```{r 4D.02, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10, fig.align = "center"}
+df.plot %>% function.center.y
+```
+
+***
+
+***
+
+**Figure 4 | Part D.2 | National mean travel time (population weighted) as a heatmap strip**
+
+***
+
+- Defining a function
+
+```{r 4D.03, echo = FALSE, eval = TRUE}
+function.heat.strip <- function(data){
+
+  #Converting travel time to hours
+  data$national.mean_travel_time_popn_weighted <- data$national.mean_travel_time_popn_weighted/60
+  #Ordering by least to greatest proportion of population infected at t = 1y from metapopulation simulation
+  p <- data %>% ggplot(aes(x = rank_for_plotting, y = 1, fill = national.mean_travel_time_popn_weighted)) +
+    geom_tile() +
+    scale_fill_viridis_c(option = "magma") +
+    #Showing text labels to allow aligning with scatter plot above
+    geom_text(aes(x = rank_for_plotting,
+                  y = 0, 
+                  label = COUNTRY_CODE),
+              angle = 90,
+              size = 3,
+              color = "#7B7B7B") +
+    #Showing legend
+    theme(legend.position = "bottom",
+          panel.grid = element_blank(),
+          axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+          axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(),
+          panel.background = element_rect(fill = "white"))
+  
+  return(p)
+  
+}
+```
+***
+
+- Plotting:
+
+```{r 4D.04, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10, fig.align = "center"}
+df.plot %>% function.heat.strip
+```
+
+***
+
+***
+
+***
+
+**Figure 4 | Part F | Climate model output: Time courses for 58 SSA cities**
+
+***
+
+```{r 4F.01, echo = FALSE, eval = TRUE}
+filename.df.clim <- "TSAfrica.csv"
+df.clim <- read.csv(file.path(mainDir, filename.df.clim), stringsAsFactors = FALSE)
+
+df.clim <- melt(df.clim, id.vars = c("Country", "City", "Lat", "Lon", "NearestLandBased")) %>% 
+  group_by(City) %>% 
+  mutate(time = 1:length(City), week = 1:length(City)/7, week.r = round(1:length(City)/7)) %>% ungroup()
+
+df.clim <- df.clim[df.clim$variable %in% c(paste0("V", rep(65:429))), ]
+
+df.max_min.clim <- df.clim %>% group_by(City) %>% 
+  summarize(peak_day = time[value == max(value)], 
+            max_I_N = max(value), 
+            peak_week = time[value == max(value)]/7) %>% ungroup()
+
+#Max: Windhoek
+#Min: Bissau
+#Mid: Antananarivo
+
+df.clim <- df.clim %>% mutate(color_group = case_when(
+  City == "Windhoek" ~ 1,
+  City == "Antananarivo" ~ 2,
+  City == "Lome" ~ 3,
+  TRUE ~  0
+))
+
+df.clim$color_group <- factor(df.clim$color_group, levels = unique(df.clim$color_group))
+
+ggplot(df.clim, aes(x = week, y = value, color = color_group, group = City, alpha = color_group)) +
+  scale_color_manual(values = c("gray", "#ad1457", "#ad1457", "#ad1457")) + 
+  geom_line(size = 0.7) +
+  scale_alpha_manual(values = c(0.2, 0.7, 0.7, 0.7)) +
+  scale_x_continuous(breaks = seq(from = 5, to = 60, by = 5)) +
+  xlab("Time (Weeks after March 1, 2020)") +
+  ylab("Proportion of Population Infected") +
+  theme(panel.background = element_blank(),
+        legend.position  = "none")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

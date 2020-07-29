@@ -1,0 +1,652 @@
+---
+title: "SARS-CoV-2 and LMICs: Risk Tiering in Africa v1.5"
+author: "Benny Rice"
+date: "6/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = FALSE)
+```
+
+***
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+## HEADER INFO
+
+**Metcalf Lab | Department of Ecology and Evolutionary Biology | Princeton University**
+
+- April-June 2020
+- Code associated with project aimed at predicting COVID-19 burden in LMICs, in particular sub-Saharan Africa
+- Apologies in advance for amateurish code (ie all the loops and clunkiness)
+
+</div>
+
+***
+
+##### (i) SET UP
+
+Defining main working directory, loading necessary packages
+```{r define mainDir + packages, echo = FALSE, eval = TRUE, message = FALSE}
+mainDir <- '/Users/blrice/Dropbox/Lab Projects/1 Post Doc/9 THE RONA/LMICs and Risk Tiering in Africa/Code/'
+library(tidyverse)
+library(RJSONIO)      #Retrieving coordinates of cities from text strings by searching OpenStreetMap
+library(kableExtra)   #For printing tables in R markdown
+library(knitr)        #For printing tables in R markdown
+library(rgho)         #Querying the WHO GHO database
+library(reshape2)     #Melting data frames as needed
+library(ggrepel)      #Plotting country names neatly
+```
+
+Reading in data sets:
+
+1. `GLOBAL_2020_06_14_select_WHO_WBK_UNDP_indicators.csv`
+2. `SSA_2020_06_14_WHO_WBK_UNDP_indicators.csv`
+
+```{r i2, echo = FALSE, eval = TRUE, message = FALSE}
+#1
+filename.df.global <- "GLOBAL_2020_06_14_select_WHO_WBK_UNDP_indicators.csv"
+df.global <- read.csv(file.path(mainDir, filename.df.global), stringsAsFactors = FALSE)
+#2
+filename.df.SSA <- "SSA_2020_06_14_WHO_WBK_UNDP_indicators.csv"
+df.SSA <- read.csv(file.path(mainDir, filename.df.SSA), stringsAsFactors = FALSE)
+```
+
+***
+***
+
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+### Section 4 | Exploring different visualizations for the WHO - World Bank - UNDP data
+
+</div>
+
+***
+***
+
+##### (4.01) Global | Ranked bar charts | Grouping by geographic region to compare between region and within region diversity
+
+```{r 4.01.01, echo = FALSE, eval = TRUE}
+#Writing a function to order within geographic regions, and return a plot object
+function.plot.by_region <- function(data){
+  
+  data <- data[data$value > 0, ]
+  
+  data$REGION_CODE <- factor(data$REGION_CODE, levels = c("SSA", "AMR", "EMR", "EUR", "SEA", "WPR"))
+  data <- data[order(data$REGION_CODE, data$value), ]
+  data <- data.frame(data, order_for_plotting = 1:length(data$COUNTRY_CODE))
+  
+  data.xlab <- paste0(data$indicator_label_standard[1], " (n = ", length(data$value), " countries)")
+  
+  p <- ggplot(data, aes(fill=REGION_CODE, y=value, x=order_for_plotting)) + 
+  geom_bar(position="dodge", stat="identity") + 
+  scale_fill_viridis_d(option="plasma", guide = guide_legend()) +
+  geom_text(aes(label = COUNTRY_NAME),
+    angle    = 90,
+    position = position_dodge(width = 0.9),
+    hjust    = -0.05,
+    size     = 1.3
+  ) + 
+  xlab(data.xlab) + 
+  theme(legend.position="bottom", legend.direction="vertical",
+        panel.grid = element_blank(),
+        axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_rect(fill = "white")
+        )
+  
+  return(p)
+}
+```
+
+***
+
+Previewing plots with 3 selected indicators:
+
+A: `% Urban popn with handwashing facilities at home`
+B: `Physicians per 100 000 popn`
+C: `% Children with pneumonia symptoms taken to health facility`
+
+***
+
+```{r 4.01.02, echo = FALSE, eval = TRUE, fig.height = 7, fig.width = 10}
+#A
+df.global[df.global$indicator_label_standard == "% Urban popn with handwashing facilities at home", ] %>% function.plot.by_region
+#B
+df.global[df.global$indicator_label_standard == "Physicians per 100 000 popn", ] %>% function.plot.by_region
+#C
+df.global[df.global$indicator_label_standard == "% Children with pneumonia symptoms taken to health facility", ] %>% function.plot.by_region
+```
+
+***
+
+##### (4.02) SSA | Faceted ranked bar charts | Plotting a set of indicators together to see variation between countries across different indicators
+
+- Values shown above bars
+- Countries retain their position along x-axis
+- Countries with missing data have a blank slot
+
+```{r 4.02.01, echo = FALSE, eval = TRUE, fig.height = 15, fig.width = 10}
+function.plot.SSA_ranked_bars_faceted <- function(data, pvars){
+  
+  data <- data %>% filter(indicator_label_standard %in% pvars) %>%
+    arrange(indicator_label_standard, value)
+  
+  data$COUNTRY_CODE <- factor(data$COUNTRY_CODE, levels = data$COUNTRY_CODE[1:length(unique(data$COUNTRY_CODE))])
+  
+  p <- ggplot(data, aes(fill=COUNTRY_CODE, y=value, x=COUNTRY_CODE)) + 
+  geom_bar(position="dodge", stat="identity") + 
+  scale_fill_viridis_d(option="cividis", guide = guide_legend()) +
+  geom_text(aes(label = round(value, 2)),
+    angle    = 90,
+    position = position_dodge(width = 0.9),
+    hjust    = -0.05,
+    size     = 1.7
+  ) + 
+  facet_grid(rows = vars(indicator_label_standard), scales = "free") +
+  theme(legend.position="none",
+        panel.grid = element_blank(),
+        axis.ticks.x = element_blank(), axis.title.x = element_blank(), axis.text.x = element_text(size = 4),
+        axis.title.y = element_blank(),
+        strip.text.x = element_text(size = 4), strip.text.y = element_text(size = 4),
+        panel.background = element_rect(fill = "white")
+        )
+  
+  return(p)
+}
+```
+
+***
+
+Previewing plot with 6 randomly selected indicators
+
+```{r 4.02.02, echo = FALSE, eval = TRUE, fig.height = 10, fig.width = 10}
+function.plot.SSA_ranked_bars_faceted(data = df.SSA, pvars = c("% Urban popn with handwashing facilities at home", "COPD mortality per 100 000 popn, age-standardized", "% Children with pneumonia symptoms taken to health facility", "Healthy life expectancy (HALE) at 60 (in years)", "% HIV prevalence among ages 15-49", "% of Urban popn living in slums"))
+```
+
+
+***
+
+##### (4.03) Global | Histograms | Looking at the distribution of the year with most recent data
+
+- Dotted vertical line shows regional median; solid vertical line shows regional mean
+- Note that most data comes from 2015-2019 (median = 2016, mean = 2014.624-2014.928), though for some indicators a country's most recent estimate is from the 1970s-80s
+
+```{r 4.03.01, echo = FALSE, eval = TRUE, fig.height = 7, fig.width = 10, fig.align = "center"}
+#Trimming out NDR region and 0 values, adding mean and median
+p.yr.df.all.indicators <- df.global[df.global$REGION_CODE != "NDR", ]
+p.yr.df.all.indicators$REGION_CODE <- factor(p.yr.df.all.indicators$REGION_CODE, levels = c("SSA", "AMR", "EMR", "EUR", "SEA", "WPR"))
+p.yr.df.all.indicators <- p.yr.df.all.indicators[p.yr.df.all.indicators$value > 0, ]
+p.yr.df.all.indicators <- p.yr.df.all.indicators %>% group_by(REGION_CODE) %>% mutate(
+  median.YEAR = median(YEAR_recent),
+  mean.YEAR   = mean(YEAR_recent)
+)
+
+p.yr.df.all.indicators %>% ggplot(aes(x = YEAR_recent, fill = REGION_CODE)) +
+  geom_histogram(binwidth=1) +
+  scale_fill_viridis_d(option="plasma", guide = guide_legend()) +
+  geom_vline(aes(xintercept = median.YEAR, group = REGION_CODE, colour = REGION_CODE), size=0.5, linetype="dotted") +
+  geom_vline(aes(xintercept = mean.YEAR, group = REGION_CODE, colour = REGION_CODE), size=0.2) +
+  scale_color_viridis_d(option="plasma", guide = guide_legend()) +
+  facet_grid(rows = vars(REGION_CODE)) +
+  theme(legend.position="bottom", legend.direction="vertical",
+        panel.grid = element_blank(),
+        panel.background = element_rect(fill = "white"),
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(size = 5),
+        axis.text.y = element_text(size = 5)
+        )
+```
+
+***
+
+##### (4.04) Global | Boxplots + Jitter | Looking at variation across indicators and comparing between global regions
+
+```{r 4.04.01, echo = FALSE, eval = TRUE}
+#Writing a function to generate box + jitter plots by region
+function.plot.box_by_region <- function(data){
+  
+  #Deleting problematic rows
+  data <- data[data$value >= 0, ]
+  data <- data[data$REGION_CODE != "NDR", ]
+  #Factoring
+  data$REGION_CODE <- factor(data$REGION_CODE, levels = c("SSA", "AMR", "EMR", "EUR", "SEA", "WPR"))
+  #Plotting
+  p <- data %>% ggplot(aes(x = REGION_CODE, y = value)) +
+  geom_boxplot(aes(color = REGION_CODE), alpha = 0.7, outlier.shape = NA) +
+  geom_jitter(aes(color = REGION_CODE), width = 0.15, size = 0.5) +
+  stat_boxplot(aes(color = REGION_CODE), geom = 'errorbar') + 
+  scale_color_viridis_d(option="plasma", guide = guide_legend()) +
+  facet_grid(rows = vars(indicator_label_standard), cols = vars(REGION_CODE), scales = "free") +
+  theme(legend.position = "none",
+        panel.background = element_rect(fill = "white"),
+        axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        strip.background = element_rect(fill = "white")
+        )
+  
+  return(p)
+}
+```
+
+- Note: the presence of clear outliers (likely data errors) is seen when looking through the indicators
+
+```{r 4.04.02, echo = FALSE, eval = TRUE, fig.height = 15, fig.width = 6, fig.align = "center"}
+#Shown from plotting the first 5 indicators for example:
+v.box.indicators_to_plot <- unique(df.global$alias)[1:5]
+function.plot.box_by_region(df.global[df.global$alias %in% v.box.indicators_to_plot, ])
+```
+
+***
+
+
+##### (4.05) SSA | Faceted unranked bar charts | Looking at variation within SSA
+
+- Generating bar charts with countries in fixed positions along x axis to allow comparison vertically
+- Highlighting a few selected countries with a different color to scroll through vertically
+- Can select the normal and highlight color
+
+```{r 4.05.01, echo = FALSE, eval = TRUE, fig.height = 7, fig.width = 10}
+function.plot.by_SSA_country <- function(data, normal_color, highlight_color, country_codes_to_highlight){
+  
+  #(1) Set Country Names as factors using the full list of countries
+  data$COUNTRY_NAME <- factor(data$COUNTRY_NAME, levels = c("Angola", "Benin", "Botswana", "Burkina Faso", "Burundi",
+"Cameroon", "Cape Verde", "Central African Republic", "Chad", "Comoros", "Cote d Ivoire", "Democratic Republic of the Congo", "Djibouti ", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea Bissau", "Kenya", "Lesotho", "Liberia", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Mozambique", "Namibia", "Niger", "Nigeria", "Republic of the Congo", "Rwanda", "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Tanzania", "Togo", "Uganda", "Zambia", "Zimbabwe"))
+  #(2) Set indicator_label_standard as factors using the full list of indicators
+  data$indicator_label_standard <- factor(data$indicator_label_standard, levels = c("Physicians per 100 000 popn", "Num anaesthesiologists", "Surgeons per 100 000 popn", "Nurses and midwives per 100 000 popn", "CHWs per 1000 popn", "Health centers per 100 000 popn", "Hospitals per 100 000 popn", "Spec hospitals per 100 000 popn", "Hospital beds 100 000 popn", "% injured patients transported by ambulance", "Num laboratory scientists", "Num laboratory techs", "CTs per million popn", "MRIs per million popn", "% Children with pneumonia symptoms taken to health facility", "Num surgical proc per 100 000 popn", "% completeness of death registration", "% measles immunization", "% Full immunization coverage among 1yos", "% Births attended by skilled staff", "TB incidence per 100 000 popn", "Malaria incidence per 1000 popn at risk", "% HIV prevalence among ages 15-49", "Measles numb of reported cases 2018", "Resp inf mortality per 100 000 popn, age-standardized", "NCDs overall mortality per 100 000 popn, age-standardized", "COPD mortality per 100 000 popn, age-standardized", "Asthma mort per 100 000 popn, age-standardized", "Other resp dis mort per 100 000 popn, age-standardized", "% Diabetes prevalence among ages 20-79", "% Anemia prevalence among NPW", "% Anemia prevalence among under 5yos", "% Undernourishment prevalence", "% Overweight prevalence among adults, age-standardized", "% Raised blood pressure prevalence, age-standardized", "% Raised cholesterol prevalence, age-standardized", "% Raised glucose prevalence, age-standardized", "Annual mean PM2.5 concentration ug/m3 in rural areas", "Annual mean PM2.5 concentration ug/m3 total", "Annual mean PM2.5 concentration ug/m3 in urban areas", "Lung cancer air pollution mortality per 100 000 popn, age-standardized", "Heart disease air pollution mortality per 100 000 popn, age-standardized", "% tobacco smoking, age-standardized", "% Rural popn with handwashing facilities at home", "% Total popn with handwashing facilities at home", "% Urban popn with handwashing facilities at home", "WASH attributable mortality per 100 000 population", "Healthy life expectancy (HALE) at 60 (in years)", "Health expenditure per capita in USD", "% MDPI attr to health dimension", "% Health expenditures that are out-of-pocket", "% of Popn below poverty line", "% of Popn with access to electricity", "% of Urban popn living in slums"))
+  #(3) Order by country name
+  data <- data[order(data$alias, data$COUNTRY_NAME), ]
+  #(4) Calculate the mean per group for adding a mean line later
+  #    Only considering values greater than 0 as some NAs are represented as 0 as a placeholder for their bar slot
+  data <- data %>% group_by(alias) %>% mutate(value.mean = mean(value[value > 0]))
+  #(5) Create the plot object
+  p <- ggplot(data, aes(y=value, 
+                        x=COUNTRY_NAME, 
+                        #Highlight some countries of interest
+                        fill=factor(ifelse(COUNTRY_CODE %in% country_codes_to_highlight, "Highlighted", "Normal")))) + 
+  geom_bar(position="dodge", stat="identity") +
+  #Choosing highlighted and normal color
+  scale_fill_manual(name = "Country", values=c(highlight_color, normal_color)) + 
+  #Adding the horizontal line for the mean
+  geom_hline(aes(yintercept=value.mean, group = indicator_label_standard), color = normal_color, size=0.3, linetype="dotted") +
+  geom_text(aes(label = COUNTRY_CODE),
+    angle    = 90,
+    position = position_dodge(width = 0.9),
+    hjust    = -0.05,
+    size     = 2
+  ) +
+  facet_grid(rows = vars(indicator_label_standard), scales = "free") +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+        strip.text.x = element_text(size = 6), strip.text.y = element_text(size = 6),
+        panel.background = element_rect(fill = "white")
+        )
+  
+  return(p)
+}
+```
+
+- Plotting data by category (means shown as dotted horizontal line, 4 countries chosen for reference)
+
+```{r 4.05.02, echo = FALSE, eval = TRUE, fig.height = 7, fig.width = 10}
+cat1.1.v.indicators <- c("1_1_chws_p1k", "1_1_num_anaesthesiologists", "1_1_nurses_midwives_p100k", "1_1_physicians_p100k", "1_1_surgical_workforce_p100k") 
+
+cat1.2.v.indicators <- c("1_2_health_centers_p100k", "1_2_hospital_beds_p100k", "1_2_hospitals_p100k", "1_2_p_ambulance", "1_2_special_hospitals_p100k")
+
+cat1.3.v.indicators <- c("1_3_ct_machines_p_million", "1_3_mri_machines_p_million", "1_3_num_lab_scientists", "1_3_num_lab_techs")
+
+cat1.4.v.indicators <- c("1_4_p_births_att_by_skill", "1_4_p_complete_of_death_reg", "1_4_p_full_vacc_1yos", "1_4_p_pneum_care_access", "1_4_p_vacc_measles", "1_4_surgical_proc_p100k")
+
+cat2.1.v.indicators <- c("2_1_inc_malaria_p1k_at_risk", "2_1_inc_tuberculosis_p100k", "2_1_num_measles_cases", "2_1_prev_hiv_15_49_yos")
+
+cat2.2.v.indicators <- c("2_2_ncd_mort_a_s_asthma", "2_2_ncd_mort_a_s_COPD", "2_2_ncd_mort_a_s_NCDs_overall", "2_2_ncd_mort_a_s_other_resp_d", "2_2_ncd_mort_a_s_resp_infs", "2_2_prev_diabetes_20_79yos")
+
+cat2.3.v.indicators <- c("2_3_prev_anaemia_5yos", "2_3_prev_anaemia_npws", "2_3_prev_overwt_bmi25_age_st", "2_3_prev_undernourishment", "2_3_raised_bp_age_st", "2_3_raised_chol_age_st", "2_3_raised_gluc_age_st")
+
+cat2.4.v.indicators <- c("2_4_air_mort_a_s_ic_heart_dis", "2_4_air_mort_a_s_lung_cancers", "2_4_mean_pm25_exp_mean", "2_4_mean_pm25_exp_rural_areas", "2_4_mean_pm25_exp_urban_areas")
+
+cat2.5.v.indicators <- c("2_5_prev_smoking_age_st")
+
+cat2.6.v.indicators <- c("2_6_p_handwashing_at_hh_rural", "2_6_p_handwashing_at_hh_total", "2_6_p_handwashing_at_hh_urban", "2_6_wash_attr_mort_p100k")
+
+cat3.1.v.indicators <- c("3_1_hale_age_60")
+
+cat3.2.v.indicators <- c("3_2_health_exp_che_per_cap", "3_2_mdpi_attr_to_health_p", "3_2_oop_exp_vs_che_p", "3_2_p_access_elec", "3_2_p_popn_below_pov_line", "3_2_p_urb_popn_in_slums")
+```
+
+
+- Showing two categories for example:
+
+***
+
+Category 1.1.0.0: Health professional workforce
+
+- Note: For each category, can inspect the plots to identify extreme outliers as potential data entry errors or variables with a high proportion of missing data
+
+```{r 4.05.03, echo = FALSE, eval = TRUE, fig.height = 12, fig.width = 10}
+function.plot.by_SSA_country(
+  data = df.SSA[df.SSA$alias %in% cat1.1.v.indicators, ], 
+  normal_color = "#512e5f",
+  highlight_color = "#f7dc6f",
+  country_codes_to_highlight = c("MDG", "GAB", "SEN", "BDI")
+)
+```
+
+***
+
+Category 1.2.0.0: Health facility physical infrastructure capacity
+
+```{r 4.05.04, echo = FALSE, eval = TRUE, fig.height = 12, fig.width = 10}
+function.plot.by_SSA_country(
+  data = df.SSA[df.SSA$alias %in% cat1.2.v.indicators, ], 
+  normal_color = "#512e5f",
+  highlight_color = "#f7dc6f",
+  country_codes_to_highlight = c("MDG", "GAB", "SEN", "BDI")
+)
+```
+
+
+***
+
+- Changing the color scheme to green and orange, highlighting Madagascar
+```{r 4.04.08, echo = FALSE, eval = TRUE, fig.height = 18, fig.width = 10}
+function.plot.by_SSA_country(
+  data = df.SSA[df.SSA$alias %in% c("1_1_physicians_p100k", "3_2_p_popn_below_pov_line", "3_2_p_urb_popn_in_slums"), ],
+  normal_color = "#117a65",
+  highlight_color = "#e59866",
+  country_codes_to_highlight = "MDG"
+)
+```
+
+
+***
+
+##### (4.06) SSA | Heatmapping | Looking at variation within SSA
+
+
+- Ordering:
+  - Ordering countries from lowest to highest for: Health life expectancy (HALE) at age 60 (years)
+  - Ordering variables by categories
+- Color:
+  - Manually set blue to red color scheme
+
+```{r 4.06.01, echo = FALSE, eval = TRUE, fig.height = 7, fig.width = 10}
+#1 Ordering
+# Order countries from lowest to highest for: Health life expectancy (HALE) at age 60 (years) then Proportion of population below the poverty line (%)
+# Order variables by categories
+
+#2 Plot pieces
+#Legend below
+#No axis labels
+#Angle indicator labels
+
+#Facet by group
+v.group.A1 <- c("Healthy life expectancy (HALE) at 60 (in years)", "% of Popn below poverty line", "% of Urban popn living in slums")
+
+v.group.B1 <- c("NCDs overall mortality per 100 000 popn, age-standardized", "% Diabetes prevalence among ages 20-79", "% Raised glucose prevalence, age-standardized", "% Raised blood pressure prevalence, age-standardized", "% Raised cholesterol prevalence, age-standardized", "% Overweight prevalence among adults, age-standardized", "% Anemia prevalence among NPW", "% Undernourishment prevalence")
+
+v.group.B2 <- c("Annual mean PM2.5 concentration ug/m3 in urban areas", "Lung cancer air pollution mortality per 100 000 popn, age-standardized", "COPD mortality per 100 000 popn, age-standardized")
+
+v.group.B3 <- c("Resp inf mortality per 100 000 popn, age-standardized", "TB incidence per 100 000 popn", "% HIV prevalence among ages 15-49")
+
+v.group.D1 <- c("% Urban popn with handwashing facilities at home", "Nurses and midwives per 100 000 popn", "Physicians per 100 000 popn", "Hospitals per 100 000 popn", "Hospital beds 100 000 popn")
+
+v.group.E1 <- c("% Children with pneumonia symptoms taken to health facility", "% Births attended by skilled staff", "% Full immunization coverage among 1yos", "Health expenditure per capita in USD", "% Health expenditures that are out-of-pocket")
+
+p.heat.df.SSA <- df.SSA %>% mutate(
+  variable.group = case_when(
+    indicator_label_standard %in% v.group.A1 ~ "A) Demographic and socio-economic",
+    indicator_label_standard %in% v.group.B1 ~ "B) Comorbidities 1: NCDs",
+    indicator_label_standard %in% v.group.B2 ~ "B) Comorbidities 2: Respiratory and pollution",
+    indicator_label_standard %in% v.group.B3 ~ "B) Comorbidities 3: Infectious diseases",
+    indicator_label_standard %in% v.group.D1 ~ "D) Capacity to deploy prevention and treatments",
+    indicator_label_standard %in% v.group.E1 ~ "E) Healthcare access and coverage",
+    TRUE ~ NA_character_)) %>% 
+  group_by(COUNTRY_NAME) %>%
+  mutate(
+    rank.sort = percentile.rank[indicator_label_standard == "Healthy life expectancy (HALE) at 60 (in years)"]
+  )
+
+p.heat.df.SSA <- p.heat.df.SSA %>% arrange(variable.group, indicator_label_standard, rank.sort)
+p.heat.df.SSA$COUNTRY_NAME <- factor(p.heat.df.SSA$COUNTRY_NAME, 
+                                     levels = p.heat.df.SSA$COUNTRY_NAME[1:48])
+p.heat.df.SSA$indicator_label_standard <- factor(p.heat.df.SSA$indicator_label_standard, 
+                                     levels = c("Healthy life expectancy (HALE) at 60 (in years)", "% of Popn below poverty line", "% of Urban popn living in slums", "NCDs overall mortality per 100 000 popn, age-standardized", "% Diabetes prevalence among ages 20-79", "% Raised glucose prevalence, age-standardized", "% Raised blood pressure prevalence, age-standardized", "% Raised cholesterol prevalence, age-standardized", "% Overweight prevalence among adults, age-standardized", "% Anemia prevalence among NPW", "% Undernourishment prevalence", "Annual mean PM2.5 concentration ug/m3 in urban areas", "Lung cancer air pollution mortality per 100 000 popn, age-standardized", "COPD mortality per 100 000 popn, age-standardized", "Resp inf mortality per 100 000 popn, age-standardized", "TB incidence per 100 000 popn", "% HIV prevalence among ages 15-49", "% Urban popn with handwashing facilities at home", "Nurses and midwives per 100 000 popn", "Physicians per 100 000 popn", "Hospitals per 100 000 popn", "Hospital beds 100 000 popn", "% Children with pneumonia symptoms taken to health facility", "% Births attended by skilled staff", "% Full immunization coverage among 1yos", "Health expenditure per capita in USD", "% Health expenditures that are out-of-pocket"))
+
+#Colors: https://colorbrewer2.org/#type=diverging&scheme=RdYlBu&n=11
+mycolors <- rev(c('#a50026','#d73027','#f46d43','#fdae61','#fee090','#ffffbf','#e0f3f8','#abd9e9','#74add1','#4575b4','#313695'))
+
+ggplot(p.heat.df.SSA, aes(x = alias, y =COUNTRY_NAME, fill = percentile.rank)) + 
+  geom_tile() +
+  #scale_fill_viridis_c(option = "cividis") +
+  scale_fill_gradientn(colors = mycolors) +
+  facet_grid(cols = vars(variable.group), scales = "free_x") +
+  theme(legend.position = "right",
+        panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 45, size = 5.5, hjust = 0.95),
+        axis.title.x = element_blank(), axis.ticks.x = element_blank(),
+        axis.text.y = element_text(size = 6),
+        axis.title.y = element_blank(),
+        strip.text.x = element_text(size = 5.5), strip.text.y = element_text(size = 6),
+        panel.background = element_rect(fill = "white")
+        )
+```
+
+***
+
+##### (4.07) SSA | Plotting percent difference from mean
+
+- Scan vertically down across indicators to compare consistency for a country (ie, is a county consistently above average)
+
+```{r 4.07.01, echo = FALSE, eval = TRUE}
+function.plot.SSA_pct_diff <- function(data){
+  
+  #(1) Set Country Names as factors using the full list of countries
+  data$COUNTRY_NAME <- factor(data$COUNTRY_NAME, levels = c("Angola", "Benin", "Botswana", "Burkina Faso", "Burundi",
+"Cameroon", "Cape Verde", "Central African Republic", "Chad", "Comoros", "Cote d Ivoire", "Democratic Republic of the Congo", "Djibouti ", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea Bissau", "Kenya", "Lesotho", "Liberia", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Mozambique", "Namibia", "Niger", "Nigeria", "Republic of the Congo", "Rwanda", "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Tanzania", "Togo", "Uganda", "Zambia", "Zimbabwe"))
+  #(2) Set indicator_label_standard as factors using the full list of indicators
+  data$indicator_label_standard <- factor(data$indicator_label_standard, levels = c("Physicians per 100 000 popn", "Num anaesthesiologists", "Surgeons per 100 000 popn", "Nurses and midwives per 100 000 popn", "CHWs per 1000 popn", "Health centers per 100 000 popn", "Hospitals per 100 000 popn", "Spec hospitals per 100 000 popn", "Hospital beds 100 000 popn", "% injured patients transported by ambulance", "Num laboratory scientists", "Num laboratory techs", "CTs per million popn", "MRIs per million popn", "% Children with pneumonia symptoms taken to health facility", "Num surgical proc per 100 000 popn", "% completeness of death registration", "% measles immunization", "% Full immunization coverage among 1yos", "% Births attended by skilled staff", "TB incidence per 100 000 popn", "Malaria incidence per 1000 popn at risk", "% HIV prevalence among ages 15-49", "Measles numb of reported cases 2018", "Resp inf mortality per 100 000 popn, age-standardized", "NCDs overall mortality per 100 000 popn, age-standardized", "COPD mortality per 100 000 popn, age-standardized", "Asthma mort per 100 000 popn, age-standardized", "Other resp dis mort per 100 000 popn, age-standardized", "% Diabetes prevalence among ages 20-79", "% Anemia prevalence among NPW", "% Anemia prevalence among under 5yos", "% Undernourishment prevalence", "% Overweight prevalence among adults, age-standardized", "% Raised blood pressure prevalence, age-standardized", "% Raised cholesterol prevalence, age-standardized", "% Raised glucose prevalence, age-standardized", "Annual mean PM2.5 concentration ug/m3 in rural areas", "Annual mean PM2.5 concentration ug/m3 total", "Annual mean PM2.5 concentration ug/m3 in urban areas", "Lung cancer air pollution mortality per 100 000 popn, age-standardized", "Heart disease air pollution mortality per 100 000 popn, age-standardized", "% tobacco smoking, age-standardized", "% Rural popn with handwashing facilities at home", "% Total popn with handwashing facilities at home", "% Urban popn with handwashing facilities at home", "WASH attributable mortality per 100 000 population", "Healthy life expectancy (HALE) at 60 (in years)", "Health expenditure per capita in USD", "% MDPI attr to health dimension", "% Health expenditures that are out-of-pocket", "% of Popn below poverty line", "% of Popn with access to electricity", "% of Urban popn living in slums"))
+  #(3) Order by country name
+  data <- data[order(data$indicator_label_standard, data$COUNTRY_NAME), ]
+  #(3) Create the plot object
+  p <- ggplot(data, aes(y=value.pct_diff, x=COUNTRY_NAME)) +
+    geom_bar(position="dodge", stat="identity", fill = "#154360") +
+    geom_text(aes(label = COUNTRY_CODE, y = min(value.pct_diff)-7.5),
+              size     = 1.7) +
+  ylab("Percent difference from mean") +
+  theme(legend.position = "none",
+        panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 0),
+        axis.title.x = element_blank(), axis.ticks.x = element_blank(),
+        strip.text.x = element_text(size = 6), strip.text.y = element_text(size = 6),
+        panel.background = element_rect(fill = "white")
+        ) +
+  facet_grid(rows = vars(indicator_label_standard), scales = "free")
+  
+  return(p)
+}
+```
+
+- Showing the comorbidity indicators as an example
+
+```{r 4.07.02, echo = FALSE, eval = TRUE, fig.height = 24, fig.width = 10}
+df.SSA[df.SSA$indicator_label_standard %in% v.group.B1, ] %>% function.plot.SSA_pct_diff
+```
+
+***
+
+##### (4.08) SSA | XY scatters to compare variables in sub-Saharan Africa
+
+- Quadrants are highlighted by specifying which quandrant is the highest risk quadrant
+
+```{r 4.08.01, echo = FALSE, eval = TRUE}
+function.xy.by_variable <- function(data, x.var_ind_label, y.var_ind_label, risk_quadrant){
+
+  sx.data <- data %>% dplyr::filter(indicator_label_standard == x.var_ind_label)
+  sy.data <- data %>% dplyr::filter(indicator_label_standard == y.var_ind_label)
+  df1 <- data.frame(COUNTRY_NAME = sx.data$COUNTRY_NAME, x = sx.data$value, y = sy.data$value)
+  df1 <- df1 %>% dplyr::filter(x > 0) %>% dplyr::filter(y > 0)
+  #Quadrant risk
+  x.mean <- mean(df1$x)
+  y.mean <- mean(df1$y)
+  df1 <- df1 %>% mutate(
+    x_mean_comp = x - x.mean,
+    y_mean_comp = y - y.mean) %>% mutate(r.quadrant = case_when(
+      x_mean_comp >= 0 & y_mean_comp >= 0 ~ "UR",
+      x_mean_comp <  0 & y_mean_comp >= 0 ~ "UL",
+      x_mean_comp >= 0 & y_mean_comp <  0 ~ "LR",
+      x_mean_comp <  0 & y_mean_comp <  0 ~ "LL"
+    ))
+  red.dark   <- "#7b241c"
+  red.medium <- "#cd6155"
+  red.light  <- "#e6b0aa"
+  #########################LL         #LR        #UL        #UR
+  UR.quadrant_colors <- c(red.light,  red.medium, red.medium, red.dark)
+  UL.quadrant_colors <- c(red.medium, red.light,  red.dark,   red.medium)
+  LR.quadrant_colors <- c(red.medium, red.dark,   red.light,  red.medium)
+  LL.quadrant_colors <- c(red.dark,   red.medium, red.medium, red.light)
+  
+  ifelse(risk_quadrant == "UR", r.quadrant_colors <- UR.quadrant_colors,
+         ifelse(risk_quadrant == "UL", r.quadrant_colors <- UL.quadrant_colors,
+                ifelse(risk_quadrant == "LR", r.quadrant_colors <- LR.quadrant_colors, r.quadrant_colors <- LL.quadrant_colors)))
+  
+  p <- df1 %>% ggplot(aes(x = x, y = y, color = r.quadrant)) +
+    geom_point(show.legend = FALSE, size = 1) +
+    scale_colour_manual(values = r.quadrant_colors) +
+    geom_text_repel(aes(x = x,
+                        y = y,
+                        label = COUNTRY_NAME,
+                        color = r.quadrant),
+                    show.legend = FALSE,
+                    size = 2) + 
+    geom_hline(aes(yintercept=y.mean), color = red.medium, size=0.2, linetype="dotted") +
+    geom_vline(aes(xintercept=x.mean), color = red.medium, size=0.2, linetype="dotted") +
+    xlab(x.var_ind_label) +
+    ylab(y.var_ind_label) +
+    theme_bw()
+  
+  return(p)
+}
+```
+
+- Defining a function to pass an X variable and a set of Y variables
+
+```{r 4.08.02, echo = FALSE, eval = TRUE}
+#Defining a function to pass a set of X and Y vars
+function.pass_XY <- function(data, xvar, yvars, r.quads){
+  plist <- list()
+  for(i in 1:length(yvars)){
+    plist[[i]] <- function.xy.by_variable(data, x.var_ind_label = xvar, y.var_ind_label = yvars[i], risk_quadrant = r.quads[i])
+  }
+  return(plist)
+}
+
+```
+
+***
+
+Example:
+
+- **A: `% of Popn below poverty line compared against:`**
+  1. `Hospital beds 100 000 popn`
+  2. `Health expenditure per capita in USD`
+  3. `% Raised blood pressure prevalence, age-standardized`
+  4. `% Raised cholesterol prevalence, age-standardized`
+
+```{r 4.08.03, echo = FALSE, eval = TRUE, fig.height = 6, fig.width = 6, fig.align="center"}
+#Passing the data, X variable, Y variables, and risk quadrants to the pass_XY function
+lpA <- function.pass_XY(data    = df.SSA,
+                        xvar    = "% of Popn below poverty line",
+                        yvars   = c("Hospital beds 100 000 popn",
+                                    "Health expenditure per capita in USD",
+                                    "% Raised blood pressure prevalence, age-standardized",
+                                    "% Raised cholesterol prevalence, age-standardized"),
+                        r.quads = c("LR",
+                                    "LR", 
+                                    "UR",
+                                    "UR"))
+
+for(i in 1:length(lpA)){plot(lpA[[i]])}
+```
+
+***
+
+- **B: `% of Urban popn living in slums`**
+  1. `% Urban popn with handwashing facilities at home`
+  2. `% Full immunization coverage among 1yos`
+  3. `TB incidence per 100 000 popn`
+  4. `COPD mortality per 100 000 popn, age-standardized`
+
+```{r 4.08.04, echo = FALSE, eval = TRUE, fig.height = 6, fig.width = 6, fig.align="center"}
+#unique(df.SSA$indicator_label_standard)
+lpB <- function.pass_XY(data    = df.SSA,
+                        xvar    =   "% of Urban popn living in slums",
+                        yvars   = c("% Urban popn with handwashing facilities at home",
+                                    "% Full immunization coverage among 1yos",
+                                    "TB incidence per 100 000 popn",
+                                    "COPD mortality per 100 000 popn, age-standardized"),
+                        r.quads = c("LR",
+                                    "LR", 
+                                    "UR",
+                                    "UR"))
+for(i in 1:length(lpB)){plot(lpB[[i]])}
+```
+
+
+***
+
+- **`C: % Urban popn with handwashing facilities at home`**
+  1. `Hospital beds 100 000 popn`
+  2. `COPD mortality per 100 000 popn, age-standardized`
+  3. `% Raised blood pressure prevalence, age-standardized`
+  4. `Healthy life expectancy (HALE) at 60 (in years)`
+
+```{r 4.08.05, echo = FALSE, eval = TRUE, fig.height = 6, fig.width = 6, fig.align="center"}
+#unique(df.SSA$indicator_label_standard)
+lpC <- function.pass_XY(data    = df.SSA,
+                        xvar    =   "% Urban popn with handwashing facilities at home",
+                        yvars   = c("Hospital beds 100 000 popn",
+                                    "COPD mortality per 100 000 popn, age-standardized",
+                                    "% Raised blood pressure prevalence, age-standardized",
+                                    "Healthy life expectancy (HALE) at 60 (in years)"),
+                        r.quads = c("LL",
+                                    "UL", 
+                                    "UL",
+                                    "LL"))
+for(i in 1:length(lpC)){plot(lpC[[i]])}
+```
+
+***
+
+- **D: Demography: `Healthy life expectancy (HALE) at 60 (in years)`**
+  1. `Physicians per 100 000 popn`
+  2. `Hospitals per 100 000 popn`
+  3. `Hospital beds 100 000 popn`
+  4. `Health expenditure per capita in USD`
+
+```{r 4.08.06, echo = FALSE, eval = TRUE, fig.height = 6, fig.width = 6, fig.align="center"}
+#unique(df.SSA$indicator_label_standard)
+lpD <- function.pass_XY(data    = df.SSA,
+                        xvar    =   "Healthy life expectancy (HALE) at 60 (in years)",
+                        yvars   = c("Physicians per 100 000 popn",
+                                    "Hospitals per 100 000 popn",
+                                    "Hospital beds 100 000 popn",
+                                    "Health expenditure per capita in USD"),
+                        r.quads = c("LR",
+                                    "LR", 
+                                    "LR",
+                                    "LR"))
+for(i in 1:length(lpD)){plot(lpD[[i]])}
+```
+
+
+
+
+

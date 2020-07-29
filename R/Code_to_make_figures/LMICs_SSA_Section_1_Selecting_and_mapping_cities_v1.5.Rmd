@@ -1,0 +1,197 @@
+---
+title: "SARS-CoV-2 and LMICs: Risk Tiering in Africa v1.5"
+author: "Benny Rice"
+date: "6/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = FALSE)
+```
+
+***
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+## HEADER INFO
+
+**Metcalf Lab | Department of Ecology and Evolutionary Biology | Princeton University**
+
+- April-June 2020
+- Code associated with project aimed at predicting COVID-19 burden in LMICs, in particular sub-Saharan Africa
+- Apologies in advance for amateurish code (ie all the loops and clunkiness)
+
+</div>
+
+***
+
+##### (i) SET UP
+
+Defining main working directory, loading necessary packages
+```{r define mainDir + packages, echo = FALSE, eval = TRUE, message = FALSE}
+mainDir <- '/Users/blrice/Dropbox/Lab Projects/1 Post Doc/9 THE RONA/LMICs and Risk Tiering in Africa/Code/'
+library(tidyverse)
+library(RJSONIO)      #Retrieving coordinates of cities from text strings by searching OpenStreetMap
+library(kableExtra)   #For printing tables in R markdown
+library(knitr)        #For printing tables in R markdown
+library(rgho)         #Querying the WHO GHO database
+library(reshape2)     #Melting data frames as needed
+library(ggrepel)      #Plotting country names neatly
+```
+
+***
+***
+
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+### Section 1 | Retrieving coordinates of selected cities
+
+</div>
+
+***
+
+
+##### Notes:
+
+- Benny Rice | 2020 04 13
+- Using the RJSONIO package to process openstreetmap data pulled from online in RJSON format
+- Note this takes approx. 1 min to run
+
+***
+
+##### (1.01) Selecting cities in sub-Saharan Africa to include in provisional list
+
+**Criteria: Cities were include if they were**
+
+**(1)** The argest city in each of the 48 countries in the sub-Saharan African region as defined by [UN Stats](https://unstats.un.org/unsd/methodology/m49/)
+
+**(2)** Any of the 25 largest cities or urban agglomerations in SSA not already in the above list. Provisionally these were pulled from [Wikipedia](https://en.wikipedia.org/wiki/List_of_urban_agglomerations_in_Africa)
+
+This added the cities:
+
+1. Lubumbashi, Democratic Republic of the Congo
+2. Kumasi, Ghana
+3. Abuja, Nigeria
+4. Kano, Nigeria
+5. Ibadan, Nigeria
+6. Port Harcourt, Nigeria
+7. Cape Town, South Africa
+8. Durban, South Africa
+9. Pretoria, South Africa
+
+**(3)** Any cities in SSA not already in the above list that had an airport among the 30 busiest (in terms of passengers per year) in Africa. Provisionally these were pulled from [Wikipedia](https://en.wikipedia.org/wiki/List_of_the_busiest_airports_in_Africa)
+
+This added the cities:
+
+1. Port Elizabeth, South Africa
+
+##### For a total of **`58`** cities selected
+
+***
+
+##### (1.02) If needed, reading in from a csv with columns for `City` and `Country` and finding associated coordinates
+
+(1.02.01) Reading in a city list
+```{r 1.02.01, echo = FALSE, eval = FALSE}
+# filename.cities_list <- "20200413 cities list_provisional.csv"
+# df.cities_list <- read.csv(file.path(mainDir, filename.cities_list), stringsAsFactors = FALSE)
+```
+
+(1.02.02) Writing a function `function.get_coords` that takes a data frame with columns for `City` and `Country`. Note the need to specify the country as in some cases searches with city names result in multiple cities from different countries
+```{r 1.02.02, echo = FALSE, eval = FALSE}
+#Defining function.get_coords that takes a data frame as input
+#url = "http://nominatim.openstreetmap.org/search?city="+CityName+"&country="+CountryName+"&limit=9&format=json"
+function.get_coords <- function(in.df){
+  v.lats <- rep(NA, length(in.df$City))
+  v.lons <- rep(NA, length(in.df$City))
+  for(i in 1:length(in.df$City)){
+    url <- paste(
+      "http://nominatim.openstreetmap.org/search?",
+      "city=",
+      #Using gsub to replace spaces with "%20"
+      gsub(' ', '%20', in.df$City[i]),
+      "&country=",
+      gsub(' ', '%20', in.df$Country[i]),
+      "&limit=9&format=json",
+      sep="")
+    x <- fromJSON(url)
+    v.lats[i] <- x[[1]]$lat
+    v.lons[i] <- x[[1]]$lon
+  }
+  out.df <- data.frame(Country = in.df$Country, City = in.df$City, Latitude = v.lats, Longitude = v.lons)
+  #Output a dataframe with latitude and longitude columns appended
+  return(out.df)
+}
+```
+
+(1.02.03) Calling `function.get_coords` on selected cities
+
+Note this takes surprisingly long (maybe from having to load 58 webpages? maybe from the silly loop? who knows): Takes approx. 60 seconds
+```{r 1.02.03, echo = FALSE, eval = FALSE}
+# df.cities_list_w_coords <- function.get_coords(df.cities_list)
+```
+
+(1.02.04) Printing the list of cities and coordinates as a table for a sanity check
+```{r 1.02.04, echo = FALSE, eval = FALSE}
+# kable(df.cities_list_w_coords, caption = "Selected cities and coordinates") %>% 
+#   kable_styling(bootstrap_options = c("striped", "hover"), font_size = 10) %>% 
+#   scroll_box(width = "100%", height = "300px")
+```
+
+(1.02.05) If needed, exporting as a CSV
+```{r 1.02.05, echo = FALSE, eval = FALSE}
+# write.csv(df.cities_list_w_coords, "20200413 cities list_provisional_w_coords.csv", row.names=FALSE)
+```
+
+***
+
+##### (1.03) If available, reading in a previously made csv with `Latitude` and `Longitude` data for select cities
+
+(1.03.01) Reading in csv
+```{r 1.03.01, echo = FALSE, eval = TRUE}
+filename.cities_list_w_coords <- "20200413 cities list_provisional_w_coords.csv"
+df.premade_cities_list_w_coords <- read.csv(file.path(mainDir, filename.cities_list_w_coords), stringsAsFactors = FALSE)
+```
+
+(1.03.02) Printing a table of cities and coordinates
+```{r 1.03.02, echo = FALSE, eval = TRUE}
+kable(df.premade_cities_list_w_coords, caption = "Selected cities and coordinates") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"), font_size = 10) %>% 
+  scroll_box(width = "100%", height = "300px")
+```
+
+***
+
+##### (1.04) Plotting selected cities on a map
+```{r 1.04, echo = FALSE, eval = TRUE, fig.height = 7, fig.width = 10}
+#Cleaning up country names to match map_data()
+v.Countries <- unique(df.premade_cities_list_w_coords$Country)
+v.Countries[v.Countries == "Congo"]         <- "Republic of Congo"
+v.Countries[v.Countries == "Cote d'Ivoire"] <- "Ivory Coast"
+v.Countries[v.Countries == "Eswatini"]      <- "Swaziland"
+#Getting the map data for SSA countries
+Africa <- map_data("world", region = v.Countries)
+#Plotting the map
+ggplot() + 
+  geom_polygon(data = Africa, aes(x=long, y = lat, group = group)) + 
+  coord_fixed(1) +
+  geom_point(data = df.premade_cities_list_w_coords, 
+             aes(x = Longitude, y = Latitude), 
+             color = "yellow", size = 1, shape = 1) +
+  theme(panel.grid = element_blank(),
+        axis.title.x = element_blank(), axis.text.x = element_blank(),
+        axis.title.y = element_blank(), axis.text.y = element_blank(),
+        panel.background = element_rect(fill = "white"))
+```
+
+***
+
+**END** Section 1
+
+
+

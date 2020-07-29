@@ -1,0 +1,185 @@
+---
+title: "SARS-CoV-2 and LMICs: Risk Tiering in Africa v1.5"
+author: "Benny Rice"
+date: "6/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = FALSE)
+```
+
+***
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+## HEADER INFO
+
+**Metcalf Lab | Department of Ecology and Evolutionary Biology | Princeton University**
+
+- April-June 2020
+- Code associated with project aimed at predicting COVID-19 burden in LMICs, in particular sub-Saharan Africa
+- Apologies in advance for amateurish code (ie all the loops and clunkiness)
+
+</div>
+
+***
+
+##### (i) SET UP
+
+Defining main working directory, loading necessary packages
+```{r define mainDir + packages, echo = FALSE, eval = TRUE, message = FALSE}
+mainDir <- '/Users/blrice/Dropbox/Lab Projects/1 Post Doc/9 THE RONA/LMICs and Risk Tiering in Africa/Code/'
+library(tidyverse)
+library(RJSONIO)      #Retrieving coordinates of cities from text strings by searching OpenStreetMap
+library(kableExtra)   #For printing tables in R markdown
+library(knitr)        #For printing tables in R markdown
+library(rgho)         #Querying the WHO GHO database
+library(reshape2)     #Melting data frames as needed
+library(ggrepel)      #Plotting country names neatly
+```
+
+
+***
+***
+
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+### Section 2 | Screening WHO GHO for available data on relevant indicators of SARS-CoV-2 risk
+
+</div>
+
+***
+
+##### Notes:
+
+- Benny Rice | 2020 04 18
+- Using the [rgho package](https://rdrr.io/cran/rgho/f/README.md) to search for reference codes in the WHO GHO database 
+- Generating URLs to download data from online databases using the corresponding reference codes 
+
+***
+
+##### (2.01) Data Sources
+
+Potentially relevant indicators were identified from:
+
+1. The World Health Organization (WHO) Global Health Observatory (GHO) [indicators](https://www.who.int/data/gho/data/indicators)
+2. World Bank [indicators](https://data.worldbank.org/indicator?tab=all)
+3. United Nations Development Programme (UNDP) Human Development Data [indicators](http://hdr.undp.org/en/data)
+
+- The list of indicators (across all fields) were scanned for those with potential relevance to aspects of healthcare capacity, comorbidities, and potential risk factors pertinent to SARS-CoV-2
+  - An initial list `241` indicators was identified on `13 April 2020`
+  - Of these, a subset of `45` indicators hypothesized to have the most direct relevance for SARS-CoV-2 risk were identified on `16 April 2020`
+    - Reference codes specifying the data sets' name and location within overall databases were obtained
+    - Using the reference codes, the data sets' for these `45` indicators were downloaded on `18 April 2020`
+- After screening, indicators were listed in file `20200425 Publicly available data.csv` with descriptions and URLs linking to the data sources
+
+***
+
+##### (2.02) Obtaining data base reference codes needed to download data from sources
+
+(2.02.01) Reference codes for WHO GHO Data
+
+Using the `rgho` package to identify reference codes in the WHO GHO database
+```{r 2.02.01, echo = FALSE, eval = FALSE}
+# rgho package: https://rdrr.io/cran/rgho/f/README.md
+
+#rgho vignettes available:
+# vignette("a-intro", "rgho")
+# vignette("b-dimensions", "rgho")
+
+#List all codes:
+# vignette("c-codes-gho", "rgho")
+```
+
+(2.02.02) Writing custom functions to use `search_codes()` and `get_gho_data()` the `rgho` package
+```{r 2.02.02, echo = FALSE, eval = TRUE}
+#search_txt specifies a text string search term(s): "handwashing" shown as an example below
+
+#Writing a function to display the search hits along with numbers of data rows and columns
+functon.search_hits <- function(search_txt){
+  #Again search_codes() to search the GHO repository
+  search_results <- search_codes(search_txt, dimension = "GHO")
+  #Extracting "label", and "code" to make a table summarizing search results
+  #Note that search queries often return multiple hits
+  attr.labels    <- attributes(search_results)
+  v.labels       <- attr.labels$label
+  attr.codes     <- attr(search_results, 'attrs')
+  v.codes        <- attr.codes$code
+  #Downloading data with the get_gho_data() function
+  #Inputting a vector containing search results codes
+  n_data_rows <- rep(NA, length(v.codes))
+  n_data_cols <- rep(NA, length(v.codes))
+  for(i in 1:length(v.codes)){
+    v.dims <- dim(get_gho_data(dimension = "GHO", code = v.codes[i]))
+    n_data_rows[i] <- v.dims[1]
+    n_data_cols[i] <- v.dims[2]
+  }
+  df.search_hits <- data.frame(
+    hit_num     = 1:length(v.codes),
+    label       = v.labels, 
+    code        = v.codes,
+    n_data_cols = n_data_cols,
+    n_data_rows = n_data_rows
+  )
+  return(df.search_hits)
+}
+
+#Writing a function to get the data for each search result and store as a list
+functon.get_gho_data <- function(search_txt){
+  #search_codes() to search the GHO repository
+  search_results <- search_codes(search_txt, dimension = "GHO")
+  #Search results are outputted as gho objects - atomic vectors with attributes
+  #Extracting "code" to input to get_gho_data() to download data
+  #Note that search queries often return multiple hits
+  attr.codes     <- attr(search_results, 'attrs')
+  search_results.codes <- attr.codes$code
+  #Downloading data with the get_gho_data() function
+  #Inputting a vector containing search results codes
+  #Outputting a list of dataframes
+  l.search_results <- list()
+  for(i in 1:length(search_results.codes)){
+    l.search_results[[i]] <- get_gho_data(dimension = "GHO", code = search_results.codes[i])
+  }
+  return(l.search_results)
+}
+```
+
+***
+
+(2.02.03) Using `handwashing` as an example
+```{r 2.02.03, echo = FALSE, eval = TRUE}
+#Specify text string search term(s): "handwashing" shown for example
+search_txt <- "handwashing"
+
+#Calling functon.search_hits to functon.get_gho_data to download the WHO GHO data and store as a list
+df.search_hits   <- functon.search_hits(search_txt)
+l.search_results <- functon.get_gho_data(search_txt)
+```
+
+(2.02.04) Reviewing the `search_hits` for handwashing
+```{r 2.02.04, echo = FALSE, eval = TRUE}
+kable(df.search_hits, caption = "Table 2.02.4A: Search hits for `handwashing`") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"), font_size = 10)
+```
+
+***
+
+(2.02.04) Getting data for the selected search hit for `handwashing` (here hit 4 is the only hit with more than 10 data rows)
+
+```{r 2.02.05, echo = FALSE, eval = TRUE}
+#Reviewing data for the selected search hit (hit 4)
+df.search_results4 <- l.search_results[[4]]
+df.search_results4 <- df.search_results4[order(df.search_results4$REGION, df.search_results4$COUNTRY),]
+kable(df.search_results4, caption = "Table 2.02.4B: Population with basic handwashing facilities at home (%)") %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"), font_size = 8) %>% scroll_box(width = "100%", height = "300px")
+```
+
+***
+
+**END** Section 2
