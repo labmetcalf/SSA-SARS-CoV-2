@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------- #
-#' Figure S3: NCDS vs. Age   
+#' Figure S6: NCDS vs. Age from IHME data
 # ---------------------------------------------------------------------------- #
 
 # Packages
@@ -10,8 +10,8 @@ library(mgcv)
 library(here)
 
 # Data
-iso_codes <- read_csv(here("data/Data/iso_codes.csv"))
-ncds <- read_csv(here("data/processed/ihme_cleaned.csv"))
+iso_codes     <- read_csv(here("data/Data/iso_codes.csv"))
+ncds          <- read_csv(here("data/processed/ihme_cleaned.csv"))
 ssa_countries <- read_csv(here("data/processed/ssa_countries.csv"))
 
 # Fit ncd mortality/prevalence to ifr ests --------------------------------
@@ -30,11 +30,12 @@ ncds %>%
 country_cols <- c("#1b9e77", "#d95f02", "#7570b3")
 names(country_cols) <- c("Italy", "China", "France")
 
-# Supplementary Figure: look at deaths & prev for the 4 main ones  ----------------------------
+# Supplementary Figure: look at deaths & prev for 4 main NCDs  ----------------------------
 ncds %>%
   pivot_longer(`Diabetes mellitus`:`Chronic respiratory diseases (-Asthma)`, 
                names_to = "cause") -> ncds_long
 
+# For plotting, not including neoplasms
 ggplot(data = filter(ncds_long, measure_name == "Deaths" & cause != "Neoplasms"), 
        aes(x = reorder(age_name, age_mid), 
            y = value, group = location_name)) +
@@ -64,5 +65,5 @@ ncds_long %>%
   filter(age_name == "50 to 54") -> compare_deaths_at_50
 
 # save them
-ggsave(here("Figures/Fig S2 20200727.pdf"), sfig_ncds_age, device = "jpeg", height = 8, width = 5)
+# ggsave(here("Figures/Fig S6 20200727.pdf"), sfig_ncds_age, device = "jpeg", height = 8, width = 5)
 
