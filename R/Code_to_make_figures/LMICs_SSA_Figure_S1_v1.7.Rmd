@@ -1,7 +1,7 @@
 ---
-title: "SARS-CoV-2 and LMICs: Risk Tiering in Africa v1.7"
+title: "SARS-CoV-2 and LMICs: Risk Tiering in Africa"
 author: "Benny Rice"
-date: "6/30/2020"
+date: "9/24/2020"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -24,6 +24,7 @@ div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
 - April-June 2020
 - Code associated with project aimed at predicting COVID-19 burden in LMICs, in particular sub-Saharan Africa
 - Apologies in advance for amateurish code (ie all the loops and clunkiness)
+- Updated September 24, 2020 during revisions
 
 </div>
 
