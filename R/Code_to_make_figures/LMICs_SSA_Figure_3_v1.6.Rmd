@@ -224,20 +224,29 @@ predict_ifr <- function(predictor, gam = ifr_fit_age) {
 #Creating a ifr by age table for plotting
 age_ifrs <- data.frame(age = seq(1, 100, by = 1))
 age_ifrs %>%
-  mutate(ifr_by_age       = predict_ifr(predictor = age,      gam = ifr_fit_age), 
-         ifr_by_ageplus2  = predict_ifr(predictor = age + 2,  gam = ifr_fit_age),
-         ifr_by_ageplus5  = predict_ifr(predictor = age + 5,  gam = ifr_fit_age),
-         ifr_by_ageplus10 = predict_ifr(predictor = age + 10, gam = ifr_fit_age)) %>%
+  mutate(ifr_by_age        = predict_ifr(predictor = age,      gam = ifr_fit_age), 
+         ifr_by_ageplus2   = predict_ifr(predictor = age + 2,  gam = ifr_fit_age),
+         ifr_by_ageplus5   = predict_ifr(predictor = age + 5,  gam = ifr_fit_age),
+         ifr_by_ageplus10  = predict_ifr(predictor = age + 10, gam = ifr_fit_age),
+         ifr_by_ageminus2  = predict_ifr(predictor = age - 2,  gam = ifr_fit_age),
+         ifr_by_ageminus5  = predict_ifr(predictor = age - 5,  gam = ifr_fit_age),
+         ifr_by_ageminus10 = predict_ifr(predictor = age - 10, gam = ifr_fit_age)) %>%
   pivot_longer(starts_with("ifr"), names_to = "ifr_type", values_to = "ifr_est") -> ages_to_plot
 #Setting colors
-ifr_cols <- c("ifr_by_age"       = "black", 
-              "ifr_by_ageplus2"  = "darkgray", 
-              "ifr_by_ageplus5"  = "darkgray", 
-              "ifr_by_ageplus10" = "darkgray")
+ifr_cols <- c("ifr_by_age"        = "black", 
+              "ifr_by_ageplus2"   = "gray", 
+              "ifr_by_ageplus5"   = "gray", 
+              "ifr_by_ageplus10"  = "gray",
+              "ifr_by_ageminus2"  = "gray",
+              "ifr_by_ageminus5"  = "gray",
+              "ifr_by_ageminus10" = "gray")
 ifr_labs <- c("Baseline", 
               "Shifted (2y younger)", 
               "Shifted (5y younger)", 
-              "Shifted (10y younger)")
+              "Shifted (10y younger)",
+              "Shifted (2y older)",
+              "Shifted (5y older)",
+              "Shifted (10y older)")
 names(ifr_labs) <- names(ifr_cols)
 #Plotting
 ggplot(data = ages_to_plot, aes(x = age, y = ifr_est, group = ifr_type)) +
@@ -251,8 +260,6 @@ ggplot(data = ages_to_plot, aes(x = age, y = ifr_est, group = ifr_type)) +
 ```
 
 - Cleaning up UN age data
-  - **FIX** Tanzania and Tunisia are confused in the UN data
-  - **FIX** Swaziland / Eswatini age data are missing
   - Matching country names and country codes (iso) with those used elsewhere
   - Shortening names for easier plotting
 
@@ -274,10 +281,13 @@ un_ages$COUNTRY_NAME[un_ages$COUNTRY_NAME == "Central African Republic"]        
 
 ```{r 2.04, echo = FALSE, eval = TRUE}
 burden_by_age <- un_ages %>%
-  mutate(ifr_by_age       = predict_ifr(predictor = age,      gam = ifr_fit_age), 
-         ifr_by_ageplus2  = predict_ifr(predictor = age + 2,  gam = ifr_fit_age),
-         ifr_by_ageplus5  = predict_ifr(predictor = age + 5,  gam = ifr_fit_age),
-         ifr_by_ageplus10 = predict_ifr(predictor = age + 10, gam = ifr_fit_age), 
+  mutate(ifr_by_age        = predict_ifr(predictor = age,      gam = ifr_fit_age), 
+         ifr_by_ageplus2   = predict_ifr(predictor = age + 2,  gam = ifr_fit_age),
+         ifr_by_ageplus5   = predict_ifr(predictor = age + 5,  gam = ifr_fit_age),
+         ifr_by_ageplus10  = predict_ifr(predictor = age + 10, gam = ifr_fit_age),
+         ifr_by_ageminus2  = predict_ifr(predictor = age - 2,  gam = ifr_fit_age),
+         ifr_by_ageminus5  = predict_ifr(predictor = age - 5,  gam = ifr_fit_age),
+         ifr_by_ageminus10 = predict_ifr(predictor = age - 10, gam = ifr_fit_age), 
          pop_over_50      = ifelse(age > 50, pop, 0)) %>%
   pivot_longer(starts_with("ifr"), names_to = "ifr_type", values_to = "ifr_est") %>%
   mutate(burden = ifr_est*pop*0.2) %>%
@@ -295,8 +305,8 @@ burden_by_age <- un_ages %>%
 
 ```{r 2.04, echo = FALSE, eval = TRUE}
 ggplot(data = burden_by_age, aes(x = reorder(COUNTRY_NAME, demo.rank_for_plotting), group = COUNTRY_CODE)) +
-  geom_point(aes(y = burden_age/pop*1e5, color = ifr_type)) +
   geom_line(aes(y = burden_age/pop*1e5), color = "darkgray") +
+  geom_point(aes(y = burden_age/pop*1e5, color = ifr_type)) +
   coord_flip() +
   scale_color_manual(values = ifr_cols, labels = ifr_labs,
                      name = "Predictor of IFR") +
