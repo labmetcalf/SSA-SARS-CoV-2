@@ -1,7 +1,7 @@
 ---
-title: "SARS-CoV-2 and LMICs: Risk Tiering in Africa v1.6"
+title: "SARS-CoV-2 and LMICs: Risk Tiering in Africa"
 author: "Benny Rice"
-date: "6/19/2020"
+date: "9/26/2020"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -24,6 +24,7 @@ div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
 - April-June 2020
 - Code associated with project aimed at predicting COVID-19 burden in LMICs, in particular sub-Saharan Africa
 - Apologies in advance for amateurish code (ie all the loops and clunkiness)
+- Updated 2020 September 26 during revisions to explore IFR scenarios where IFRs decreased in SSA
 
 </div>
 
@@ -31,9 +32,8 @@ div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
 
 ##### (i) SET UP
 
-Defining main working directory, loading necessary packages
+Loading packages
 ```{r define mainDir + packages, echo = FALSE, eval = TRUE, message = FALSE}
-mainDir <- '/Users/blrice/Dropbox/Lab Projects/1 Post Doc/9 THE RONA/LMICs and Risk Tiering in Africa/Code/'
 library(tidyverse)
 library(RJSONIO)      #Retrieving coordinates of cities from text strings by searching OpenStreetMap
 library(kableExtra)   #For printing tables in R markdown
@@ -58,23 +58,22 @@ Reading in data sets:
 
 ```{r i2, echo = FALSE, eval = TRUE}
 #1
-filename.ifr_ests <- "ifrs_from_lit.csv"
-ifr_ests <- read.csv(file.path(mainDir, filename.ifr_ests), stringsAsFactors = FALSE)
+ifr_ests <- read_csv(here("data/Data/ifrs_from_lit.csv"))
+
 #2
-filename.un_ages <- "un_ages.csv"
-un_ages <- read.csv(file.path(mainDir, filename.un_ages), stringsAsFactors = FALSE)
+un_ages <- read_csv(here("data/Data/un_ages.csv"))
+
 #3
-filename.iso_codes <- "iso_codes.csv"
-iso_codes <- read.csv(file.path(mainDir, filename.iso_codes), stringsAsFactors = FALSE)
+iso_codes <- read_csv(here("data/Data/iso_codes.csv"))
+
 #4
-filename.hosp_ests <- "hosp_from_salje.csv"
-hosp_ests <- read.csv(file.path(mainDir, filename.hosp_ests), stringsAsFactors = FALSE)
+hosp_ests <- read_csv(here("data/Data/hosp_from_salje.csv"))
+
 #5
-filename.df.SSA <- "SSA_2020_06_14_WHO_WBK_UNDP_indicators.csv"
-df.SSA <- read.csv(file.path(mainDir, filename.df.SSA), stringsAsFactors = FALSE)
+df.SSA <- read_csv(here("data/Data/SSA_2020_06_14_WHO_WBK_UNDP_indicators.csv"))
+
 #6
-filename.metadata <- "METADATA_2020_07_03_SSA_indicators.csv"
-metadata <- read.csv(file.path(mainDir, filename.metadata), stringsAsFactors = FALSE)
+metadata <- read_csv(here("data/Data/METADATA_2020_07_03_SSA_indicators.csv"))
 ```
 
 Pasting country codes and names:

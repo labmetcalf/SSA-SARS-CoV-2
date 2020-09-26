@@ -32,7 +32,7 @@ div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
 
 ##### (i) SET UP
 
-Defining main working directory, loading necessary packages
+Loading packages
 ```{r i1, echo = FALSE, eval = TRUE, message = FALSE}
 library(tidyverse)
 library(RJSONIO)      #Retrieving coordinates of cities from text strings by searching OpenStreetMap
