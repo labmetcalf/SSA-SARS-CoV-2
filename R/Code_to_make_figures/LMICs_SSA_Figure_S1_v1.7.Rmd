@@ -188,11 +188,24 @@ df.plot$COUNTRY_NAME[df.plot$COUNTRY_NAME == "Central African Republic"]        
 
 ```{r 1.02, echo = FALSE, eval = TRUE}
 #Trimming out columns from Africa CDC data entry
-df.plot <- df.plot %>% 
+## SEPTEMBER DATA ##
+df.plot.sept <- df.plot %>% 
   select("COUNTRY_NAME", "COUNTRY_CODE", "cases_20200923", "deaths_20200923", "tests_20200923", "popn")
-names(df.plot) <- c("COUNTRY_NAME", "COUNTRY_CODE", "cases", "deaths", "tests", "popn")
+names(df.plot.sept) <- c("COUNTRY_NAME", "COUNTRY_CODE", "cases", "deaths", "tests", "popn")
 #Calculating cases and tests per 100,000 popn, positivity, cfr
-df.plot <- df.plot %>% mutate(
+df.plot.sept <- df.plot.sept %>% mutate(
+  cases_p100k  = cases/popn*100000,
+  deaths_p100k = deaths/popn*100000,
+  tests_p100k  = tests/popn*100000,
+  positivity   = cases/tests*100,
+  cfr          = deaths/cases*100)
+
+## JUNE DATA ##
+df.plot.june <- df.plot %>% 
+  select("COUNTRY_NAME", "COUNTRY_CODE", "cases_20200628", "deaths_20200628", "tests_20200628", "popn")
+names(df.plot.june) <- c("COUNTRY_NAME", "COUNTRY_CODE", "cases", "deaths", "tests", "popn")
+#Calculating cases and tests per 100,000 popn, positivity, cfr
+df.plot.june <- df.plot.june %>% mutate(
   cases_p100k  = cases/popn*100000,
   deaths_p100k = deaths/popn*100000,
   tests_p100k  = tests/popn*100000,
@@ -236,7 +249,8 @@ function.ps1a <- function(data){
 - Plotting:
 
 ```{r 2.02, echo = FALSE, eval = TRUE, warning = FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
-df.plot %>% function.ps1a
+df.plot.june %>% function.ps1a
+df.plot.sept %>% function.ps1a
 ```
 
 ***
@@ -279,7 +293,8 @@ function.ps1b <- function(data){
 - Plotting:
 
 ```{r 2.04, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10, fig.align = "center"}
-df.plot %>% function.ps1b
+df.plot.june %>% function.ps1b
+df.plot.sept %>% function.ps1b
 ```
 
 ***
@@ -292,8 +307,10 @@ cor(df.plot$tests, df.plot$cases, method="pearson")
 #Correlation p value
 cor.test(df.plot$tests, df.plot$cases, method="pearson")
 #Linear regression
-m1 <- lm(formula = cases ~ tests, data = df.plot)
-summary(m1)
+m1.june <- lm(formula = cases ~ tests, data = df.plot.june)
+summary(m1.june)
+m1.sept <- lm(formula = cases ~ tests, data = df.plot.sept)
+summary(m1.sept)
 ```
 
 
@@ -348,7 +365,8 @@ function.ps1c <- function(data){
 - Plotting:
 
 ```{r 2.07, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10, fig.align = "center"}
-df.plot %>% function.ps1c
+df.plot.june %>% function.ps1c
+df.plot.sept %>% function.ps1c
 ```
 
 ***
@@ -467,7 +485,7 @@ Function inputs
   - `n_infs = total_deaths / P(death|n_infs = 1)`
 
 ```{r 5.01, echo = FALSE, eval = TRUE}
-f.popn_specific_ifr <- function(demo.age.str){
+f.popn_specific_ifr.drr <- function(demo.age.str, ifr_shift = 0){
   
   inf.age.str <- inf.even
 
@@ -481,7 +499,7 @@ f.popn_specific_ifr <- function(demo.age.str){
     mutate(pop.inf = prop.s * 1)
   #Calculating the number of deaths expected per age for the specified IFR scenario
   df.expected_deaths <- df.pop %>%
-    mutate(ifr_by_age = predict_ifr(predictor = age, gam = ifr_fit_age)) %>%
+    mutate(ifr_by_age = predict_ifr(predictor = age + ifr_shift, gam = ifr_fit_age)) %>%
     pivot_longer(starts_with("ifr"), names_to = "ifr_type", values_to = "ifr_est") %>%
     mutate(deaths = ifr_est * pop.inf)
   #Summing the number of total number of deaths
@@ -498,8 +516,8 @@ f.country.demo.age.str <- function(country_code){
 }
 
 
-df.exps <- df.plot %>% group_by(COUNTRY_CODE) %>%
-  mutate(exp_death_per1inf = f.country.demo.age.str(as.character(COUNTRY_CODE)) %>% f.popn_specific_ifr) %>% 
+df.exps.drr <- df.plot %>% group_by(COUNTRY_CODE) %>%
+  mutate(exp_death_per1inf = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift = 0)) %>% 
   ungroup() %>% 
   mutate(exp_inf = 1/exp_death_per1inf * deaths) %>%
   mutate(exp_perc_inf.100R = exp_inf*(1)  / popn*100,
@@ -515,28 +533,100 @@ df.exps <- df.plot %>% group_by(COUNTRY_CODE) %>%
               "rank_for_plotting",
               "exp_death_per1inf", "exp_inf"))
 
-#Setting colors
-exp_inf_cols <- c("exp_perc_inf.100R" = "#880e4f", 
-                  "exp_perc_inf.50R"  = "#ad1457", 
-                  "exp_perc_inf.25R"  = "#ec407a", 
-                  "exp_perc_inf.10R"  = "#f48fb1")
-exp_inf_labs <- c("100%", 
-                  "50%", 
-                  "25%", 
-                  "10%")
-names(exp_inf_labs) <- names(exp_inf_cols)
+#Setting colors and labels
+exp_inf_cols.drr <- c("exp_perc_inf.100R" = "#880e4f", 
+                      "exp_perc_inf.50R"  = "#ad1457", 
+                      "exp_perc_inf.25R"  = "#ec407a", 
+                      "exp_perc_inf.10R"  = "#f48fb1")
+exp_inf_labs.drr <- c("100%", 
+                      "50%", 
+                      "25%", 
+                      "10%")
+names(exp_inf_labs.drr) <- names(exp_inf_cols.drr)
 
-df.exps %>% filter(exp_inf > 0) %>%
+df.exps.drr %>% filter(exp_inf > 0) %>%
   ggplot(aes(x = reorder(COUNTRY_NAME, rank_for_plotting), group = COUNTRY_CODE)) +
   geom_line(aes(y = value), color = "#e0e0e0") +
   geom_point(aes(y = value, color = variable)) +
   ylab("Expected cumulative % of the population infected to date \n given death reporting") +
-  scale_y_log10(labels = scales::number_format(accuracy = 0.01), breaks = c(0.01, 0.10, 1.00, 5.00, 10.00, 50.00, 100.00)) +
-  scale_color_manual(values = exp_inf_cols, labels = exp_inf_labs,
+  scale_y_log10(labels = scales::number_format(accuracy = 0.01), 
+                breaks = c(0.01, 0.10, 1.00, 5.00, 10.00, 50.00, 100.00),
+                limits = c(0.001, 100)) +
+  scale_color_manual(values = exp_inf_cols.drr, labels = exp_inf_labs.drr,
                      name = "Death reporting rate") +
   theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 9),
+        #legend.position = "none",
         axis.title.x = element_blank())
+
+
+
+
+df.exps.ifr <- df.plot %>% group_by(COUNTRY_CODE) %>%
+  mutate(exp_death_per1inf.s10 = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift = -10),
+         exp_death_per1inf.s5  = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift = -5 ),
+         exp_death_per1inf.s2  = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift = -2 ),
+         exp_death_per1inf.0   = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift =  0 ),
+         exp_death_per1inf.p2  = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift =  2 ),
+         exp_death_per1inf.p5  = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift =  5 ),
+         exp_death_per1inf.p10 = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift =  10)) %>% 
+  ungroup() %>% 
+  mutate(exp_perc_inf.s10 = 1/exp_death_per1inf.s10 * deaths / popn*100,
+         exp_perc_inf.s5  = 1/exp_death_per1inf.s5  * deaths / popn*100,
+         exp_perc_inf.s2  = 1/exp_death_per1inf.s2  * deaths / popn*100,
+         exp_perc_inf.0   = 1/exp_death_per1inf.0   * deaths / popn*100,
+         exp_perc_inf.p2  = 1/exp_death_per1inf.p2  * deaths / popn*100,
+         exp_perc_inf.p5  = 1/exp_death_per1inf.p5  * deaths / popn*100,
+         exp_perc_inf.p10 = 1/exp_death_per1inf.p10 * deaths / popn*100) %>%
+  mutate(rank_for_plotting = rank(exp_perc_inf.0, ties.method = "first")) %>%
+  melt(id = c("COUNTRY_NAME", "COUNTRY_CODE", 
+              "cases", "deaths", "tests", 
+              "popn", 
+              "cases_p100k", "deaths_p100k", "tests_p100k", 
+              "positivity", "cfr",
+              "rank_for_plotting",
+              "exp_death_per1inf.s10", "exp_death_per1inf.s5", "exp_death_per1inf.s2",
+              "exp_death_per1inf.0",
+              "exp_death_per1inf.p2", "exp_death_per1inf.p5", "exp_death_per1inf.p10"))
+
+
+#Setting colors and labels
+exp_inf_cols.ifr <- c("exp_perc_inf.s10" = "#f48fb1", 
+                      "exp_perc_inf.s5"  = "#ec407a", 
+                      "exp_perc_inf.s2"  = "#ad1457",
+                      
+                      "exp_perc_inf.0"   = "#880e4f",
+                      
+                      "exp_perc_inf.p2"  = "#ad1457", 
+                      "exp_perc_inf.p5"  = "#ec407a", 
+                      "exp_perc_inf.p10" = "#f48fb1") 
+
+exp_inf_labs.ifr <- c("-10 years", 
+                      "-5 years", 
+                      "-2 years", 
+                      "0 years", 
+                      "+2 years", 
+                      "+5 years", 
+                      "+10 years")
+
+names(exp_inf_labs.ifr) <- names(exp_inf_cols.ifr)
+
+
+df.exps.ifr %>% filter(deaths > 0) %>%
+  ggplot(aes(x = reorder(COUNTRY_NAME, rank_for_plotting), group = COUNTRY_CODE)) +
+  geom_line(aes(y = value), color = "#e0e0e0") +
+  geom_point(aes(y = value, color = variable)) +
+  ylab("Expected cumulative % of the population infected to date \n given IFR by age curve") +
+  scale_y_log10(labels = scales::number_format(accuracy = 0.01), 
+                breaks = c(0.01, 0.10, 1.00, 5.00, 10.00, 50.00, 100.00),
+                limits = c(0.001, 100)) +
+  scale_color_manual(values = exp_inf_cols.ifr, labels = exp_inf_labs.ifr,
+                     name = "IFR by age shift") +
+  theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 9),
+        #legend.position = "none",
+        axis.title.x = element_blank())
+
 ```
 
 
