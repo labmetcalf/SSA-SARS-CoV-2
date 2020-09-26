@@ -34,7 +34,6 @@ div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
 
 Defining main working directory, loading necessary packages
 ```{r i1, echo = FALSE, eval = TRUE, message = FALSE}
-mainDir <- '/Users/blrice/Dropbox/Lab Projects/1 Post Doc/9 THE RONA/LMICs and Risk Tiering in Africa/Code/'
 library(tidyverse)
 library(RJSONIO)      #Retrieving coordinates of cities from text strings by searching OpenStreetMap
 library(kableExtra)   #For printing tables in R markdown
@@ -66,16 +65,18 @@ div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
 
 Reading in data sets:
 
-1. SSA testing data: `manual_africa_cdc_data_20200629.csv`
+1. SSA testing data: `manual_africa_cdc_data_20200924.csv`
 2. UN age data: `un_ages.csv`
+3. Infection fatality ratios from the literature (e.g., Verity et al): `ifrs_from_lit.csv`
 
 ```{r i2, echo = FALSE, eval = TRUE}
 #1
-filename.df.testing <- "manual_africa_cdc_data_20200629.csv"
-df.testing <- read.csv(file.path(mainDir, filename.df.testing), stringsAsFactors = FALSE)
+df.testing <- read_csv(here("data/Data/manual_africa_cdc_data_20200924.csv"))
 #2
-filename.un_ages <- "un_ages.csv"
-un_ages <- read.csv(file.path(mainDir, filename.un_ages), stringsAsFactors = FALSE)
+un_ages <- read_csv(here("data/Data/un_ages.csv"))
+#3
+ifr_ests <- read_csv(here("data/Data/ifrs_from_lit.csv"))
+
 ```
 
 - Pasting country codes and names
@@ -187,13 +188,16 @@ df.plot$COUNTRY_NAME[df.plot$COUNTRY_NAME == "Central African Republic"]        
 
 ```{r 1.02, echo = FALSE, eval = TRUE}
 #Trimming out columns from Africa CDC data entry
-df.plot <- df.plot %>% select("COUNTRY_NAME", "COUNTRY_CODE", "cases", "deaths", "tests", "popn")
+df.plot <- df.plot %>% 
+  select("COUNTRY_NAME", "COUNTRY_CODE", "cases_20200923", "deaths_20200923", "tests_20200923", "popn")
+names(df.plot) <- c("COUNTRY_NAME", "COUNTRY_CODE", "cases", "deaths", "tests", "popn")
 #Calculating cases and tests per 100,000 popn, positivity, cfr
 df.plot <- df.plot %>% mutate(
-  cases_p100k = cases/popn*100000,
-  tests_p100k = tests/popn*100000,
-  positivity  = cases/tests*100,
-  cfr         = deaths/cases*100)
+  cases_p100k  = cases/popn*100000,
+  deaths_p100k = deaths/popn*100000,
+  tests_p100k  = tests/popn*100000,
+  positivity   = cases/tests*100,
+  cfr          = deaths/cases*100)
 ```
 
 ***
@@ -208,7 +212,7 @@ df.plot <- df.plot %>% mutate(
 
 ***
 
-- Defining a function to create the XY scatter plot
+- Defining a function to create the vertical line plot
 
 ```{r 2.01, echo = FALSE, eval = TRUE}
 function.ps1a <- function(data){
@@ -225,7 +229,6 @@ function.ps1a <- function(data){
           axis.title.y = element_text(size = 10))
   return(p)
 }
-
 ```
 
 ***
@@ -350,44 +353,193 @@ df.plot %>% function.ps1c
 
 ***
 
+***
+
+##### Section 1: Making age vs IFR curves: Fitting age to IFR estimates
 
 ***
 
-***
+- Fitting age to IFR estimates from France, Italy, China using a GAM
 
-**Figure S1 | Part D | Tests versus date of first detection**
-
-***
-
-- Defining a function to create the XY scatter plot and CFR diagonal lines
-
-```{r 2.08, echo = FALSE, eval = TRUE}
-filename.df.hop <- "Xdf.hop.csv"
-df.hop <- read.csv(file.path(mainDir, filename.df.hop), stringsAsFactors = FALSE)
-
-df.hop <- df.hop %>% filter(REGION_CODE == "SSA") %>% group_by(COUNTRY_CODE) %>% summarize(date_detect = min(DATE[CASES > 0]))
-
-df.p <- full_join(df.plot, df.hop, by = "COUNTRY_CODE")
-
-df.p %>% ggplot(aes(x = tests, y = date_detect)) +
-    geom_point(color = "#7B7B7B") +
-    geom_text_repel(aes(x = tests, 
-                  y = date_detect, 
-                  label = COUNTRY_CODE),
-              color = "#7B7B7B",
-              size = 2,
-              segment.size = 0.2,
-              point.padding	= 0.2,
-              min.segment.length = 0) +
-    scale_x_log10(labels = comma) +
-    xlab("Reported number of tests completed") +
-    ylab("Reported date of first detected cases") +
-    theme_minimal_hgrid(line_size = 0.1, color = "#E4E4E4") +
-    theme(axis.text.x = element_text(size = 7),
-        axis.text.y = element_text(size = 7),
-        axis.title.x = element_text(size = 10),
-        axis.title.y = element_text(size = 10))
+```{r 1.01, echo = FALSE, eval = TRUE}
+# Fit age to IFR estimates ------------------------------------------------
+ifr_ests$predictor <- (ifr_ests$age_lower + ifr_ests$age_upper)/2
+ifr_ests$ifr_prop_est <- ifr_ests$ifr_perc_est/100
+ifr_fit_age <- gam(ifr_prop_est ~ s(predictor), family = betar(link="logit"), 
+               data = ifr_ests, method = "REML")
+ages <- seq(0, 100, by = 1)
+ifr_preds_age <- predict(ifr_fit_age,  data.frame(predictor = ages), 
+                     type = "response", se.fit = TRUE)
+ifrs_to_plot_age <- data.frame(ages = ages,
+                               est = ifr_preds_age$fit, 
+                               upper = ifr_preds_age$fit + 2*ifr_preds_age$se.fit, 
+                               lower = ifr_preds_age$fit - 2*ifr_preds_age$se.fit)
 ```
+
+***
+
+##### Section 2: Plotting IFR curves 
+
+***
+
+- Writing a function to fit and shift IFR curves
+
+```{r 2.01, echo = FALSE, eval = TRUE}
+predict_ifr <- function(predictor, gam = ifr_fit_age){
+  predict(gam, newdata = data.frame(predictor = predictor), type = "response")
+}
+```
+
+- Plotting baseline and shifted IFR vs age curves
+
+```{r 2.02, echo = FALSE, eval = TRUE}
+#Creating a ifr by age table for plotting
+age_ifrs <- data.frame(age = seq(1, 100, by = 1))
+age_ifrs %>%
+  mutate(ifr_by_age_plus00y = predict_ifr(predictor = age + 0,  gam = ifr_fit_age), 
+         ifr_by_age_plus02y = predict_ifr(predictor = age + 2,  gam = ifr_fit_age),
+         ifr_by_age_plus04y = predict_ifr(predictor = age + 4,  gam = ifr_fit_age),
+         ifr_by_age_plus06y = predict_ifr(predictor = age + 6,  gam = ifr_fit_age),
+         ifr_by_age_plus08y = predict_ifr(predictor = age + 8,  gam = ifr_fit_age),
+         ifr_by_age_plus10y = predict_ifr(predictor = age + 10, gam = ifr_fit_age)) %>%
+  pivot_longer(starts_with("ifr"), names_to = "ifr_type", values_to = "ifr_est") %>%
+  mutate(ifr_type = factor(ifr_type, levels = c("ifr_by_age_plus00y", 
+                                                "ifr_by_age_plus02y", 
+                                                "ifr_by_age_plus04y", 
+                                                "ifr_by_age_plus06y", 
+                                                "ifr_by_age_plus08y", 
+                                                "ifr_by_age_plus10y"))) -> ages_to_plot
+#Setting colors
+ifr_cols <- c("ifr_by_age_plus00y" = "#ffccbc", 
+              "ifr_by_age_plus02y" = "#ff8a65", 
+              "ifr_by_age_plus04y" = "#ff7043", 
+              "ifr_by_age_plus06y" = "#ff5722", 
+              "ifr_by_age_plus08y" = "#e64a19", 
+              "ifr_by_age_plus10y" = "#bf360c")
+ifr_labs <- c("Baseline", 
+              "Shifted (2y younger)", 
+              "Shifted (4y younger)", 
+              "Shifted (6y younger)", 
+              "Shifted (8y younger)", 
+              "Shifted (10y younger)")
+names(ifr_labs) <- names(ifr_cols)
+#Plotting
+ggplot(data = ages_to_plot, aes(x = age, y = ifr_est, group = ifr_type)) +
+  geom_line(aes(color = ifr_type)) + 
+  scale_color_manual(values = ifr_cols, labels = ifr_labs,
+                     name = "Predictor of IFR") +
+  theme_minimal_hgrid(color = "white") +
+  labs(x = "Age", y = "IFR") +
+  theme(legend.position = "right",
+        text = element_text(size = 12))
+```
+
+***
+***
+
+##### Section 4: Infection over age pattern scenarios
+
+***
+
+4.1 | **Baseline/conservative infection scenario:** Infections are randomly distributed among age groups
+
+  - (ie the infected population reflects the age structure of the population as a whole)
+
+```{r 4.01, echo = FALSE, eval = TRUE}
+#Creating a data frame showing constant probability of infection among age groups
+inf.even <- data.frame(age = 0:95, pr_susc = rep(1, 96))
+```
+
+***
+
+##### Section 5: Writing a function to return an expected number of deaths (i.e., a population specific IFR)
+
+***
+
+Function inputs
+1. A given number of infected individuals --> flip to a given number of deaths
+2. A specified age structure (ie the porportion of the population in each age group)
+
+***
+
+- Note: The probability of death for one infection (`n_infs = 1`) can be multiplied by the number of infections to give the total number of deaths expected: 
+  - `total_deaths = P(death|n_infs = 1) * n_infs`
+  - `n_infs = total_deaths / P(death|n_infs = 1)`
+
+```{r 5.01, echo = FALSE, eval = TRUE}
+f.popn_specific_ifr <- function(demo.age.str){
+  
+  inf.age.str <- inf.even
+
+  #prop.s is the proportion of the susceptible population contributed by each age
+  df.pop <- full_join(demo.age.str, inf.age.str, by = "age") %>%
+    mutate(pop.s = pop * pr_susc) %>%
+    mutate(prop.s = pop.s/sum(pop.s)) %>%
+    #pop.inf is the number of infected individuals contributed by each age:
+    #   = number of infections (n_infs) * proportion of the susceptible population contributed by each age (prop.s)
+    #   Here, looking at prob of death given 1 infection so number of infections = 1
+    mutate(pop.inf = prop.s * 1)
+  #Calculating the number of deaths expected per age for the specified IFR scenario
+  df.expected_deaths <- df.pop %>%
+    mutate(ifr_by_age = predict_ifr(predictor = age, gam = ifr_fit_age)) %>%
+    pivot_longer(starts_with("ifr"), names_to = "ifr_type", values_to = "ifr_est") %>%
+    mutate(deaths = ifr_est * pop.inf)
+  #Summing the number of total number of deaths
+  expected_deaths <- sum(df.expected_deaths$deaths)
+  
+  return(expected_deaths)
+}
+
+f.country.demo.age.str <- function(country_code){
+  demo.age.str <- un_ages %>% filter(COUNTRY_CODE == country_code) %>% select(age, pop) %>% mutate(prop = pop/(sum(pop))) %>%
+    #Binning all ages over 95 such that 95 is the last age (corresponds to ages 95+)
+    mutate(prop = if_else(age == 95, sum(prop[ages >= 95]), prop)) %>% filter(age <= 95)
+  return(demo.age.str)
+}
+
+
+df.exps <- df.plot %>% group_by(COUNTRY_CODE) %>%
+  mutate(exp_death_per1inf = f.country.demo.age.str(as.character(COUNTRY_CODE)) %>% f.popn_specific_ifr) %>% 
+  ungroup() %>% 
+  mutate(exp_inf = 1/exp_death_per1inf * deaths) %>%
+  mutate(exp_perc_inf.100R = exp_inf*(1)  / popn*100,
+         exp_perc_inf.50R  = exp_inf*(2)  / popn*100,
+         exp_perc_inf.25R  = exp_inf*(4)  / popn*100,
+         exp_perc_inf.10R  = exp_inf*(10) / popn*100) %>%
+  mutate(rank_for_plotting = rank(exp_inf/popn, ties.method = "first")) %>%
+  melt(id = c("COUNTRY_NAME", "COUNTRY_CODE", 
+              "cases", "deaths", "tests", 
+              "popn", 
+              "cases_p100k", "deaths_p100k", "tests_p100k", 
+              "positivity", "cfr",
+              "rank_for_plotting",
+              "exp_death_per1inf", "exp_inf"))
+
+#Setting colors
+exp_inf_cols <- c("exp_perc_inf.100R" = "#880e4f", 
+                  "exp_perc_inf.50R"  = "#ad1457", 
+                  "exp_perc_inf.25R"  = "#ec407a", 
+                  "exp_perc_inf.10R"  = "#f48fb1")
+exp_inf_labs <- c("100%", 
+                  "50%", 
+                  "25%", 
+                  "10%")
+names(exp_inf_labs) <- names(exp_inf_cols)
+
+df.exps %>% filter(exp_inf > 0) %>%
+  ggplot(aes(x = reorder(COUNTRY_NAME, rank_for_plotting), group = COUNTRY_CODE)) +
+  geom_line(aes(y = value), color = "#e0e0e0") +
+  geom_point(aes(y = value, color = variable)) +
+  ylab("Expected cumulative % of the population infected to date \n given death reporting") +
+  scale_y_log10(labels = scales::number_format(accuracy = 0.01), breaks = c(0.01, 0.10, 1.00, 5.00, 10.00, 50.00, 100.00)) +
+  scale_color_manual(values = exp_inf_cols, labels = exp_inf_labs,
+                     name = "Death reporting rate") +
+  theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+        axis.title.x = element_blank())
+```
+
+
 
 
 
