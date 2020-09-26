@@ -1,7 +1,7 @@
 ---
-title: "SARS-CoV-2 and LMICs: Risk Tiering in Africa v1.8"
+title: "SARS-CoV-2 and LMICs: Risk Tiering in Africa"
 author: "Benny Rice"
-date: "6/30/2020"
+date: "9/26/2020"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -24,6 +24,7 @@ div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
 - April-June 2020
 - Code associated with project aimed at predicting COVID-19 burden in LMICs, in particular sub-Saharan Africa
 - Apologies in advance for amateurish code (ie all the loops and clunkiness)
+- Updated during revision 2020 09 26 to include climate models incorporating a % reduction in transmission due to control efforts
 
 </div>
 
@@ -31,9 +32,8 @@ div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
 
 ##### (i) SET UP
 
-Defining main working directory, loading necessary packages
+Loading packages
 ```{r i1, echo = FALSE, eval = TRUE, message = FALSE}
-mainDir <- '/Users/blrice/Dropbox/Lab Projects/1 Post Doc/9 THE RONA/LMICs and Risk Tiering in Africa/Code/'
 library(tidyverse)
 library(RJSONIO)      #Retrieving coordinates of cities from text strings by searching OpenStreetMap
 library(kableExtra)   #For printing tables in R markdown
@@ -53,30 +53,26 @@ Reading in data sets:
 
 1. SSA indicator data: `SSA_2020_06_14_WHO_WBK_UNDP_indicators.csv`
 2. Connectivity data: `ttimes_SSA.csv`
-3. Metapopulation model output data: `dataBenMetapop.csv`
+3. Metapopulation model output data: `data_Metapop.csv`
 4. Flight data: `Princeton_Uni_AFRICA_JobId1590035.csv`
 5. Hopkins global case count data: `hopkins_time_series_covid19_confirmed_global.csv`
-6. Climate model output data: `TSAfrica.csv`
+6. Climate model output data: (for 0%, 10%, and 20% control effects):`TSAfrica0_20200921.csv`, `TSAfrica10_20200921.csv`, `TSAfrica20_20200921.csv`
 
 ```{r i2, echo = FALSE, eval = TRUE}
 #1
-filename.df.SSA <- "SSA_2020_06_14_WHO_WBK_UNDP_indicators.csv"
-df.SSA <- read.csv(file.path(mainDir, filename.df.SSA), stringsAsFactors = FALSE)
+df.SSA <- read_csv(here("data/Data/SSA_2020_06_14_WHO_WBK_UNDP_indicators.csv"))
 #2
-filename.df.conn <- "ttimes_SSA.csv"
-df.conn <- read.csv(file.path(mainDir, filename.df.conn), stringsAsFactors = FALSE)
+df.conn <- read_csv(here("data/Data/ttimes_SSA.csv"))
 #3
-filename.df.metapop <- "dataBenMetapop.csv"
-df.metapop <- read.csv(file.path(mainDir, filename.df.metapop), stringsAsFactors = FALSE)
-#4
-filename.air <- "Princeton_Uni_AFRICA_JobId1590035.csv"
-df.air <- read.csv(file.path(mainDir, filename.air), stringsAsFactors = FALSE)
+df.metapop <- read_csv(here("data/Data/data_Metapop.csv"))
+#4 #NOTE File is stored offline due to size constraints
+df.air <- read_csv(here("data/Data/Princeton_Uni_AFRICA_JobId1590035.csv"))
 #5
-filename.hop <- "hopkins_time_series_covid19_confirmed_global.csv"
-df.hop <- read.csv(file.path(mainDir, filename.hop), stringsAsFactors = FALSE)
+df.hop <- read_csv(here("data/Data/hopkins_time_series_covid19_confirmed_global.csv"))
 #6
-filename.df.clim <- "TSAfrica.csv"
-df.clim <- read.csv(file.path(mainDir, filename.df.clim), stringsAsFactors = FALSE)
+df.clim.0  <- read_csv(here("data/Data/TSAfrica0_20200921.csv"))
+df.clim.10 <- read_csv(here("data/Data/TSAfrica10_20200921.csv"))
+df.clim.20 <- read_csv(here("data/Data/TSAfrica20_20200921.csv"))
 ```
 
 Pasting country codes and names:
@@ -665,42 +661,50 @@ df.plot %>% function.heat.strip
 ***
 
 ```{r 4F.01, echo = FALSE, eval = TRUE}
-filename.df.clim <- "TSAfrica.csv"
-df.clim <- read.csv(file.path(mainDir, filename.df.clim), stringsAsFactors = FALSE)
+df.clim.0  <- read_csv(here("data/Data/TSAfrica0_20200921.csv"))
+df.clim.10 <- read_csv(here("data/Data/TSAfrica10_20200921.csv"))
+df.clim.20 <- read_csv(here("data/Data/TSAfrica20_20200921.csv"))
 
-df.clim <- melt(df.clim, id.vars = c("Country", "City", "Lat", "Lon", "NearestLandBased")) %>% 
+
+df.clim.0  <- df.clim.0  %>% select(-X1) %>% select(-(V6:V76)) %>% select(-(V441:V465)) %>% 
+  drop_na %>% 
+  melt(id.vars = c("Country", "City", "Lat", "Lon", "NearestLandBased")) %>% 
+  filter(value > 0) %>%
   group_by(City) %>% 
-  mutate(time = 1:length(City), week = 1:length(City)/7, week.r = round(1:length(City)/7)) %>% ungroup()
+  mutate(time = 1:length(City), week = 1:length(City)/7, week.r = round(1:length(City)/7)) %>% ungroup() %>%
+  mutate(color_group = case_when(City == "Windhoek" ~ 1, City == "Antananarivo" ~ 2, City == "Lome" ~ 3, TRUE ~  0))
+df.clim.10  <- df.clim.10  %>% select(-X1) %>% select(-(V6:V76)) %>% select(-(V441:V465)) %>% 
+  drop_na %>% 
+  melt(id.vars = c("Country", "City", "Lat", "Lon", "NearestLandBased")) %>% 
+  filter(value > 0) %>%
+  group_by(City) %>% 
+  mutate(time = 1:length(City), week = 1:length(City)/7, week.r = round(1:length(City)/7)) %>% ungroup() %>%
+  mutate(color_group = case_when(City == "Windhoek" ~ 1, City == "Antananarivo" ~ 2, City == "Lome" ~ 3, TRUE ~  0))
 
-df.clim <- df.clim[df.clim$variable %in% c(paste0("V", rep(65:429))), ]
+df.max_min.clim.0 <- df.clim.0 %>% group_by(City) %>% 
+  summarize(peak_week = week.r[value == max(value)], max_I_N = max(value)) %>% ungroup()
+df.max_min.clim.10 <- df.clim.10 %>% group_by(City) %>% 
+  summarize(peak_week = week.r[value == max(value)], max_I_N = max(value)) %>% ungroup()
 
-df.max_min.clim <- df.clim %>% group_by(City) %>% 
-  summarize(peak_day = time[value == max(value)], 
-            max_I_N = max(value), 
-            peak_week = time[value == max(value)]/7) %>% ungroup()
+df.clim.0$color_group <- factor(df.clim.0$color_group, levels = unique(df.clim.0$color_group))
+df.clim.10$color_group <- factor(df.clim.10$color_group, levels = unique(df.clim.10$color_group))
 
-#Max: Windhoek
-#Min: Bissau
-#Mid: Antananarivo
 
-df.clim <- df.clim %>% mutate(color_group = case_when(
-  City == "Windhoek" ~ 1,
-  City == "Antananarivo" ~ 2,
-  City == "Lome" ~ 3,
-  TRUE ~  0
-))
 
-df.clim$color_group <- factor(df.clim$color_group, levels = unique(df.clim$color_group))
 
-ggplot(df.clim, aes(x = week, y = value, color = color_group, group = City, alpha = color_group)) +
+
+ggplot(df.clim.10, aes(x = week, y = value, color = color_group, group = City, alpha = color_group)) +
   scale_color_manual(values = c("gray", "#ad1457", "#ad1457", "#ad1457")) + 
   geom_line(size = 0.7) +
   scale_alpha_manual(values = c(0.2, 0.7, 0.7, 0.7)) +
   scale_x_continuous(breaks = seq(from = 5, to = 60, by = 5)) +
-  xlab("Time (Weeks after March 1, 2020)") +
+  xlab("Time (Weeks since case count exceeded 10)") +
   ylab("Proportion of Population Infected") +
   theme(panel.background = element_blank(),
         legend.position  = "none")
+
+
+
 ```
 
 
