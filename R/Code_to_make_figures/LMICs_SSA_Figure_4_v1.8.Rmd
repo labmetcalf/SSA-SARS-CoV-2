@@ -782,6 +782,9 @@ df.max_min.rmax5 <- df.clim.rmax5 %>% group_by(City) %>%
 df.clim.rmax5$color_group  <- factor(df.clim.rmax5$color_group, levels = unique(df.clim.rmax5$color_group))
 
 
+
+
+
 p1A <- df.clim.0 %>% filter(week.r < 61) %>%
   ggplot(aes(x = week, y = value, color = color_group, group = City, alpha = color_group)) +
   scale_color_manual(values = c("gray", "gray", "gray", "gray")) + 
@@ -797,7 +800,50 @@ p1A <- df.clim.0 %>% filter(week.r < 61) %>%
   theme(panel.background = element_blank(),
         legend.position  = "none")
 
+p1B <- df.clim.0 %>% filter(City == "Windhoek") %>% filter(week.r < 61) %>%
+  ggplot(aes(x = week, y = value, color = color_group, group = City, alpha = color_group)) +
+  scale_color_manual(values = c("#5677fc", "gray", "gray", "gray")) + 
+  geom_line(size = 0.7) +
+  scale_alpha_manual(values = c(0.5, 0.5, 0.5, 0.5)) +
+  scale_x_continuous(breaks = seq(from = 0, to = 60, by = 10)) +
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.01), 
+                breaks = c(0.00, 0.05, 0.10),
+                limits = c(0.00, 0.14)) +
+  xlab("Time (weeks since start of outbreak)") +
+  ylab("I/N") +
+  ggtitle("Windhoek") +
+  theme(panel.background = element_blank(),
+        legend.position  = "none")
 
+p1C <- df.clim.0 %>% filter(City == "Antananarivo") %>% filter(week.r < 61) %>%
+  ggplot(aes(x = week, y = value, color = color_group, group = City, alpha = color_group)) +
+  scale_color_manual(values = c("#cddc39", "gray", "gray", "gray")) + 
+  geom_line(size = 0.7) +
+  scale_alpha_manual(values = c(0.5, 0.5, 0.5, 0.5)) +
+  scale_x_continuous(breaks = seq(from = 0, to = 60, by = 10)) +
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.01), 
+                breaks = c(0.00, 0.05, 0.10),
+                limits = c(0.00, 0.14)) +
+  xlab("Time (weeks since start of outbreak)") +
+  ylab("I/N") +
+  ggtitle("Antananarivo") +
+  theme(panel.background = element_blank(),
+        legend.position  = "none")
+
+p1D <- df.clim.0 %>% filter(City == "Lome") %>% filter(week.r < 61) %>%
+  ggplot(aes(x = week, y = value, color = color_group, group = City, alpha = color_group)) +
+  scale_color_manual(values = c("#ff9100", "gray", "gray", "gray")) + 
+  geom_line(size = 0.7) +
+  scale_alpha_manual(values = c(0.5, 0.5, 0.5, 0.5)) +
+  scale_x_continuous(breaks = seq(from = 0, to = 60, by = 10)) +
+  scale_y_continuous(labels = scales::number_format(accuracy = 0.01), 
+                breaks = c(0.00, 0.05, 0.10),
+                limits = c(0.00, 0.14)) +
+  xlab("Time (weeks since start of outbreak)") +
+  ylab("I/N") +
+  ggtitle("Lome") +
+  theme(panel.background = element_blank(),
+        legend.position  = "none")
 
 
 
@@ -929,6 +975,7 @@ p3D <- df.clim.rmax5 %>% filter(City == "Lome") %>% filter(week.r < 61) %>%
 
 
 
+grid.arrange(p1A, p1B, p1C, p1D, nrow = 1)
 grid.arrange(p2A, p2B, p2C, p2D, nrow = 1)
 grid.arrange(p3A, p3B, p3C, p3D, nrow = 1)
 
