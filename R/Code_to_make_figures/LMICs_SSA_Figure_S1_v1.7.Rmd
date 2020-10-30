@@ -46,6 +46,7 @@ library(patchwork)    #Combining ggplots neatly
 library(mgcv)         #Gams
 library(here)         #Finding files easily
 library(scales)       #Axis scales in plots
+library(gridExtra)    #Arrange multiple plots onto one page
 ```
 
 ***
@@ -485,7 +486,7 @@ Function inputs
   - `n_infs = total_deaths / P(death|n_infs = 1)`
 
 ```{r 5.01, echo = FALSE, eval = TRUE}
-f.popn_specific_ifr.drr <- function(demo.age.str, ifr_shift = 0){
+f.popn_specific_ifr <- function(demo.age.str, ifr_shift = 0){
   
   inf.age.str <- inf.even
 
@@ -515,11 +516,15 @@ f.country.demo.age.str <- function(country_code){
   return(demo.age.str)
 }
 
+df.sero <- data.frame(COUNTRY_NAME = c("Kenya", "Nigeria", "Malawi"), sero_perc = c(5.2, 25.41, 12.3))
 
-df.exps.drr <- df.plot %>% group_by(COUNTRY_CODE) %>%
+df.exps.drr <- df.plot %>% select(-c(cases_20200628, deaths_20200628, tests_20200628)) %>%
+  rename(cases = cases_20200923, deaths = deaths_20200923, tests = tests_20200923) %>%
+  group_by(COUNTRY_CODE) %>%
   mutate(exp_death_per1inf = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift = 0)) %>% 
   ungroup() %>% 
   mutate(exp_inf = 1/exp_death_per1inf * deaths) %>%
+  left_join(df.sero, by = "COUNTRY_NAME") %>%
   mutate(exp_perc_inf.100R = exp_inf*(1)  / popn*100,
          exp_perc_inf.50R  = exp_inf*(2)  / popn*100,
          exp_perc_inf.25R  = exp_inf*(4)  / popn*100,
@@ -528,10 +533,9 @@ df.exps.drr <- df.plot %>% group_by(COUNTRY_CODE) %>%
   melt(id = c("COUNTRY_NAME", "COUNTRY_CODE", 
               "cases", "deaths", "tests", 
               "popn", 
-              "cases_p100k", "deaths_p100k", "tests_p100k", 
-              "positivity", "cfr",
               "rank_for_plotting",
-              "exp_death_per1inf", "exp_inf"))
+              "exp_death_per1inf", "exp_inf",
+              "sero_perc"))
 
 #Setting colors and labels
 exp_inf_cols.drr <- c("exp_perc_inf.100R" = "#880e4f", 
@@ -544,10 +548,12 @@ exp_inf_labs.drr <- c("100%",
                       "10%")
 names(exp_inf_labs.drr) <- names(exp_inf_cols.drr)
 
-df.exps.drr %>% filter(exp_inf > 0) %>%
+
+p1A <- df.exps.drr %>% filter(exp_inf > 0) %>%
   ggplot(aes(x = reorder(COUNTRY_NAME, rank_for_plotting), group = COUNTRY_CODE)) +
   geom_line(aes(y = value), color = "#e0e0e0") +
   geom_point(aes(y = value, color = variable)) +
+  geom_point(aes(y = sero_perc), shape = 2) +
   ylab("Expected cumulative % of the population infected to date \n given death reporting") +
   scale_y_log10(labels = scales::number_format(accuracy = 0.01), 
                 breaks = c(0.01, 0.10, 1.00, 5.00, 10.00, 50.00, 100.00),
@@ -562,7 +568,9 @@ df.exps.drr %>% filter(exp_inf > 0) %>%
 
 
 
-df.exps.ifr <- df.plot %>% group_by(COUNTRY_CODE) %>%
+df.exps.ifr <- df.plot %>% select(-c(cases_20200628, deaths_20200628, tests_20200628)) %>%
+  rename(cases = cases_20200923, deaths = deaths_20200923, tests = tests_20200923) %>%
+  group_by(COUNTRY_CODE) %>%
   mutate(exp_death_per1inf.s10 = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift = -10),
          exp_death_per1inf.s5  = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift = -5 ),
          exp_death_per1inf.s2  = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift = -2 ),
@@ -578,16 +586,16 @@ df.exps.ifr <- df.plot %>% group_by(COUNTRY_CODE) %>%
          exp_perc_inf.p2  = 1/exp_death_per1inf.p2  * deaths / popn*100,
          exp_perc_inf.p5  = 1/exp_death_per1inf.p5  * deaths / popn*100,
          exp_perc_inf.p10 = 1/exp_death_per1inf.p10 * deaths / popn*100) %>%
+  left_join(df.sero, by = "COUNTRY_NAME") %>%
   mutate(rank_for_plotting = rank(exp_perc_inf.0, ties.method = "first")) %>%
   melt(id = c("COUNTRY_NAME", "COUNTRY_CODE", 
               "cases", "deaths", "tests", 
               "popn", 
-              "cases_p100k", "deaths_p100k", "tests_p100k", 
-              "positivity", "cfr",
               "rank_for_plotting",
               "exp_death_per1inf.s10", "exp_death_per1inf.s5", "exp_death_per1inf.s2",
               "exp_death_per1inf.0",
-              "exp_death_per1inf.p2", "exp_death_per1inf.p5", "exp_death_per1inf.p10"))
+              "exp_death_per1inf.p2", "exp_death_per1inf.p5", "exp_death_per1inf.p10",
+              "sero_perc"))
 
 
 #Setting colors and labels
@@ -612,10 +620,11 @@ exp_inf_labs.ifr <- c("-10 years",
 names(exp_inf_labs.ifr) <- names(exp_inf_cols.ifr)
 
 
-df.exps.ifr %>% filter(deaths > 0) %>%
+p1B <- df.exps.ifr %>% filter(deaths > 0) %>%
   ggplot(aes(x = reorder(COUNTRY_NAME, rank_for_plotting), group = COUNTRY_CODE)) +
   geom_line(aes(y = value), color = "#e0e0e0") +
   geom_point(aes(y = value, color = variable)) +
+  geom_point(aes(y = sero_perc), shape = 2) +
   ylab("Expected cumulative % of the population infected to date \n given IFR by age curve") +
   scale_y_log10(labels = scales::number_format(accuracy = 0.01), 
                 breaks = c(0.01, 0.10, 1.00, 5.00, 10.00, 50.00, 100.00),
@@ -626,6 +635,9 @@ df.exps.ifr %>% filter(deaths > 0) %>%
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 9),
         #legend.position = "none",
         axis.title.x = element_blank())
+
+grid.arrange(p1A, p1B, nrow = 1)
+
 
 ```
 
