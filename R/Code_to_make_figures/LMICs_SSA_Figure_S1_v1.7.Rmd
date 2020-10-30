@@ -562,7 +562,7 @@ p1A <- df.exps.drr %>% filter(exp_inf > 0) %>%
                      name = "Death reporting rate") +
   theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 9),
-        #legend.position = "none",
+        legend.position = "none",
         axis.title.x = element_blank())
 
 
@@ -633,7 +633,7 @@ p1B <- df.exps.ifr %>% filter(deaths > 0) %>%
                      name = "IFR by age shift") +
   theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 9),
-        #legend.position = "none",
+        legend.position = "none",
         axis.title.x = element_blank())
 
 grid.arrange(p1A, p1B, nrow = 1)
