@@ -24,7 +24,7 @@ div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
 - April-June 2020
 - Code associated with project aimed at predicting COVID-19 burden in LMICs, in particular sub-Saharan Africa
 - Apologies in advance for amateurish code (ie all the loops and clunkiness)
-- Updated September 24, 2020 during revisions
+- Updated September 24, 2020 during revisions; Updated December 20, 2020 during revisions to update case, death, testing data
 
 </div>
 
@@ -66,13 +66,13 @@ div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
 
 Reading in data sets:
 
-1. SSA testing data: `manual_africa_cdc_data_20200924.csv`
+1. SSA testing data: `manual_africa_cdc_data_20201215.csv`
 2. UN age data: `un_ages.csv`
 3. Infection fatality ratios from the literature (e.g., Verity et al): `ifrs_from_lit.csv`
 
 ```{r i2, echo = FALSE, eval = TRUE}
 #1
-df.testing <- read_csv(here("data/Data/manual_africa_cdc_data_20200924.csv"))
+df.testing <- read_csv(here("data/Data/manual_africa_cdc_data_20201215.csv"))
 #2
 un_ages <- read_csv(here("data/Data/un_ages.csv"))
 #3
@@ -189,6 +189,18 @@ df.plot$COUNTRY_NAME[df.plot$COUNTRY_NAME == "Central African Republic"]        
 
 ```{r 1.02, echo = FALSE, eval = TRUE}
 #Trimming out columns from Africa CDC data entry
+## DECEMBER DATA ##
+df.plot.dec <- df.plot %>% 
+  select("COUNTRY_NAME", "COUNTRY_CODE", "cases_20201220", "deaths_20201220", "tests_20201220", "popn")
+names(df.plot.dec) <- c("COUNTRY_NAME", "COUNTRY_CODE", "cases", "deaths", "tests", "popn")
+#Calculating cases and tests per 100,000 popn, positivity, cfr
+df.plot.dec <- df.plot.dec %>% mutate(
+  cases_p100k  = cases/popn*100000,
+  deaths_p100k = deaths/popn*100000,
+  tests_p100k  = tests/popn*100000,
+  positivity   = cases/tests*100,
+  cfr          = deaths/cases*100)
+
 ## SEPTEMBER DATA ##
 df.plot.sept <- df.plot %>% 
   select("COUNTRY_NAME", "COUNTRY_CODE", "cases_20200923", "deaths_20200923", "tests_20200923", "popn")
@@ -236,7 +248,7 @@ function.ps1a <- function(data){
                  color = "#7B7B7B") +
     theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
     scale_y_log10(labels = comma) +
-    ylab("Reported number of tests completed\n(per 100,000 population)") +
+    ylab("(A) Reported number of tests completed\n(per 100,000 population)") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 7),
           axis.text.y = element_text(size = 7),
           axis.title.x = element_blank(),
@@ -252,6 +264,7 @@ function.ps1a <- function(data){
 ```{r 2.02, echo = FALSE, eval = TRUE, warning = FALSE, fig.height = 5, fig.width = 10, fig.align = "center"}
 df.plot.june %>% function.ps1a
 df.plot.sept %>% function.ps1a
+df.plot.dec  %>% function.ps1a
 ```
 
 ***
@@ -279,7 +292,7 @@ function.ps1b <- function(data){
     scale_y_log10(labels = comma) + 
     scale_x_log10(labels = comma) +
     xlab("Reported number of tests completed") +
-    ylab("Reported number of infections") +
+    ylab("(B) Reported number of infections") +
     theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
     theme(axis.text.x = element_text(size = 7),
         axis.text.y = element_text(size = 7),
@@ -296,6 +309,7 @@ function.ps1b <- function(data){
 ```{r 2.04, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10, fig.align = "center"}
 df.plot.june %>% function.ps1b
 df.plot.sept %>% function.ps1b
+df.plot.dec  %>% function.ps1b
 ```
 
 ***
@@ -304,14 +318,18 @@ df.plot.sept %>% function.ps1b
 
 ```{r 2.05, echo = TRUE, eval = TRUE}
 #Correlation
-cor(df.plot$tests, df.plot$cases, method="pearson")
+cor(df.plot.june$tests, df.plot.june$cases, method="pearson")
+cor(df.plot.sept$tests, df.plot.sept$cases, method="pearson")
+cor(df.plot.dec$tests,  df.plot.dec$cases,  method="pearson")
 #Correlation p value
-cor.test(df.plot$tests, df.plot$cases, method="pearson")
+cor.test(df.plot.dec$tests, df.plot.dec$cases, method="pearson")
 #Linear regression
 m1.june <- lm(formula = cases ~ tests, data = df.plot.june)
 summary(m1.june)
 m1.sept <- lm(formula = cases ~ tests, data = df.plot.sept)
 summary(m1.sept)
+m1.dec  <- lm(formula = cases ~ tests, data = df.plot.dec)
+summary(m1.dec)
 ```
 
 
@@ -347,11 +365,11 @@ function.ps1c <- function(data){
     geom_abline(aes(intercept = log10(0.100), slope = 1, color = "#b71c1c"), linetype = 1, size = 0.4, alpha = 0.5) +
     scale_color_identity(labels=cfr.labels, guide="legend") +
     xlab("Reported number of infections") +
-    ylab("Reported number of deaths") +
+    ylab("(C) Reported number of deaths") +
     scale_x_log10(labels = comma) +
     scale_y_log10(labels = comma) +
     theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
-    theme(legend.position = "right",
+    theme(legend.position = "right", legend.title = element_blank(),
           axis.text.x = element_text(size = 7),
           axis.text.y = element_text(size = 7),
           axis.title.x = element_text(size = 10),
@@ -368,6 +386,7 @@ function.ps1c <- function(data){
 ```{r 2.07, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 10, fig.align = "center"}
 df.plot.june %>% function.ps1c
 df.plot.sept %>% function.ps1c
+df.plot.dec  %>% function.ps1c
 ```
 
 ***
