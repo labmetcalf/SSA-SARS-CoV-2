@@ -1114,7 +1114,7 @@ p4_4 <- df.clim.rmin1_4 %>% filter(week.r < 61) %>%
   theme(panel.background = element_blank(),
         legend.position  = "none")
 
-grid.arrange(p4_1, p4_2, p4_3, p4_4, nrow = 4)
+grid.arrange(p4_1, p4_2, p4_3, p4_4, nrow = 1)
 
 
 ```
