@@ -538,7 +538,8 @@ f.country.demo.age.str <- function(country_code){
 df.sero <- data.frame(COUNTRY_NAME = c("Kenya", "Nigeria", "Malawi"), sero_perc = c(5.2, 25.41, 12.3))
 
 df.exps.drr <- df.plot %>% select(-c(cases_20200628, deaths_20200628, tests_20200628)) %>%
-  rename(cases = cases_20200923, deaths = deaths_20200923, tests = tests_20200923) %>%
+  select(-c(cases_20200923, deaths_20200923, tests_20200923)) %>%
+  rename(cases = cases_20201220, deaths = deaths_20201220, tests = tests_20201220) %>%
   group_by(COUNTRY_CODE) %>%
   mutate(exp_death_per1inf = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift = 0)) %>% 
   ungroup() %>% 
@@ -576,7 +577,7 @@ p1A <- df.exps.drr %>% filter(exp_inf > 0) %>%
   ylab("Expected cumulative % of the population infected to date \n given death reporting") +
   scale_y_log10(labels = scales::number_format(accuracy = 0.01), 
                 breaks = c(0.01, 0.10, 1.00, 5.00, 10.00, 50.00, 100.00),
-                limits = c(0.001, 100)) +
+                limits = c(0.001, 150)) +
   scale_color_manual(values = exp_inf_cols.drr, labels = exp_inf_labs.drr,
                      name = "Death reporting rate") +
   theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
@@ -585,10 +586,9 @@ p1A <- df.exps.drr %>% filter(exp_inf > 0) %>%
         axis.title.x = element_blank())
 
 
-
-
 df.exps.ifr <- df.plot %>% select(-c(cases_20200628, deaths_20200628, tests_20200628)) %>%
-  rename(cases = cases_20200923, deaths = deaths_20200923, tests = tests_20200923) %>%
+  select(-c(cases_20200923, deaths_20200923, tests_20200923)) %>%
+  rename(cases = cases_20201220, deaths = deaths_20201220, tests = tests_20201220) %>%
   group_by(COUNTRY_CODE) %>%
   mutate(exp_death_per1inf.s10 = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift = -10),
          exp_death_per1inf.s5  = f.popn_specific_ifr(f.country.demo.age.str(as.character(COUNTRY_CODE)), ifr_shift = -5 ),
@@ -647,7 +647,7 @@ p1B <- df.exps.ifr %>% filter(deaths > 0) %>%
   ylab("Expected cumulative % of the population infected to date \n given IFR by age curve") +
   scale_y_log10(labels = scales::number_format(accuracy = 0.01), 
                 breaks = c(0.01, 0.10, 1.00, 5.00, 10.00, 50.00, 100.00),
-                limits = c(0.001, 100)) +
+                limits = c(0.001, 150)) +
   scale_color_manual(values = exp_inf_cols.ifr, labels = exp_inf_labs.ifr,
                      name = "IFR by age shift") +
   theme_minimal_hgrid(line_size = 0.3, color = "#E4E4E4") +
